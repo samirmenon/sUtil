@@ -38,7 +38,6 @@ sUtil. If not, see <http://www.gnu.org/licenses/>.
 
 namespace sutil
 {
-
   /** This template class contains a multi level linked list.
    *
    * It is an extension of a PileMap, which itself is a
