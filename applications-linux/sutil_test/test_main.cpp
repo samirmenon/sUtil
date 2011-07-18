@@ -32,7 +32,7 @@ sUtil. If not, see <http://www.gnu.org/licenses/>.
 #include "test-singleton.hpp"
 
 #include <sutil/CSingleton.hpp>
-//#include <sutil/CSystemClock.hpp>
+#include <sutil/CSystemClock.hpp>
 
 #include <iostream>
 #include <stdlib.h>
@@ -45,6 +45,7 @@ using namespace sutil;
  * features. */
 int main(int argc, char** argv)
 {
+  bool flag;
   if(argc != 2)
   {
     int tid = 0;
@@ -59,22 +60,25 @@ int main(int argc, char** argv)
     unsigned int tid, id = 1;
     tid = static_cast<unsigned int>(atoi(argv[1]));
     cout<<"\nRunning sutil tests for case: "<<tid;
-//    sutil::CSystemClock::create_clock(); //NOTE: Clock MUST be created and destroyed in main
-//    cout<<"\nStarting tests. Time:"<<sutil::CSystemClock::get_clock()->get_sys_time();
+
+    flag = sutil::CSystemClock::start(); //NOTE: Clock MUST be created and destroyed in main
+    if(false == flag)
+    { throw(std::runtime_error("Could not start system clock"));  }
+
+    cout<<"\nStarting tests. Time:"<<sutil::CSystemClock::getSysTime();
 
     if((tid==0)||(tid==id))
     {//Test clock
-      std::cout<<"\n\nTest #"<<id/*<<". System Clock [Sys time, Sim time :"
-          <<sutil::CSystemClock::get_clock()->get_sys_time()
+      std::cout<<"\n\nTest #"<<id<<". System Clock [Sys time, Sim time :"
+          <<sutil::CSystemClock::getSysTime()
           <<" "
-          <<sutil::CSystemClock::get_clock()->get_sim_time()
-          <<"]"*/;
+          <<sutil::CSystemClock::getSimTime()
+          <<"]";
       sutil_test::test_singleton(id);
     }
     ++id;
 
-//    cout<<"\n\nEnding tests. Time:"<<sutil::CSystemClock::get_clock()->get_sys_time()<<"\n";
-//    sutil::CSystemClock::destroy_clock();//NOTE: Clock MUST be created and destroyed
+    cout<<"\n\nEnding tests. Time:"<<sutil::CSystemClock::getSysTime()<<"\n";
   }
   return 0;
 }
