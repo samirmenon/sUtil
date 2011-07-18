@@ -1,4 +1,6 @@
-/* This file is free software; you can redistribute it and/or
+/* This file is part of sUtil, a random collection of utilities.
+
+sUtil is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
 License as published by the Free Software Foundation; either
 version 3 of the License, or (at your option) any later version.
@@ -8,20 +10,20 @@ modify it under the terms of the GNU General Public License as
 published by the Free Software Foundation; either version 2 of
 the License, or (at your option) any later version.
 
-This file is distributed in the hope that it will be useful,
+sUtil is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public
 License and a copy of the GNU General Public License along with
-this file. If not, see <http://www.gnu.org/licenses/>.
+sUtil. If not, see <http://www.gnu.org/licenses/>.
  */
 /* \file CSystemClock.hpp
  *
- *  Created on: 2008
+ *  Created on: Jul 17, 2011
  *
- *  Copyright (C) 2008, Samir Menon <smenon@stanford.edu>
+ *  Copyright (C) 2011, Samir Menon <smenon@stanford.edu>
  */
 
 #ifndef CSYSTEMCLOCK_HPP_
@@ -74,7 +76,7 @@ namespace sutil
    * to zero.
    *
    * NOTE : This class does not do any error checks while returning
-   * the time.
+   * the time. Make sure that start() returns true.
    */
   class CSystemClock : private CSingleton<SSystemClock>
   {
