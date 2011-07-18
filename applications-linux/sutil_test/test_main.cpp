@@ -29,6 +29,7 @@ sUtil. If not, see <http://www.gnu.org/licenses/>.
 #include "test-singleton.hpp"
 #include "test-pilemap.hpp"
 #include "test-branching-struct.hpp"
+#include "test-memcopier.hpp"
 
 #include <sutil/CSingleton.hpp>
 #include <sutil/CSystemClock.hpp>
@@ -52,6 +53,9 @@ int main(int argc, char** argv)
     cout<<"\n"<<tid++<<" : Run all tests";
     cout<<"\n"<<tid++<<" : Run singleton tests";
     cout<<"\n"<<tid++<<" : Run pilemap tests";
+    cout<<"\n"<<tid++<<" : Run multi-level pilemap tests";
+    cout<<"\n"<<tid++<<" : Run branching structure tests";
+    cout<<"\n"<<tid++<<" : Run memcopier tests";
     cout<<"\n";
   }
   else
@@ -107,6 +111,17 @@ int main(int argc, char** argv)
       <<sutil::CSystemClock::getSimTime()
       <<"]";
       sutil_test::test_branching_struct(id);
+    }
+    ++id;
+
+    if((tid==0)||(tid==id))
+    {//Test memcopier
+      std::cout<<"\n\nTest #"<<id<<". System Clock [Sys time, Sim time :"
+          <<sutil::CSystemClock::getSysTime()
+      <<" "
+      <<sutil::CSystemClock::getSimTime()
+      <<"]";
+      sutil_test::test_memcopier(id);
     }
     ++id;
 
