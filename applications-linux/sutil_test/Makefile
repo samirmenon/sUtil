@@ -6,9 +6,6 @@ CXX = g++
 
 ############################# INCLUDE OPTIONS ############################
 SU_INC_DIR = ../../src/
-SU_LIB_DIR_DBG = -L../sutil_lib/debug/ -Wl,--rpath=../sutil_lib/debug/
-SU_LIB_DIR_REL = -L../sutil_lib/release/ -Wl,--rpath=../sutil_lib/release/
-SU_LIB = -lsutil
 SU_DEFS_DBG = -DASSERT=assert -DDEBUG=1 -DSU_TESTING=1
 SU_DEFS_REL = -DRELEASE=1
 
@@ -21,10 +18,8 @@ INCLUDEDIRS = -I$(SU_INC_DIR) -I$(EIGEN_INC_DIR)
 
 ############################# Compile options ############################
 DBGFLAGS = -Wall -g -ggdb -pg -O0 $(INCLUDEDIRS) \
-           -fPIC $(SU_LIB_DIR_DBG) $(SU_LIB) \
            $(SU_DEFS_DBG)
 RELFLAGS = -Wall -O3 $(INCLUDEDIRS) \
-           -fPIC $(SU_LIB_DIR_REL) $(SU_LIB) \
            $(SU_DEFS_REL) 
 
 ############################ SOURCE FILES ############################

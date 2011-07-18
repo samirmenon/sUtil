@@ -154,9 +154,9 @@ namespace sutil_test
 
       //Test the memcpy speed (slow things down for debug mode)
 #ifdef DEBUG
-      long long max_iters = 1000000;
+      long long max_iters = 100000;
 #else
-      long long max_iters = 10000000;
+      long long max_iters = 1000000;
 #endif
       t1 = sutil::CSystemClock::getSysTime();
       for(long long i=0;i<max_iters;i++)
