@@ -31,8 +31,6 @@ sUtil. If not, see <http://www.gnu.org/licenses/>.
 
 #include <sutil/CPileMap.hpp>
 
-#include <vector>
-#include <string>
 #ifdef DEBUG
 #include <iostream>
 #endif
