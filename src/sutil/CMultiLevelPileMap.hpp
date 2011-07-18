@@ -139,7 +139,7 @@ namespace sutil
   T* CMultiLevelPileMap<Idx,T>::create(
       const Idx& arg_idx, const T & arg_node2add,
       const std::size_t arg_priority)
-  {
+      {
     //Add the node.
     T* tLnk = CPileMap<Idx,T>::create(arg_idx,arg_node2add);
 
@@ -155,12 +155,12 @@ namespace sutil
       map_nodeptr2pri_.insert(std::pair<T*,std::size_t>(tLnk,arg_priority));
     }
     return tLnk;
-  }
+      }
 
   template <typename Idx, typename T>
   T* CMultiLevelPileMap<Idx,T>::create(
       const Idx& arg_idx, const std::size_t arg_priority)
-  {
+      {
     //Add the node.
     T* tLnk = CPileMap<Idx,T>::create(arg_idx);
 
@@ -177,7 +177,7 @@ namespace sutil
     }
 
     return tLnk;
-  }
+      }
 
   template <typename Idx, typename T>
   bool CMultiLevelPileMap<Idx,T>::
@@ -199,7 +199,7 @@ namespace sutil
       while(arg_br->iterator_!=NULL)
       {
         T* tmp = CPileMap<Idx,T>::create(*(arg_br->iterator_->id_),
-        *(arg_br->iterator_->data_));
+            *(arg_br->iterator_->data_));
         if(NULL == tmp)
         {
 #ifdef DEBUG
@@ -352,14 +352,14 @@ namespace sutil
     return true;
   }
   template <typename Idx, typename T>
-    bool CMultiLevelPileMap<Idx,T>::clear()
-    {
-      CPileMap<Idx,T>::clear();
-      mlvec_.clear();
-      map_nodeptr2pri_.clear();
-      pri_levels_=0;
-      return true;
-    }
+  bool CMultiLevelPileMap<Idx,T>::clear()
+  {
+    CPileMap<Idx,T>::clear();
+    mlvec_.clear();
+    map_nodeptr2pri_.clear();
+    pri_levels_=0;
+    return true;
+  }
 
   template <typename Idx, typename T>
   std::vector<T*>* CMultiLevelPileMap<Idx,T>::
