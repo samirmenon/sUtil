@@ -188,7 +188,7 @@ namespace sutil
     /**Set the current pilemap to the new pilemap**/
     if(0 == arg_br->size())
     {
-      CPileMap<Idx,T>::head_ = NULL;
+      CPileMap<Idx,T>::front_ = NULL;
       CPileMap<Idx,T>::map_.clear();
       CPileMap<Idx,T>::size_ = 0;
       mlvec_.clear(); map_nodeptr2pri_.clear();
@@ -242,7 +242,7 @@ namespace sutil
   bool CMultiLevelPileMap<Idx,T>::erase(T* arg_t)
   {
     bool flag;
-    if((NULL==CPileMap<Idx,T>::head_) || (NULL==arg_t))
+    if((NULL==CPileMap<Idx,T>::front_) || (NULL==arg_t))
     { return false;  }
     else
     {
@@ -297,7 +297,7 @@ namespace sutil
   bool CMultiLevelPileMap<Idx,T>::erase(const Idx& arg_idx)
   {
     bool flag;
-    if(NULL==CPileMap<Idx,T>::head_)
+    if(NULL==CPileMap<Idx,T>::front_)
     { return false;  }
     else
     {

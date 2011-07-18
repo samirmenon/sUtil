@@ -74,10 +74,8 @@ protected:
     }
   };
 
-  /**
-   * Pointers to the head of the list
-   */
-  SPMNode<Idx,T> *head_;
+  /** Pointers to the head of the list */
+  SPMNode<Idx,T> *front_;
   std::map<Idx, SPMNode<Idx,T>*> map_;
 
   std::size_t size_;
@@ -92,11 +90,11 @@ public:
 
   /** Reset iterator to head */
   virtual void resetIterator()
-  { iterator_ = static_cast<const SPMNode<Idx,T> *>(head_); }
+  { iterator_ = static_cast<const SPMNode<Idx,T> *>(front_); }
 
   /** Constructor : Resets the pilemap. */
   CPileMap()
-  { head_ = NULL; map_.clear(); size_ = 0; }
+  { front_ = NULL; map_.clear(); size_ = 0; }
 
   /** Copy-Constructor : Does a deep copy of the pilemap to
    * get a new one.
@@ -164,7 +162,7 @@ bool CPileMap<Idx,T>::deepCopy(CPileMap<Idx,T>* arg_pmap)
 
   /**Set the current pilemap to the new pilemap**/
   if(0 == arg_pmap->size())
-  { head_ = NULL; map_.clear(); size_ = 0; }
+  { front_ = NULL; map_.clear(); size_ = 0; }
   else
   {
     arg_pmap->resetIterator();
@@ -192,9 +190,9 @@ template <typename Idx, typename T>
 CPileMap<Idx,T>::~CPileMap()
 {
   SPMNode<Idx,T> *t, *t2;
-  t = head_;
+  t = front_;
   if(NULL!=t)
-  { t2 = head_->next_;  }
+  { t2 = front_->next_;  }
   while(NULL!=t)
   {
     if(NULL!=t->data_)
@@ -208,7 +206,7 @@ CPileMap<Idx,T>::~CPileMap()
     { t2 = t->next_;  }
   }
 
-  head_ = NULL;
+  front_ = NULL;
   map_.clear();
   size_ = 0;
 }
@@ -232,14 +230,14 @@ T* CPileMap<Idx,T>::create(const Idx & arg_idx)
 
   tmp->data_ = new T();
   tmp->id_ = new Idx(arg_idx);
-  tmp->next_ = head_;
-  head_ = tmp;
+  tmp->next_ = front_;
+  front_ = tmp;
   tmp = NULL;
   size_++;
 
-  map_.insert( std::pair<Idx, SPMNode<Idx,T> *>(arg_idx, head_) );
+  map_.insert( std::pair<Idx, SPMNode<Idx,T> *>(arg_idx, front_) );
 
-  return head_->data_;
+  return front_->data_;
 }
 
 template <typename Idx, typename T>
@@ -261,26 +259,26 @@ T* CPileMap<Idx,T>::create(const Idx & arg_idx, const T& arg_t)
 
   tmp->data_ = new T(arg_t);
   tmp->id_ = new Idx(arg_idx);
-  tmp->next_ = head_;
-  head_ = tmp;
+  tmp->next_ = front_;
+  front_ = tmp;
   tmp = NULL;
   size_++;
 
-  map_.insert( std::pair<Idx, SPMNode<Idx,T> *>(arg_idx, head_) );
+  map_.insert( std::pair<Idx, SPMNode<Idx,T> *>(arg_idx, front_) );
 
-  return head_->data_;
+  return front_->data_;
 }
 
 template <typename Idx, typename T>
 T* CPileMap<Idx,T>::at(const std::size_t & arg_idx)
 {
-  if(NULL==head_)
+  if(NULL==front_)
   { return NULL;  }
   else
   {
     if(arg_idx > size_)
     { return NULL; }
-    SPMNode<Idx,T> * t = head_;
+    SPMNode<Idx,T> * t = front_;
 
     for(std::size_t i=0; i<arg_idx; ++i)
     {
@@ -302,7 +300,7 @@ T* CPileMap<Idx,T>::at(const std::size_t & arg_idx)
 template <typename Idx, typename T>
 T* CPileMap<Idx,T>::at(const Idx & arg_idx)
 {
-  if(NULL==head_)
+  if(NULL==front_)
   { return NULL;  }
   else
   {
@@ -342,16 +340,16 @@ const T* CPileMap<Idx,T>::at_const(const Idx & arg_idx)
 template <typename Idx, typename T>
 bool CPileMap<Idx,T>::erase(T* arg_t)
 {
-  if((NULL==head_) || (NULL==arg_t))
+  if((NULL==front_) || (NULL==arg_t))
   { return false;  }
 
   SPMNode<Idx,T> * t, *tpre;
 
   //Head is a special case
-  if(head_->data_ == arg_t)
+  if(front_->data_ == arg_t)
   {
-    t = head_;
-    head_ = head_->next_;
+    t = front_;
+    front_ = front_->next_;
 
     if(NULL!= t->data_)
     {
@@ -371,8 +369,8 @@ bool CPileMap<Idx,T>::erase(T* arg_t)
   else
   {
     //The head doesn't match.
-    tpre = head_;
-    t = head_->next_;
+    tpre = front_;
+    t = front_->next_;
 
     //Find the node
     while(NULL!=t)
@@ -407,7 +405,7 @@ bool CPileMap<Idx,T>::erase(T* arg_t)
 template <typename Idx, typename T>
 bool CPileMap<Idx,T>::erase(const Idx& arg_idx)
 {
-  if(NULL==head_)
+  if(NULL==front_)
   { return false;  }
 
   //Make sure the node exists
@@ -423,10 +421,10 @@ bool CPileMap<Idx,T>::erase(const Idx& arg_idx)
   SPMNode<Idx,T> * node = map_[arg_idx];
 
   //Head is a special case
-  if(head_->data_ == node->data_)
+  if(front_->data_ == node->data_)
   {
-    t = head_;
-    head_ = head_->next_;
+    t = front_;
+    front_ = front_->next_;
 
     if(NULL!= t->data_)
     {
@@ -444,8 +442,8 @@ bool CPileMap<Idx,T>::erase(const Idx& arg_idx)
   else
   {
     //The head doesn't match.
-    tpre = head_;
-    t = head_->next_;
+    tpre = front_;
+    t = front_->next_;
 
     //Find the node
     while(NULL!=t)
@@ -477,7 +475,7 @@ template <typename Idx, typename T>
 bool CPileMap<Idx,T>::clear()
 {
   SPMNode<Idx,T> *tpre;
-  tpre = head_;
+  tpre = front_;
 
   if(tpre == NULL)
   {
@@ -485,7 +483,7 @@ bool CPileMap<Idx,T>::clear()
     return true;
   } //Nothing in the list.
 
-  head_ = head_->next_;
+  front_ = front_->next_;
 
   while(NULL!=tpre)
   {
@@ -495,10 +493,10 @@ bool CPileMap<Idx,T>::clear()
     { delete tpre->id_; }
     delete tpre;
 
-    tpre = head_;
+    tpre = front_;
     if(NULL==tpre)//Reached the end.
     { break; }
-    head_ = head_->next_;
+    front_ = front_->next_;
   }
 
   size_=0;
