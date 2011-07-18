@@ -100,7 +100,7 @@ namespace sutil
 
     /** Constructor : Resets the pilemap. */
     CPileMap()
-    { front_ = NULL; map_.clear(); size_ = 0; }
+    { front_ = NULL; back_ = NULL; map_.clear(); size_ = 0; }
 
     /** Copy-Constructor : Does a deep copy of the pilemap to
      * get a new one.
@@ -168,7 +168,7 @@ namespace sutil
 
     /**Set the current pilemap to the new pilemap**/
     if(0 == arg_pmap->size())
-    { front_ = NULL; map_.clear(); size_ = 0; }
+    { front_ = NULL; back_ = NULL; map_.clear(); size_ = 0; }
     else
     {
       arg_pmap->resetIterator();
@@ -213,6 +213,7 @@ namespace sutil
     }
 
     front_ = NULL;
+    back_ = NULL;
     map_.clear();
     size_ = 0;
   }
@@ -240,6 +241,9 @@ namespace sutil
     front_ = tmp;
     tmp = NULL;
     size_++;
+
+    if(1 == size_)
+    { back_ = front_; }
 
     map_.insert( std::pair<Idx, SPMNode<Idx,T> *>(arg_idx, front_) );
 
@@ -269,6 +273,9 @@ namespace sutil
     front_ = tmp;
     tmp = NULL;
     size_++;
+
+    if(1 == size_)
+    { back_ = front_; }
 
     map_.insert( std::pair<Idx, SPMNode<Idx,T> *>(arg_idx, front_) );
 
@@ -367,6 +374,10 @@ namespace sutil
         }
         delete t;
         size_--;
+
+        if(0 == size_)
+        { back_ = NULL; }
+
         return true; // Deleted head.
       }
 
@@ -394,6 +405,10 @@ namespace sutil
             }
             delete t;
             size_--;
+
+            if(0 == size_)
+            { back_ = NULL; }
+
             return true; // Deleted node.
           }
           else
@@ -439,6 +454,10 @@ namespace sutil
         { delete t->id_;  }
         size_--;
         map_.erase(arg_idx);
+
+        if(0 == size_)
+        { back_ = NULL; }
+
         delete t;
         return true; // Deleted head.
       }
@@ -464,6 +483,10 @@ namespace sutil
             { delete t->id_;  }
             size_--;
             map_.erase(arg_idx);
+
+            if(0 == size_)
+            { back_ = NULL; }
+
             delete t;
             return true; // Deleted node.
           }
@@ -506,6 +529,7 @@ namespace sutil
     }
 
     size_=0;
+    back_ = NULL;
     map_.clear(); // Clear the map.
     return true;
   }
