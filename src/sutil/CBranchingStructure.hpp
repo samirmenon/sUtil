@@ -168,7 +168,7 @@ namespace sutil
   TNode* CBranchingStructure<TIdx,TNode>::create(
       const TIdx& arg_idx, const TNode & arg_node2add,
       const bool arg_is_root_)
-  {
+      {
     if((arg_is_root_)&&(NULL!=root_node_))
     {
 #ifdef DEBUG
@@ -185,7 +185,7 @@ namespace sutil
     { root_node_ = tLnk;  }
 
     return tLnk;
-  }
+      }
 
   /**
    * Adds a node to the root or child node vectors depending on the
@@ -196,7 +196,7 @@ namespace sutil
   template <typename TIdx, typename TNode>
   TNode* CBranchingStructure<TIdx,TNode>::create(
       const TIdx& arg_idx, const bool arg_is_root_)
-  {
+      {
     if((arg_is_root_)&&(NULL!=root_node_))
     {
 #ifdef DEBUG
@@ -212,7 +212,7 @@ namespace sutil
     { root_node_ = tLnk;  }
 
     return tLnk;
-  }
+      }
 
 
   /**
@@ -269,7 +269,7 @@ namespace sutil
 
 #ifdef DEBUG
         std::cout<<"\n\tAdding child "<<tmp_node->name_
-        <<" to (parent) "<<tmp_node->parent_addr_->name_;
+            <<" to (parent) "<<tmp_node->parent_addr_->name_;
         std::cout<<std::flush;
 #endif
       }
