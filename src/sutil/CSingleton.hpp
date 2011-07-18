@@ -27,7 +27,10 @@ this file. If not, see <http://www.gnu.org/licenses/>.
 #ifndef CSINGLETON_HPP_
 #define CSINGLETON_HPP_
 
+#ifdef DEBUG
+//For printing debug messages
 #include <iostream>
+#endif
 
 namespace sutil
 {
@@ -50,7 +53,7 @@ namespace sutil
     /** Creates a singleton if necessary and returns it.
      *
      * Returns a pointer instead of a reference to support
-     * a NULL return when there is an error
+     * a 0 return when there is an error
      */
     static SDataStruct* getData();
 
@@ -74,18 +77,20 @@ namespace sutil
 
   /** This initializes the pointer to null */
   template<typename SDataStruct>
-  CSingleton<SDataStruct>* CSingleton<SDataStruct>::singleton_ = NULL;
+  CSingleton<SDataStruct>* CSingleton<SDataStruct>::singleton_ = 0;
 
   template<typename SDataStruct>
   SDataStruct* CSingleton<SDataStruct>::getData()
   {
-    if (NULL == singleton_)  // is it the first call?
+    if (0 == singleton_)  // is it the first call?
     {
       singleton_ = new CSingleton<SDataStruct>(); // create sole instance
-      if(NULL == singleton_)
+      if(0 == singleton_)
       {
+#ifdef DEBUG
         std::cout<<"\nCDatabase::createDb() Error: Could not dynamically allocate the database";
-        return NULL;
+#endif
+        return 0;
       }
     }
     return &(singleton_->data_);
@@ -94,8 +99,13 @@ namespace sutil
   template<typename SDataStruct>
   CSingleton<SDataStruct>::~CSingleton()
   {
-    if(NULL != singleton_)
-    { delete singleton_;  }
+    if(0 != singleton_)
+    {
+      delete singleton_;
+#ifdef DEBUG
+      std::cout<<"\nCDatabase::~CDatabase() : Destroying singleton";
+#endif
+    }
   }
 }
 
