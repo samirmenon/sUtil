@@ -29,12 +29,15 @@ sUtil. If not, see <http://www.gnu.org/licenses/>.
 #ifndef CPILEMAP_HPP_
 #define CPILEMAP_HPP_
 
-
-#include <cassert>
 #include <map>
-#include <stdexcept>
 
-#include <stdio.h>
+#ifdef DEBUG
+#include <iostream>
+#endif
+
+#ifdef ASSERT
+#include <cassert>
+#endif
 
 namespace sutil
 {
@@ -52,9 +55,7 @@ template <typename Idx, typename T>
 class CPileMap
 {
 protected:
-  /**
-   * A node in the linked list
-   */
+  /** A node in the linked list */
   template <typename IdxS, typename TS>
   class SPMNode
   {
@@ -79,7 +80,7 @@ protected:
   SPMNode<Idx,T> *head_;
   std::map<Idx, SPMNode<Idx,T>*> map_;
 
-  unsigned int size_;
+  std::size_t size_;
 
 public:
   /** Const pointer access to the list.
@@ -120,7 +121,7 @@ public:
    * debugging)
    *
    * NOTE : The index starts at 0   */
-  virtual T* at(const unsigned int & arg_idx);
+  virtual T* at(const std::size_t & arg_idx);
 
   /** Returns the element referenced by the index
    *
@@ -132,7 +133,7 @@ public:
    * debugging)
    *
    * NOTE : The index starts at 0   */
-  virtual const T* at_const(const unsigned int & arg_idx);
+  virtual const T* at_const(const std::size_t & arg_idx);
 
   /** Returns a const pointer to the element referenced by the index
    *
@@ -150,7 +151,7 @@ public:
   virtual bool erase(const Idx& arg_idx);
 
   /** Returns the size of the pile */
-  virtual inline unsigned int size(){ return size_; }
+  virtual inline std::size_t size(){ return size_; }
 
   /** Clears all elements from the list */
   virtual bool clear();
@@ -173,8 +174,10 @@ bool CPileMap<Idx,T>::deepCopy(CPileMap<Idx,T>* arg_pmap)
       *(arg_pmap->iterator_->data_));
       if(NULL == tmp)
       {
-        printf("\nCPileMap<Idx,T>::CPileMap(const CPileMap<Idx,T>& arg_pmap) : ");
-        printf("ERROR : Copy constructor failed. Resetting pilemap.");
+#ifdef DEBUG
+        std::cout<<"\nCPileMap<Idx,T>::CPileMap(const CPileMap<Idx,T>& arg_pmap) : ";
+        std::cout<<"ERROR : Copy constructor failed. Resetting pilemap.";
+#endif
         this->~CPileMap();//Reset the pilemap.
         return false;
       }
@@ -222,7 +225,7 @@ T* CPileMap<Idx,T>::create(const Idx & arg_idx)
   if(map_.find(arg_idx) != map_.end())
   {
 #ifdef DEBUG
-    printf("\nCPileMap<Idx,T>::create() ERROR : Idx exists. Tried to add duplicate entry");
+    std::cout<<"\nCPileMap<Idx,T>::create() ERROR : Idx exists. Tried to add duplicate entry";
 #endif
     return NULL;
   }
@@ -251,7 +254,7 @@ T* CPileMap<Idx,T>::create(const Idx & arg_idx, const T& arg_t)
   if(map_.find(arg_idx) != map_.end())
   {
 #ifdef DEBUG
-    printf("\nCPileMap<Idx,T>::create() ERROR : Idx exists. Tried to add duplicate entry");
+    std::cout<<"\nCPileMap<Idx,T>::create() ERROR : Idx exists. Tried to add duplicate entry";
 #endif
     return NULL;
   }
@@ -269,7 +272,7 @@ T* CPileMap<Idx,T>::create(const Idx & arg_idx, const T& arg_t)
 }
 
 template <typename Idx, typename T>
-T* CPileMap<Idx,T>::at(const unsigned int & arg_idx)
+T* CPileMap<Idx,T>::at(const std::size_t & arg_idx)
 {
   if(NULL==head_)
   { return NULL;  }
@@ -279,9 +282,11 @@ T* CPileMap<Idx,T>::at(const unsigned int & arg_idx)
     { return NULL; }
     SPMNode<Idx,T> * t = head_;
 
-    for(unsigned int i=0; i<arg_idx; ++i)
+    for(std::size_t i=0; i<arg_idx; ++i)
     {
+#ifdef ASSERT
       assert(i<=size_);
+#endif
 
       if(NULL==t)
       { return NULL;  }
@@ -326,7 +331,7 @@ T* CPileMap<Idx,T>::at(const Idx & arg_idx)
 
 
 template <typename Idx, typename T>
-const T* CPileMap<Idx,T>::at_const(const unsigned int & arg_idx)
+const T* CPileMap<Idx,T>::at_const(const std::size_t & arg_idx)
 { return (const T*) at(arg_idx);  }
 
 template <typename Idx, typename T>
@@ -409,7 +414,7 @@ bool CPileMap<Idx,T>::erase(const Idx& arg_idx)
   if(map_.find(arg_idx) == map_.end())
   {
 #ifdef DEBUG
-    printf("\nCPileMap<Idx,T>::erase() WARNING : Tried to erase a nonexistent entry");
+    std::cout<<"\nCPileMap<Idx,T>::erase() WARNING : Tried to erase a nonexistent entry";
 #endif
     return false;
   }

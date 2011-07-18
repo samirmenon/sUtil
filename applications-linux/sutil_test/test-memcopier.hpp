@@ -152,13 +152,13 @@ namespace sutil_test
       else
       { std::cout<<"\nTest Result ("<<test_id++<<") Memcpy worked correctly again";  }
 
-      //Test the memcpy speed
-      t1 = sutil::CSystemClock::getSysTime();
+      //Test the memcpy speed (slow things down for debug mode)
 #ifdef DEBUG
       long long max_iters = 1000000;
 #else
       long long max_iters = 10000000;
 #endif
+      t1 = sutil::CSystemClock::getSysTime();
       for(long long i=0;i<max_iters;i++)
       { mcd.copy(); }
       t2 = sutil::CSystemClock::getSysTime();
