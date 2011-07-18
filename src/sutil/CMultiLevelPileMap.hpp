@@ -31,10 +31,11 @@ sUtil. If not, see <http://www.gnu.org/licenses/>.
 
 #include <sutil/CPileMap.hpp>
 
-#include <iostream>
 #include <vector>
-#include <list>
-#include <stdexcept>
+
+#ifdef DEBUG
+#include <iostream>
+#endif
 
 namespace sutil
 {
@@ -57,11 +58,11 @@ namespace sutil
     /** Adds a node to the pilemap and inserts its vector into
      * the appropriate slot in the vector-list */
     virtual T* create(const Idx& arg_idx, const T &arg_node2add,
-        const unsigned int arg_priority);
+        const std::size_t arg_priority);
 
     /** Adds a node to the pilemap and inserts its vector into
      * the appropriate slot in the vector-list. Uses the copy-constructor. */
-    virtual T* create(const Idx& arg_idx, const unsigned int arg_priority);
+    virtual T* create(const Idx& arg_idx, const std::size_t arg_priority);
 
     /** Copy-Constructor : Does a deep copy of the branching structure to
      *  get a new one.
@@ -80,9 +81,9 @@ namespace sutil
     virtual bool clear();
 
     /** Returns the tasks at a level */
-    std::vector<T*>* getSinglePriorityLevel(unsigned int arg_pri);
+    std::vector<T*>* getSinglePriorityLevel(std::size_t arg_pri);
 
-    unsigned int getNumPriorityLevels() const
+    std::size_t getNumPriorityLevels() const
     { return pri_levels_; }
 
     /** Returns the priority level of the element
@@ -107,10 +108,10 @@ namespace sutil
      * well. This allows chaining to find out the pri level even from
      * the index (pri == map_nodeptr2pri_[map_[idx]]) &&
      * (pri == map_nodeptr2pri_[nodeptr]) */
-    std::map<T*, unsigned int> map_nodeptr2pri_;
+    std::map<T*, std::size_t> map_nodeptr2pri_;
 
     /** The priority levels this multi-level map has */
-    unsigned int pri_levels_;
+    std::size_t pri_levels_;
   }; //End of template class
 
   /***************************************************************
@@ -137,42 +138,42 @@ namespace sutil
   template <typename Idx, typename T>
   T* CMultiLevelPileMap<Idx,T>::create(
       const Idx& arg_idx, const T & arg_node2add,
-      const unsigned int arg_priority)
+      const std::size_t arg_priority)
   {
     //Add the node.
     T* tLnk = CPileMap<Idx,T>::create(arg_idx,arg_node2add);
 
     if(NULL!=tLnk)
     {
-      for(unsigned int i=mlvec_.size(); i <= arg_priority; i++)
+      for(std::size_t i=mlvec_.size(); i <= arg_priority; i++)
       {
         std::vector<T*> tmp;
         mlvec_.push_back(tmp);
         pri_levels_++;//Every push back increases pri levels.
       }
       mlvec_[arg_priority].push_back(tLnk);
-      map_nodeptr2pri_.insert(std::pair<T*,unsigned int>(tLnk,arg_priority));
+      map_nodeptr2pri_.insert(std::pair<T*,std::size_t>(tLnk,arg_priority));
     }
     return tLnk;
   }
 
   template <typename Idx, typename T>
   T* CMultiLevelPileMap<Idx,T>::create(
-      const Idx& arg_idx, const unsigned int arg_priority)
+      const Idx& arg_idx, const std::size_t arg_priority)
   {
     //Add the node.
     T* tLnk = CPileMap<Idx,T>::create(arg_idx);
 
     if(NULL!=tLnk)
     {
-      for(unsigned int i=mlvec_.size(); i <= arg_priority; i++)
+      for(std::size_t i=mlvec_.size(); i <= arg_priority; i++)
       {
         std::vector<T*> tmp;
         mlvec_.push_back(tmp);
         pri_levels_++;//Every push back increases pri levels.
       }
       mlvec_[arg_priority].push_back(tLnk);
-      map_nodeptr2pri_.insert(std::pair<T*,unsigned int>(tLnk,arg_priority));
+      map_nodeptr2pri_.insert(std::pair<T*,std::size_t>(tLnk,arg_priority));
     }
 
     return tLnk;
@@ -182,8 +183,6 @@ namespace sutil
   bool CMultiLevelPileMap<Idx,T>::
   deepCopy(CMultiLevelPileMap<Idx,T>* arg_br)
   {//Deep copy.
-    try
-    {
     this->~CMultiLevelPileMap(); //Delete everything in the pilemap
 
     /**Set the current pilemap to the new pilemap**/
@@ -202,18 +201,28 @@ namespace sutil
         T* tmp = CPileMap<Idx,T>::create(*(arg_br->iterator_->id_),
         *(arg_br->iterator_->data_));
         if(NULL == tmp)
-        { throw(std::runtime_error("Deep copy failed. Resetting multi-level pilemap.")); }
+        {
+#ifdef DEBUG
+          std::cout<<"\nCMultiLevelPileMap<Idx,T>::deepCopy() Error :Deep copy failed. Resetting multi-level pilemap.";
+#endif
+          clear(); return false;
+        }
 
         //Now recreate the priority map
         if(arg_br->map_nodeptr2pri_.find(tmp) ==
             arg_br->map_nodeptr2pri_.end())
-        { throw(std::runtime_error("Did not find a node in the priority map.")); }
+        {
+#ifdef DEBUG
+          std::cout<<"\nCMultiLevelPileMap<Idx,T>::deepCopy() Error :Did not find a node in the priority map.";
+#endif
+          clear(); return false;
+        }
 
-        unsigned int pri = arg_br->map_nodeptr2pri_[tmp];
-        map_nodeptr2pri_.insert(std::pair<T*,unsigned int>(tmp,pri));
+        std::size_t pri = arg_br->map_nodeptr2pri_[tmp];
+        map_nodeptr2pri_.insert(std::pair<T*,std::size_t>(tmp,pri));
 
         //Now add the entry to the vector
-        for(unsigned int i=mlvec_.size(); i <= pri; i++)
+        for(std::size_t i=mlvec_.size(); i <= pri; i++)
         {
           std::vector<T*> tmp;
           mlvec_.push_back(tmp);
@@ -225,13 +234,6 @@ namespace sutil
         arg_br->iterator_ = arg_br->iterator_->next_;
       }
       arg_br->resetIterator();
-    }
-    }
-    catch(std::exception &e)
-    {
-      std::cerr<<"\nCMultiLevelPileMap<Idx,T>::deepCopy() Error :"<<e.what();
-      clear();//Reset the pilemap.
-      return false;
     }
     return true;
   }
@@ -248,7 +250,7 @@ namespace sutil
           map_nodeptr2pri_.end())
       { return false; }
 
-      unsigned int pri = map_nodeptr2pri_[arg_t];
+      std::size_t pri = map_nodeptr2pri_[arg_t];
 
       //Remove it from the priority level vectors
       typename std::vector<T*>::iterator it,ite;
@@ -307,7 +309,7 @@ namespace sutil
           map_nodeptr2pri_.end())
       { return false; }
 
-      unsigned int pri = map_nodeptr2pri_[t_ptr];
+      std::size_t pri = map_nodeptr2pri_[t_ptr];
 
       //Remove it from the priority level vectors
       typename std::vector<T*>::iterator it,ite;
@@ -361,7 +363,7 @@ namespace sutil
 
   template <typename Idx, typename T>
   std::vector<T*>* CMultiLevelPileMap<Idx,T>::
-  getSinglePriorityLevel(unsigned int arg_pri)
+  getSinglePriorityLevel(std::size_t arg_pri)
   {
     if(arg_pri > mlvec_.size())
     { return NULL;  }
