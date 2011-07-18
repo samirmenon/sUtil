@@ -1,5 +1,4 @@
-/* This file is part of sUtil, a control and simulation library
-for neural networks.
+/* This file is part of sUtil, a random collection of utilities.
 
 sUtil is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
@@ -24,12 +23,11 @@ sUtil. If not, see <http://www.gnu.org/licenses/>.
  *
  *  Created on: Jul 7, 2011
  *
- *  Copyright (C) 2011
- *
- *  Author: Samir Menon <smenon@stanford.edu>
+ *  Copyright (C) 2011, Samir Menon <smenon@stanford.edu>
  */
 
 #include "test-singleton.hpp"
+#include "test-pilemap.hpp"
 
 #include <sutil/CSingleton.hpp>
 #include <sutil/CSystemClock.hpp>
@@ -51,8 +49,8 @@ int main(int argc, char** argv)
     int tid = 0;
     cout<<"\nThe command line input is: ./<executable> <test_number>";
     cout<<"\n"<<tid++<<" : Run all tests";
-    cout<<"\n"<<tid++<<" : Run parser tests";
-    cout<<"\n"<<tid++<<" : Run database tests";
+    cout<<"\n"<<tid++<<" : Run singleton tests";
+    cout<<"\n"<<tid++<<" : Run pilemap tests";
     cout<<"\n";
   }
   else
@@ -75,6 +73,28 @@ int main(int argc, char** argv)
           <<sutil::CSystemClock::getSimTime()
           <<"]";
       sutil_test::test_singleton(id);
+    }
+    ++id;
+
+    if((tid==0)||(tid==id))
+    {//Test clock
+      std::cout<<"\n\nTest #"<<id<<". System Clock [Sys time, Sim time :"
+          <<sutil::CSystemClock::getSysTime()
+      <<" "
+      <<sutil::CSystemClock::getSimTime()
+      <<"]";
+      sutil_test::test_pilemap(id);
+    }
+    ++id;
+
+    if((tid==0)||(tid==id))
+    {//Test clock
+      std::cout<<"\n\nTest #"<<id<<". System Clock [Sys time, Sim time :"
+          <<sutil::CSystemClock::getSysTime()
+      <<" "
+      <<sutil::CSystemClock::getSimTime()
+      <<"]";
+      sutil_test::test_multi_pilemap(id);
     }
     ++id;
 
