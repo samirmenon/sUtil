@@ -28,6 +28,7 @@ sUtil. If not, see <http://www.gnu.org/licenses/>.
 
 #include "test-singleton.hpp"
 #include "test-pilemap.hpp"
+#include "test-branching-struct.hpp"
 
 #include <sutil/CSingleton.hpp>
 #include <sutil/CSystemClock.hpp>
@@ -66,7 +67,7 @@ int main(int argc, char** argv)
     cout<<"\nStarting tests. Time:"<<sutil::CSystemClock::getSysTime();
 
     if((tid==0)||(tid==id))
-    {//Test clock
+    {//Test singleton
       std::cout<<"\n\nTest #"<<id<<". System Clock [Sys time, Sim time :"
           <<sutil::CSystemClock::getSysTime()
           <<" "
@@ -77,7 +78,7 @@ int main(int argc, char** argv)
     ++id;
 
     if((tid==0)||(tid==id))
-    {//Test clock
+    {//Test pilemap
       std::cout<<"\n\nTest #"<<id<<". System Clock [Sys time, Sim time :"
           <<sutil::CSystemClock::getSysTime()
       <<" "
@@ -88,13 +89,24 @@ int main(int argc, char** argv)
     ++id;
 
     if((tid==0)||(tid==id))
-    {//Test clock
+    {//Test multi-level pilemap
       std::cout<<"\n\nTest #"<<id<<". System Clock [Sys time, Sim time :"
           <<sutil::CSystemClock::getSysTime()
       <<" "
       <<sutil::CSystemClock::getSimTime()
       <<"]";
       sutil_test::test_multi_pilemap(id);
+    }
+    ++id;
+
+    if((tid==0)||(tid==id))
+    {//Test branching structure
+      std::cout<<"\n\nTest #"<<id<<". System Clock [Sys time, Sim time :"
+          <<sutil::CSystemClock::getSysTime()
+      <<" "
+      <<sutil::CSystemClock::getSimTime()
+      <<"]";
+      sutil_test::test_branching_struct(id);
     }
     ++id;
 
