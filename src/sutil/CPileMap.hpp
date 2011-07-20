@@ -103,10 +103,8 @@ namespace sutil
     { front_ = NULL; back_ = NULL; map_.clear(); size_ = 0; }
 
     /** Copy-Constructor : Does a deep copy of the pilemap to
-     * get a new one.
-     *
-     * NOTE : This uses the passed pilemap's iterator construct. */
-    virtual bool deepCopy(CPileMap<Idx,T>* arg_pmap);
+     * get a new one. This is VERY SLOW. */
+    virtual bool deepCopy(const CPileMap<Idx,T>* const arg_pmap);
 
     /** Destructor : Deallocates all the nodes if someone already hasn't
      * done so. */
@@ -125,7 +123,7 @@ namespace sutil
      * debugging)
      *
      * NOTE : The index starts at 0   */
-    virtual T* at(const std::size_t & arg_idx);
+    virtual T* at(const std::size_t arg_idx);
 
     /** Returns the element referenced by the index
      *
@@ -137,7 +135,7 @@ namespace sutil
      * debugging)
      *
      * NOTE : The index starts at 0   */
-    virtual const T* at_const(const std::size_t & arg_idx);
+    virtual const T* at_const(const std::size_t arg_idx);
 
     /** Returns a const pointer to the element referenced by the index
      *
@@ -159,23 +157,39 @@ namespace sutil
 
     /** Clears all elements from the list */
     virtual bool clear();
+
+    /** Typical operator access */
+    virtual T* operator[](const std::size_t arg_idx)
+    { return at(arg_idx); }
+
+    /** Copy-Constructor : Does a deep copy of the pilemap to
+     * get a new one. This is VERY SLOW. */
+    virtual CPileMap<Idx,T>& operator = (const CPileMap<Idx,T>& arg_rhs)
+    {
+      deepCopy(&arg_rhs);
+      return *this;
+    }
+
+  private:
+    /** Copy Constructor : Private. */
+    CPileMap(const CPileMap<Idx,T>& arg_pm);
   };
 
   template <typename Idx, typename T>
-  bool CPileMap<Idx,T>::deepCopy(CPileMap<Idx,T>* arg_pmap)
+  bool CPileMap<Idx,T>::deepCopy(const CPileMap<Idx,T>* const arg_pmap)
   {//Deep copy.
     this->~CPileMap(); //Delete everything in the pilemap
 
     /**Set the current pilemap to the new pilemap**/
-    if(0 == arg_pmap->size())
+    if(0 == arg_pmap->size_)
     { front_ = NULL; back_ = NULL; map_.clear(); size_ = 0; }
     else
     {
-      arg_pmap->resetIterator();
-      while(arg_pmap->iterator_!=NULL)
+      SPMNode<Idx,T> *iterator = arg_pmap->front_;
+      while(iterator!=NULL)
       {
-        T* tmp = create(*(arg_pmap->iterator_->id_),
-            *(arg_pmap->iterator_->data_));
+        T* tmp = create(*(iterator->id_),
+            *(iterator->data_));
         if(NULL == tmp)
         {
 #ifdef DEBUG
@@ -185,9 +199,8 @@ namespace sutil
           this->~CPileMap();//Reset the pilemap.
           return false;
         }
-        arg_pmap->iterator_ = arg_pmap->iterator_->next_;
+        iterator = iterator->next_;
       }
-      arg_pmap->resetIterator();
     }
     return true;
   }
@@ -283,7 +296,7 @@ namespace sutil
   }
 
   template <typename Idx, typename T>
-  T* CPileMap<Idx,T>::at(const std::size_t & arg_idx)
+  T* CPileMap<Idx,T>::at(const std::size_t arg_idx)
   {
     if(NULL==front_)
     { return NULL;  }
@@ -342,7 +355,7 @@ namespace sutil
 
 
   template <typename Idx, typename T>
-  const T* CPileMap<Idx,T>::at_const(const std::size_t & arg_idx)
+  const T* CPileMap<Idx,T>::at_const(const std::size_t arg_idx)
   { return (const T*) at(arg_idx);  }
 
   template <typename Idx, typename T>
