@@ -225,30 +225,29 @@ namespace sutil
   bool CBranchingStructure<TIdx,TNode>::linkNodes()
   {
     //Clear previous links (if any)
-
-    sutil::CPileMap<TIdx,TNode>::resetIterator();
-    while(sutil::CPileMap<TIdx,TNode>::iterator_ != NULL)
+    typename sutil::CPileMap<TIdx,TNode>::template SPMNode<TIdx,TNode> *iterator;
+    iterator = this->CPileMap<TIdx,TNode>::front_;
+    while(iterator != NULL)
     {
-      TNode* tmp_node = sutil::CPileMap<TIdx,TNode>::iterator_->data_;
+      TNode* tmp_node = iterator->data_;
       tmp_node->parent_addr_ = NULL;
       tmp_node->child_addrs_.clear();
-      sutil::CPileMap<TIdx,TNode>::iterator_ =
-          sutil::CPileMap<TIdx,TNode>::iterator_->next_;
+      iterator = iterator->next_;
     }
 
     //Form the new links
-    sutil::CPileMap<TIdx,TNode>::resetIterator();
-    while(sutil::CPileMap<TIdx,TNode>::iterator_ != NULL)
+    iterator = this->CPileMap<TIdx,TNode>::front_;
+    while(iterator != NULL)
     {
-      TNode* tmp_node = sutil::CPileMap<TIdx,TNode>::iterator_->data_;
+      TNode* tmp_node = iterator->data_;
       //Iterate over all nodes and connect them to their
       //parents
       if(tmp_node == root_node_)
       {//No parents
         has_been_init_ = true;
         //Increment the iterator
-        sutil::CPileMap<TIdx,TNode>::iterator_ =
-            sutil::CPileMap<TIdx,TNode>::iterator_->next_;
+        iterator =
+            iterator->next_;
         continue;
       }
       else
@@ -261,8 +260,8 @@ namespace sutil
           std::cout<<"\nCBranchingStructure::linkNodes(): Warning.";
           std::cout<<"Orphan node found: "<<tmp_node->name_<<". Ignoring.";
 #endif
-          sutil::CPileMap<TIdx,TNode>::iterator_ =
-              sutil::CPileMap<TIdx,TNode>::iterator_->next_;
+          iterator =
+              iterator->next_;
           continue;
         }
         tmp_node->parent_addr_->child_addrs_.push_back(tmp_node);
@@ -275,8 +274,8 @@ namespace sutil
       }
 
       //Increment the iterator
-      sutil::CPileMap<TIdx,TNode>::iterator_ =
-          sutil::CPileMap<TIdx,TNode>::iterator_->next_;
+      iterator =
+          iterator->next_;
     }//End of while loop
     return has_been_init_;
   }
