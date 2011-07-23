@@ -56,35 +56,7 @@ namespace sutil
   {
   protected:
     /** A node in the linked list */
-    template <typename IdxS, typename TS>
-    class SPMNode
-    {
-    public:
-      TS* data_;
-      IdxS* id_;
-
-      //For the linked list
-      SPMNode<IdxS,TS> *next_;
-
-      SPMNode()
-      {
-        data_=NULL;
-        id_=NULL;
-        next_=NULL;
-      }
-    };
-
-    /** Pointer to the head/front/insertion-end of the list */
-    SPMNode<Idx,T> *front_;
-
-    /** Pointer to the tail/back/dangling-end of the list */
-    SPMNode<Idx,T> *back_;
-
-    /** The map that will enable Idx based data lookup */
-    std::map<Idx, SPMNode<Idx,T>*> map_;
-
-    /** The size of the PileMap */
-    std::size_t size_;
+    template <typename IdxS, typename TS> class SPMNode;
 
   public:
     /** Const pointer access to the list.
@@ -169,6 +141,38 @@ namespace sutil
       deepCopy(&arg_rhs);
       return *this;
     }
+
+  protected:
+    /** A node in the linked list */
+    template <typename IdxS, typename TS>
+    class SPMNode
+    {
+    public:
+      TS* data_;
+      IdxS* id_;
+
+      //For the linked list
+      SPMNode<IdxS,TS> *next_;
+
+      SPMNode()
+      {
+        data_=NULL;
+        id_=NULL;
+        next_=NULL;
+      }
+    };
+
+    /** Pointer to the head/front/insertion-end of the list */
+    SPMNode<Idx,T> *front_;
+
+    /** Pointer to the tail/back/dangling-end of the list */
+    SPMNode<Idx,T> *back_;
+
+    /** The map that will enable Idx based data lookup */
+    std::map<Idx, SPMNode<Idx,T>*> map_;
+
+    /** The size of the PileMap */
+    std::size_t size_;
 
   private:
     /** Copy Constructor : Private. */
