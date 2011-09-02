@@ -46,7 +46,7 @@ namespace sutil_test
 {
   /** Tests the pilemap utility
    * @param arg_id : The id of the test */
-  void test_pilemap(const int arg_id)
+  void test_mappedlist(const int arg_id)
   {
     bool flag = true;
     unsigned int test_id=0;

@@ -88,7 +88,7 @@ int main(int argc, char** argv)
       <<" "
       <<sutil::CSystemClock::getSimTime()
       <<"]";
-      sutil_test::test_pilemap(id);
+      sutil_test::test_mappedlist(id);
     }
     ++id;
 
