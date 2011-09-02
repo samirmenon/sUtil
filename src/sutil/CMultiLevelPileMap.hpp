@@ -45,7 +45,7 @@ namespace sutil
    * collection of pointers (memory managed) stored in a
    * linked list. */
   template <typename Idx, typename T>
-  class CMultiLevelPileMap  : public CPileMap<Idx,T>
+  class CMultiLevelPileMap  : public CMappedList<Idx,T>
   {
   public:
     /** Constructor : Empties the data structure */
@@ -122,11 +122,11 @@ namespace sutil
   /** Constructor. Sets default values.   */
   template <typename Idx, typename T>
   CMultiLevelPileMap<Idx,T>::CMultiLevelPileMap() :
-  CPileMap<Idx,T>::CPileMap()
+  CMappedList<Idx,T>::CPileMap()
   { mlvec_.clear(); pri_levels_ = 0; }
 
   /** Does nothing itself.
-   * Calls CPileMap::~CPileMap() which
+   * Calls CMappedList::~CMappedList() which
    * destroys the (dynamically allocated)
    * nodes in the node linked list.   */
   template <typename Idx, typename T>
@@ -141,7 +141,7 @@ namespace sutil
       const std::size_t arg_priority)
   {
     //Add the node.
-    T* tLnk = CPileMap<Idx,T>::create(arg_idx,arg_node2add);
+    T* tLnk = CMappedList<Idx,T>::create(arg_idx,arg_node2add);
 
     if(NULL!=tLnk)
     {
@@ -162,7 +162,7 @@ namespace sutil
       const Idx& arg_idx, const std::size_t arg_priority)
   {
     //Add the node.
-    T* tLnk = CPileMap<Idx,T>::create(arg_idx);
+    T* tLnk = CMappedList<Idx,T>::create(arg_idx);
 
     if(NULL!=tLnk)
     {
@@ -188,9 +188,9 @@ namespace sutil
     /**Set the current pilemap to the new pilemap**/
     if(0 == arg_br->size())
     {
-      CPileMap<Idx,T>::front_ = NULL;
-      CPileMap<Idx,T>::map_.clear();
-      CPileMap<Idx,T>::size_ = 0;
+      CMappedList<Idx,T>::front_ = NULL;
+      CMappedList<Idx,T>::map_.clear();
+      CMappedList<Idx,T>::size_ = 0;
       mlvec_.clear(); map_nodeptr2pri_.clear();
     }
     else
@@ -198,7 +198,7 @@ namespace sutil
       arg_br->resetIterator();
       while(arg_br->iterator_!=NULL)
       {
-        T* tmp = CPileMap<Idx,T>::create(*(arg_br->iterator_->id_),
+        T* tmp = CMappedList<Idx,T>::create(*(arg_br->iterator_->id_),
             *(arg_br->iterator_->data_));
         if(NULL == tmp)
         {
@@ -242,7 +242,7 @@ namespace sutil
   bool CMultiLevelPileMap<Idx,T>::erase(T* arg_t)
   {
     bool flag;
-    if((NULL==CPileMap<Idx,T>::front_) || (NULL==arg_t))
+    if((NULL==CMappedList<Idx,T>::front_) || (NULL==arg_t))
     { return false;  }
     else
     {
@@ -285,7 +285,7 @@ namespace sutil
       map_nodeptr2pri_.erase(arg_t);
 
       //Remove it from the pilemap (deallocate memory)
-      flag = CPileMap<Idx,T>::erase(arg_t);
+      flag = CMappedList<Idx,T>::erase(arg_t);
       if(false == flag)
       { return false; }
     }
@@ -297,11 +297,11 @@ namespace sutil
   bool CMultiLevelPileMap<Idx,T>::erase(const Idx& arg_idx)
   {
     bool flag;
-    if(NULL==CPileMap<Idx,T>::front_)
+    if(NULL==CMappedList<Idx,T>::front_)
     { return false;  }
     else
     {
-      T* t_ptr = CPileMap<Idx,T>::at(arg_idx);
+      T* t_ptr = CMappedList<Idx,T>::at(arg_idx);
       if(NULL == t_ptr)
       { return false; }
 
@@ -344,7 +344,7 @@ namespace sutil
       map_nodeptr2pri_.erase(t_ptr);
 
       //Remove it from the pilemap (deallocate memory)
-      flag = CPileMap<Idx,T>::erase(arg_idx);
+      flag = CMappedList<Idx,T>::erase(arg_idx);
       if(false == flag)
       { return false; }
     }
@@ -354,7 +354,7 @@ namespace sutil
   template <typename Idx, typename T>
   bool CMultiLevelPileMap<Idx,T>::clear()
   {
-    CPileMap<Idx,T>::clear();
+    CMappedList<Idx,T>::clear();
     mlvec_.clear();
     map_nodeptr2pri_.clear();
     pri_levels_=0;
@@ -392,7 +392,7 @@ namespace sutil
   int CMultiLevelPileMap<Idx,T>::
   getPriorityLevel(const Idx & arg_idx)
   {
-    T* t_ptr = CPileMap<Idx,T>::at(arg_idx);
+    T* t_ptr = CMappedList<Idx,T>::at(arg_idx);
     if(NULL == t_ptr)
     { return -1;  }
 

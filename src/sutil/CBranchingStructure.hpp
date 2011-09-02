@@ -63,7 +63,7 @@ namespace sutil
    *          to organize your (unordered) list of nodes into a tree.
    */
   template <typename TIdx, typename TNode>
-  class CBranchingStructure : public sutil::CPileMap<TIdx,TNode>
+  class CBranchingStructure : public sutil::CMappedList<TIdx,TNode>
   {
   protected:
     /** The root of the branching structure */
@@ -130,7 +130,7 @@ namespace sutil
 
   /**
    * Does nothing itself.
-   * Calls CPileMap::~CPileMap() which
+   * Calls CMappedList::~CMappedList() which
    * destroys the (dynamically allocated)
    * nodes in the node-vector.
    */
@@ -143,7 +143,7 @@ namespace sutil
   deepCopy(CBranchingStructure<TIdx,TNode>* arg_br)
   {//Deep copy.
     bool flag;
-    flag = sutil::CPileMap<TIdx,TNode>::
+    flag = sutil::CMappedList<TIdx,TNode>::
         deepCopy(arg_br);
     if(true == flag)
     {
@@ -179,7 +179,7 @@ namespace sutil
 
     //Add the node.
     TNode* tLnk =
-        sutil::CPileMap<TIdx,TNode>::create(arg_idx,arg_node2add);
+        sutil::CMappedList<TIdx,TNode>::create(arg_idx,arg_node2add);
 
     if((arg_is_root_) && (root_node_==NULL))
     { root_node_ = tLnk;  }
@@ -206,7 +206,7 @@ namespace sutil
     }
 
     //Add the node.
-    TNode* tLnk = sutil::CPileMap<TIdx,TNode>::create(arg_idx);
+    TNode* tLnk = sutil::CMappedList<TIdx,TNode>::create(arg_idx);
 
     if((arg_is_root_) && (NULL==root_node_))
     { root_node_ = tLnk;  }
@@ -225,8 +225,8 @@ namespace sutil
   bool CBranchingStructure<TIdx,TNode>::linkNodes()
   {
     //Clear previous links (if any)
-    typename sutil::CPileMap<TIdx,TNode>::template SPMNode<TIdx,TNode> *iterator;
-    iterator = this->CPileMap<TIdx,TNode>::front_;
+    typename sutil::CMappedList<TIdx,TNode>::template SPMNode<TIdx,TNode> *iterator;
+    iterator = this->CMappedList<TIdx,TNode>::front_;
     while(iterator != NULL)
     {
       TNode* tmp_node = iterator->data_;
@@ -236,7 +236,7 @@ namespace sutil
     }
 
     //Form the new links
-    iterator = this->CPileMap<TIdx,TNode>::front_;
+    iterator = this->CMappedList<TIdx,TNode>::front_;
     while(iterator != NULL)
     {
       TNode* tmp_node = iterator->data_;
@@ -253,7 +253,7 @@ namespace sutil
       else
       {
         tmp_node->parent_addr_ =
-            sutil::CPileMap<TIdx,TNode>::at(tmp_node->parent_name_);
+            sutil::CMappedList<TIdx,TNode>::at(tmp_node->parent_name_);
         if(tmp_node->parent_addr_ == NULL)
         {//No parent -- Ignore this node
 #ifdef DEBUG

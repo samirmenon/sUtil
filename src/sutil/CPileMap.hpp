@@ -19,7 +19,7 @@ You should have received a copy of the GNU Lesser General Public
 License and a copy of the GNU General Public License along with
 sUtil. If not, see <http://www.gnu.org/licenses/>.
  */
-/* \file CPileMap.hpp
+/* \file CMappedList.hpp
  *
  *  Created on: Jul 12, 2010
  *
@@ -52,7 +52,7 @@ namespace sutil
    * that many must access.
    */
   template <typename Idx, typename T>
-  class CPileMap
+  class CMappedList
   {
   protected:
     /** A node in the linked list */
@@ -71,16 +71,16 @@ namespace sutil
     { iterator_ = static_cast<const SPMNode<Idx,T> *>(front_); }
 
     /** Constructor : Resets the pilemap. */
-    CPileMap()
+    CMappedList()
     { front_ = NULL; back_ = NULL; map_.clear(); size_ = 0; }
 
     /** Copy-Constructor : Does a deep copy of the pilemap to
      * get a new one. This is VERY SLOW. */
-    virtual bool deepCopy(const CPileMap<Idx,T>* const arg_pmap);
+    virtual bool deepCopy(const CMappedList<Idx,T>* const arg_pmap);
 
     /** Destructor : Deallocates all the nodes if someone already hasn't
      * done so. */
-    virtual ~CPileMap();
+    virtual ~CMappedList();
 
     /** Creates an element, inserts an element into the list
      * and returns the pointer   */
@@ -136,7 +136,7 @@ namespace sutil
 
     /** Copy-Constructor : Does a deep copy of the pilemap to
      * get a new one. This is VERY SLOW. */
-    virtual CPileMap<Idx,T>& operator = (const CPileMap<Idx,T>& arg_rhs)
+    virtual CMappedList<Idx,T>& operator = (const CMappedList<Idx,T>& arg_rhs)
     {
       deepCopy(&arg_rhs);
       return *this;
@@ -176,13 +176,13 @@ namespace sutil
 
   private:
     /** Copy Constructor : Private. */
-    CPileMap(const CPileMap<Idx,T>& arg_pm);
+    CMappedList(const CMappedList<Idx,T>& arg_pm);
   };
 
   template <typename Idx, typename T>
-  bool CPileMap<Idx,T>::deepCopy(const CPileMap<Idx,T>* const arg_pmap)
+  bool CMappedList<Idx,T>::deepCopy(const CMappedList<Idx,T>* const arg_pmap)
   {//Deep copy.
-    this->~CPileMap(); //Delete everything in the pilemap
+    this->~CMappedList(); //Delete everything in the pilemap
 
     /**Set the current pilemap to the new pilemap**/
     if(0 == arg_pmap->size_)
@@ -200,7 +200,7 @@ namespace sutil
           std::cout<<"\nCPileMap<Idx,T>::CPileMap(const CPileMap<Idx,T>& arg_pmap) : ";
           std::cout<<"ERROR : Copy constructor failed. Resetting pilemap.";
 #endif
-          this->~CPileMap();//Reset the pilemap.
+          this->~CMappedList();//Reset the pilemap.
           return false;
         }
         iterator = iterator->next_;
@@ -210,7 +210,7 @@ namespace sutil
   }
 
   template <typename Idx, typename T>
-  CPileMap<Idx,T>::~CPileMap()
+  CMappedList<Idx,T>::~CMappedList()
   {
     SPMNode<Idx,T> *t, *t2;
     t = front_;
@@ -236,7 +236,7 @@ namespace sutil
   }
 
   template <typename Idx, typename T>
-  T* CPileMap<Idx,T>::create(const Idx & arg_idx)
+  T* CMappedList<Idx,T>::create(const Idx & arg_idx)
   {
     SPMNode<Idx,T> * tmp = new SPMNode<Idx,T>();
 
@@ -268,7 +268,7 @@ namespace sutil
   }
 
   template <typename Idx, typename T>
-  T* CPileMap<Idx,T>::create(const Idx & arg_idx, const T& arg_t)
+  T* CMappedList<Idx,T>::create(const Idx & arg_idx, const T& arg_t)
   {
     SPMNode<Idx,T> * tmp = new SPMNode<Idx,T>();
 
@@ -300,7 +300,7 @@ namespace sutil
   }
 
   template <typename Idx, typename T>
-  T* CPileMap<Idx,T>::at(const std::size_t arg_idx)
+  T* CMappedList<Idx,T>::at(const std::size_t arg_idx)
   {
     if(NULL==front_)
     { return NULL;  }
@@ -328,7 +328,7 @@ namespace sutil
   }
 
   template <typename Idx, typename T>
-  T* CPileMap<Idx,T>::at(const Idx & arg_idx)
+  T* CMappedList<Idx,T>::at(const Idx & arg_idx)
   {
     if(NULL==front_)
     { return NULL;  }
@@ -359,16 +359,16 @@ namespace sutil
 
 
   template <typename Idx, typename T>
-  const T* CPileMap<Idx,T>::at_const(const std::size_t arg_idx)
+  const T* CMappedList<Idx,T>::at_const(const std::size_t arg_idx)
   { return (const T*) at(arg_idx);  }
 
   template <typename Idx, typename T>
-  const T* CPileMap<Idx,T>::at_const(const Idx & arg_idx)
+  const T* CMappedList<Idx,T>::at_const(const Idx & arg_idx)
   { return (const T*) at(arg_idx);  }
 
 
   template <typename Idx, typename T>
-  bool CPileMap<Idx,T>::erase(T* arg_t)
+  bool CMappedList<Idx,T>::erase(T* arg_t)
   {
     if((NULL==front_) || (NULL==arg_t))
     { return false;  }
@@ -441,7 +441,7 @@ namespace sutil
 
 
   template <typename Idx, typename T>
-  bool CPileMap<Idx,T>::erase(const Idx& arg_idx)
+  bool CMappedList<Idx,T>::erase(const Idx& arg_idx)
   {
     if(NULL==front_)
     { return false;  }
@@ -518,7 +518,7 @@ namespace sutil
   }
 
   template <typename Idx, typename T>
-  bool CPileMap<Idx,T>::clear()
+  bool CMappedList<Idx,T>::clear()
   {
     SPMNode<Idx,T> *tpre;
     tpre = front_;

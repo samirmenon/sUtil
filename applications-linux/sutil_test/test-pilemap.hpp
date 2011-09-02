@@ -57,7 +57,7 @@ namespace sutil_test
 
       //Initialize the buffers and the mem copier
       double *t1, *t2, *t3, *t4;
-      sutil::CPileMap<std::string,double> pilemap;
+      sutil::CMappedList<std::string,double> pilemap;
 
       std::string tstr;
 
