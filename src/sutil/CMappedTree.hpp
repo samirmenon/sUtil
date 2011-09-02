@@ -172,7 +172,7 @@ namespace sutil
     if((arg_is_root_)&&(NULL!=root_node_))
     {
 #ifdef DEBUG
-      std::cout<<"\nCBranchingStructure::create() : Error. Tried to insert a root node when one already exists.";
+      std::cerr<<"\nCBranchingStructure::create() : Error. Tried to insert a root node when one already exists.";
 #endif
       return NULL;
     }
@@ -200,7 +200,7 @@ namespace sutil
     if((arg_is_root_)&&(NULL!=root_node_))
     {
 #ifdef DEBUG
-      std::cout<<"\nCBranchingStructure::create() : Error. Tried to insert a root node when one already exists.";
+      std::cerr<<"\nCBranchingStructure::create() : Error. Tried to insert a root node when one already exists.";
 #endif
       return NULL;
     }

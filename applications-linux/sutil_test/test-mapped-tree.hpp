@@ -162,12 +162,12 @@ namespace sutil_test
       { throw(std::runtime_error("String-AddressPointer map is incorrect Node l1 : Failed")); }
       else { std::cout<<"\nTest Result ("<<test_id++<<") : String-AddressPointer map verified for Node l1";  }
 
-      std::cout<<"\nTest #"<<arg_id<<" (Branching Structure Test) Succeeded.";
+      std::cout<<"\nTest #"<<arg_id<<" (Mapped Tree Test) Succeeded.";
   }
   catch (std::exception& ee)
   {
     std::cout<<"\nTest Error ("<<test_id++<<") : "<<ee.what();
-    std::cout<<"\nTest #"<<arg_id<<" (Branching Structure Test) Failed.";
+    std::cout<<"\nTest #"<<arg_id<<" (Mapped Tree Test) Failed.";
   }
 }
 

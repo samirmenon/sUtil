@@ -33,9 +33,6 @@ sUtil. If not, see <http://www.gnu.org/licenses/>.
 
 #ifdef DEBUG
 #include <iostream>
-#endif
-
-#ifdef ASSERT
 #include <cassert>
 #endif
 
@@ -197,8 +194,8 @@ namespace sutil
         if(NULL == tmp)
         {
 #ifdef DEBUG
-          std::cout<<"\nCMappedList<Idx,T>::CMappedList(const CMappedList<Idx,T>& arg_pmap) : ";
-          std::cout<<"ERROR : Copy constructor failed. Resetting mappedlist.";
+          std::cerr<<"\nCMappedList<Idx,T>::CMappedList(const CMappedList<Idx,T>& arg_pmap) : ";
+          std::cerr<<"ERROR : Deep copy failed to duplicate a node. Resetting mappedlist.";
 #endif
           this->~CMappedList();//Reset the mappedlist.
           return false;
@@ -247,7 +244,7 @@ namespace sutil
     if(map_.find(arg_idx) != map_.end())
     {
 #ifdef DEBUG
-      std::cout<<"\nCMappedList<Idx,T>::create() ERROR : Idx exists. Tried to add duplicate entry";
+      std::cerr<<"\nCMappedList<Idx,T>::create() ERROR : Idx exists. Tried to add duplicate entry";
 #endif
       return NULL;
     }
@@ -279,7 +276,7 @@ namespace sutil
     if(map_.find(arg_idx) != map_.end())
     {
 #ifdef DEBUG
-      std::cout<<"\nCMappedList<Idx,T>::create() ERROR : Idx exists. Tried to add duplicate entry";
+      std::cerr<<"\nCMappedList<Idx,T>::create() ERROR : Idx exists. Tried to add duplicate entry";
 #endif
       return NULL;
     }
@@ -312,7 +309,7 @@ namespace sutil
 
       for(std::size_t i=0; i<arg_idx; ++i)
       {
-#ifdef ASSERT
+#ifdef DEBUG
         assert(i<=size_);
 #endif
 

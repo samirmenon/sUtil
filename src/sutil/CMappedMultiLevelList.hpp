@@ -203,7 +203,7 @@ namespace sutil
         if(NULL == tmp)
         {
 #ifdef DEBUG
-          std::cout<<"\nCMultiLevelPileMap<Idx,T>::deepCopy() Error :Deep copy failed. Resetting multi-level mapped list.";
+          std::cerr<<"\nCMultiLevelPileMap<Idx,T>::deepCopy() Error :Deep copy failed. Resetting multi-level mapped list.";
 #endif
           clear(); return false;
         }
@@ -213,7 +213,7 @@ namespace sutil
             arg_br->map_nodeptr2pri_.end())
         {
 #ifdef DEBUG
-          std::cout<<"\nCMultiLevelPileMap<Idx,T>::deepCopy() Error :Did not find a node in the priority map.";
+          std::cerr<<"\nCMultiLevelPileMap<Idx,T>::deepCopy() Error :Did not find a node in the priority map.";
 #endif
           clear(); return false;
         }

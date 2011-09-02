@@ -37,7 +37,7 @@ namespace sutil
 
   /** Use this to create a singleton with any given data type
    *
-   * Works quite well to implement the 'Database', a shared
+   * Works quite well to implement the 'Singleton', a shared
    * data structure that allows different threads in a program
    * to communicate efficiently.
    */
@@ -88,10 +88,13 @@ namespace sutil
       if(0 == singleton_)
       {
 #ifdef DEBUG
-        std::cout<<"\nCDatabase::createDb() Error: Could not dynamically allocate the database";
+        std::cerr<<"\nCSingleton::createDb() Error: Could not dynamically allocate the database";
 #endif
         return 0;
       }
+#ifdef DEBUG
+      std::cout<<"\nCSingleton::getData() : Creating singleton";
+#endif
     }
     return &(singleton_->data_);
   }
@@ -103,7 +106,7 @@ namespace sutil
     {
       delete singleton_;
 #ifdef DEBUG
-      std::cout<<"\nCDatabase::~CDatabase() : Destroying singleton";
+      std::cout<<"\nCSingleton::~CSingleton() : Destroying singleton";
 #endif
     }
   }
