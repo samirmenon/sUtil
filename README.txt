@@ -27,7 +27,14 @@ About:
 
 sUtil is a collection of useful utility classes and functions, collected together in a header-only library. Simply include the files and use them. No linking required.
 
-To see example code for the different header files, look at the tests in applications-linux.
+Examples:
+
+To see example code for the different header files, look at the tests in applications-linux. 
+
+You may run the tests using:
+$ cd applications-linux/sutil_test
+$ make release
+$ ./sutil_test 0
 
 
 Supported Platforms:
