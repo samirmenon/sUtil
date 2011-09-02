@@ -19,15 +19,15 @@ You should have received a copy of the GNU Lesser General Public
 License and a copy of the GNU General Public License along with
 sUtil. If not, see <http://www.gnu.org/licenses/>.
  */
-/* \file CMultiLevelPileMap.hpp
+/* \file CMappedMultiLevelList.hpp
  *
  *  Created on: Jun 28, 2010
  *
  *  Copyright (C) 2010, Samir Menon <smenon@stanford.edu>
  */
 
-#ifndef CMULTILEVELPILEMAP_HPP_
-#define CMULTILEVELPILEMAP_HPP_
+#ifndef CMAPPEDMULTILEVELLIST_HPP_
+#define CMAPPEDMULTILEVELLIST_HPP_
 
 #include <sutil/CMappedList.hpp>
 
@@ -45,15 +45,15 @@ namespace sutil
    * collection of pointers (memory managed) stored in a
    * linked list. */
   template <typename Idx, typename T>
-  class CMultiLevelPileMap  : public CMappedList<Idx,T>
+  class CMappedMultiLevelList  : public CMappedList<Idx,T>
   {
   public:
     /** Constructor : Empties the data structure */
-    CMultiLevelPileMap();
+    CMappedMultiLevelList();
 
     /** Destructor : Deallocates all the nodes if someone already hasn't
      * done so. */
-    virtual ~CMultiLevelPileMap();
+    virtual ~CMappedMultiLevelList();
 
     /** Adds a node to the pilemap and inserts its vector into
      * the appropriate slot in the vector-list */
@@ -67,7 +67,7 @@ namespace sutil
     /** Copy-Constructor : Does a deep copy of the branching structure to
      *  get a new one.
      * NOTE : This uses the passed pilemap's iterator construct. */
-    virtual bool deepCopy(CMultiLevelPileMap<Idx,T>* arg_br);
+    virtual bool deepCopy(CMappedMultiLevelList<Idx,T>* arg_br);
 
     /** Erases an element from the list.
      * Referenced by the element's memory location */
@@ -121,7 +121,7 @@ namespace sutil
 
   /** Constructor. Sets default values.   */
   template <typename Idx, typename T>
-  CMultiLevelPileMap<Idx,T>::CMultiLevelPileMap() :
+  CMappedMultiLevelList<Idx,T>::CMappedMultiLevelList() :
   CMappedList<Idx,T>::CMappedList()
   { mlvec_.clear(); pri_levels_ = 0; }
 
@@ -130,13 +130,13 @@ namespace sutil
    * destroys the (dynamically allocated)
    * nodes in the node linked list.   */
   template <typename Idx, typename T>
-  CMultiLevelPileMap<Idx,T>::~CMultiLevelPileMap()
+  CMappedMultiLevelList<Idx,T>::~CMappedMultiLevelList()
   { mlvec_.clear(); map_nodeptr2pri_.clear(); pri_levels_=0; }
 
 
   /** Adds a node at the given level and returns its address.   */
   template <typename Idx, typename T>
-  T* CMultiLevelPileMap<Idx,T>::create(
+  T* CMappedMultiLevelList<Idx,T>::create(
       const Idx& arg_idx, const T & arg_node2add,
       const std::size_t arg_priority)
   {
@@ -158,7 +158,7 @@ namespace sutil
   }
 
   template <typename Idx, typename T>
-  T* CMultiLevelPileMap<Idx,T>::create(
+  T* CMappedMultiLevelList<Idx,T>::create(
       const Idx& arg_idx, const std::size_t arg_priority)
   {
     //Add the node.
@@ -180,10 +180,10 @@ namespace sutil
   }
 
   template <typename Idx, typename T>
-  bool CMultiLevelPileMap<Idx,T>::
-  deepCopy(CMultiLevelPileMap<Idx,T>* arg_br)
+  bool CMappedMultiLevelList<Idx,T>::
+  deepCopy(CMappedMultiLevelList<Idx,T>* arg_br)
   {//Deep copy.
-    this->~CMultiLevelPileMap(); //Delete everything in the pilemap
+    this->~CMappedMultiLevelList(); //Delete everything in the pilemap
 
     /**Set the current pilemap to the new pilemap**/
     if(0 == arg_br->size())
@@ -239,7 +239,7 @@ namespace sutil
   }
 
   template <typename Idx, typename T>
-  bool CMultiLevelPileMap<Idx,T>::erase(T* arg_t)
+  bool CMappedMultiLevelList<Idx,T>::erase(T* arg_t)
   {
     bool flag;
     if((NULL==CMappedList<Idx,T>::front_) || (NULL==arg_t))
@@ -294,7 +294,7 @@ namespace sutil
   }
 
   template <typename Idx, typename T>
-  bool CMultiLevelPileMap<Idx,T>::erase(const Idx& arg_idx)
+  bool CMappedMultiLevelList<Idx,T>::erase(const Idx& arg_idx)
   {
     bool flag;
     if(NULL==CMappedList<Idx,T>::front_)
@@ -352,7 +352,7 @@ namespace sutil
     return true;
   }
   template <typename Idx, typename T>
-  bool CMultiLevelPileMap<Idx,T>::clear()
+  bool CMappedMultiLevelList<Idx,T>::clear()
   {
     CMappedList<Idx,T>::clear();
     mlvec_.clear();
@@ -362,7 +362,7 @@ namespace sutil
   }
 
   template <typename Idx, typename T>
-  std::vector<T*>* CMultiLevelPileMap<Idx,T>::
+  std::vector<T*>* CMappedMultiLevelList<Idx,T>::
   getSinglePriorityLevel(std::size_t arg_pri)
   {
     if(arg_pri > mlvec_.size())
@@ -375,7 +375,7 @@ namespace sutil
   }
 
   template <typename Idx, typename T>
-  int CMultiLevelPileMap<Idx,T>::
+  int CMappedMultiLevelList<Idx,T>::
   getPriorityLevel(T* arg_t)
   {
     int ret;
@@ -389,7 +389,7 @@ namespace sutil
   }
 
   template <typename Idx, typename T>
-  int CMultiLevelPileMap<Idx,T>::
+  int CMappedMultiLevelList<Idx,T>::
   getPriorityLevel(const Idx & arg_idx)
   {
     T* t_ptr = CMappedList<Idx,T>::at(arg_idx);
@@ -408,4 +408,4 @@ namespace sutil
 
 }//End of namespace sutil
 
-#endif /*CMULTILEVELPILEMAP_HPP_*/
+#endif /*CMAPPEDMULTILEVELLIST_HPP_*/

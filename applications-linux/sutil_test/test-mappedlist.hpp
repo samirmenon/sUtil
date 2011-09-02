@@ -203,7 +203,7 @@ namespace sutil_test
     {
       //Initialize the buffers and the mem copier
       SMapTester *t1, *t2, *t3, *t4;
-      sutil::CMultiLevelPileMap<std::string,SMapTester> mlpmap;
+      sutil::CMappedMultiLevelList<std::string,SMapTester> mlpmap;
 
       std::string tstr;
 
