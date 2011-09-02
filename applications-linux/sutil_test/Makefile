@@ -9,12 +9,9 @@ SU_INC_DIR = ../../src/
 SU_DEFS_DBG = -DASSERT=assert -DDEBUG=1 -DSU_TESTING=1
 SU_DEFS_REL = -DRELEASE=1
 
-#3rd party lib : Eigen (local install)
-EIGEN_INC_DIR = ../../3rdparty/eigen3.0.1/
-
 ############################# INCLUDE AND LINK OPTIONS ############################
 #Collate all the include directiories
-INCLUDEDIRS = -I$(SU_INC_DIR) -I$(EIGEN_INC_DIR)
+INCLUDEDIRS = -I$(SU_INC_DIR)
 
 ############################# Compile options ############################
 DBGFLAGS = -Wall -g -ggdb -pg -O0 $(INCLUDEDIRS) \
