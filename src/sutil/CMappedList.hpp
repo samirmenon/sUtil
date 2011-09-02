@@ -39,6 +39,25 @@ sUtil. If not, see <http://www.gnu.org/licenses/>.
 namespace sutil
 {
 
+  /** A node in the linked list */
+  template <typename IdxS, typename TS>
+  class SMLNode
+  {
+  public:
+    TS* data_;
+    IdxS* id_;
+
+    //For the linked list
+    SMLNode<IdxS,TS> *next_;
+
+    SMLNode()
+    {
+      data_=NULL;
+      id_=NULL;
+      next_=NULL;
+    }
+  };
+
   /** A linked list to allocate memory for objects and
    * store them, allowing pointer access.
    *
@@ -51,21 +70,17 @@ namespace sutil
   template <typename Idx, typename T>
   class CMappedList
   {
-  protected:
-    /** A node in the linked list */
-    template <typename IdxS, typename TS> class SPMNode;
-
   public:
     /** Const pointer access to the list.
      *
      * 1. Can be moved across the list manually to iterate over all the nodes
      * 2. Can be reset to the head of the list.
      */
-    const SPMNode<Idx,T> *iterator_;
+    const SMLNode<Idx,T> *iterator_;
 
     /** Reset iterator to head */
     virtual void resetIterator()
-    { iterator_ = static_cast<const SPMNode<Idx,T> *>(front_); }
+    { iterator_ = static_cast<const SMLNode<Idx,T> *>(front_); }
 
     /** Constructor : Resets the mappedlist. */
     CMappedList()
@@ -140,33 +155,15 @@ namespace sutil
     }
 
   protected:
-    /** A node in the linked list */
-    template <typename IdxS, typename TS>
-    class SPMNode
-    {
-    public:
-      TS* data_;
-      IdxS* id_;
-
-      //For the linked list
-      SPMNode<IdxS,TS> *next_;
-
-      SPMNode()
-      {
-        data_=NULL;
-        id_=NULL;
-        next_=NULL;
-      }
-    };
 
     /** Pointer to the head/front/insertion-end of the list */
-    SPMNode<Idx,T> *front_;
+    SMLNode<Idx,T> *front_;
 
     /** Pointer to the tail/back/dangling-end of the list */
-    SPMNode<Idx,T> *back_;
+    SMLNode<Idx,T> *back_;
 
     /** The map that will enable Idx based data lookup */
-    std::map<Idx, SPMNode<Idx,T>*> map_;
+    std::map<Idx, SMLNode<Idx,T>*> map_;
 
     /** The size of the PileMap */
     std::size_t size_;
@@ -186,7 +183,7 @@ namespace sutil
     { front_ = NULL; back_ = NULL; map_.clear(); size_ = 0; }
     else
     {
-      SPMNode<Idx,T> *iterator = arg_pmap->front_;
+      SMLNode<Idx,T> *iterator = arg_pmap->front_;
       while(iterator!=NULL)
       {
         T* tmp = create(*(iterator->id_),
@@ -209,7 +206,7 @@ namespace sutil
   template <typename Idx, typename T>
   CMappedList<Idx,T>::~CMappedList()
   {
-    SPMNode<Idx,T> *t, *t2;
+    SMLNode<Idx,T> *t, *t2;
     t = front_;
     if(NULL!=t)
     { t2 = front_->next_;  }
@@ -235,7 +232,7 @@ namespace sutil
   template <typename Idx, typename T>
   T* CMappedList<Idx,T>::create(const Idx & arg_idx)
   {
-    SPMNode<Idx,T> * tmp = new SPMNode<Idx,T>();
+    SMLNode<Idx,T> * tmp = new SMLNode<Idx,T>();
 
     if(NULL==tmp) //Memory not allocated
     { return NULL; }
@@ -259,7 +256,7 @@ namespace sutil
     if(1 == size_)
     { back_ = front_; }
 
-    map_.insert( std::pair<Idx, SPMNode<Idx,T> *>(arg_idx, front_) );
+    map_.insert( std::pair<Idx, SMLNode<Idx,T> *>(arg_idx, front_) );
 
     return front_->data_;
   }
@@ -267,7 +264,7 @@ namespace sutil
   template <typename Idx, typename T>
   T* CMappedList<Idx,T>::create(const Idx & arg_idx, const T& arg_t)
   {
-    SPMNode<Idx,T> * tmp = new SPMNode<Idx,T>();
+    SMLNode<Idx,T> * tmp = new SMLNode<Idx,T>();
 
     if(NULL==tmp) //Memory not allocated
     { return NULL; }
@@ -291,7 +288,7 @@ namespace sutil
     if(1 == size_)
     { back_ = front_; }
 
-    map_.insert( std::pair<Idx, SPMNode<Idx,T> *>(arg_idx, front_) );
+    map_.insert( std::pair<Idx, SMLNode<Idx,T> *>(arg_idx, front_) );
 
     return front_->data_;
   }
@@ -305,7 +302,7 @@ namespace sutil
     {
       if(arg_idx > size_)
       { return NULL; }
-      SPMNode<Idx,T> * t = front_;
+      SMLNode<Idx,T> * t = front_;
 
       for(std::size_t i=0; i<arg_idx; ++i)
       {
@@ -338,7 +335,7 @@ namespace sutil
           return NULL;
         }
 
-        SPMNode<Idx,T> * t = map_[arg_idx];
+        SMLNode<Idx,T> * t = map_[arg_idx];
 
         if(NULL==t)
         { return NULL;  }
@@ -370,7 +367,7 @@ namespace sutil
     if((NULL==front_) || (NULL==arg_t))
     { return false;  }
 
-    SPMNode<Idx,T> * t, *tpre;
+    SMLNode<Idx,T> * t, *tpre;
 
     //Head is a special case
     if(front_->data_ == arg_t)
@@ -452,8 +449,8 @@ namespace sutil
       return false;
     }
 
-    SPMNode<Idx,T> * t, *tpre;
-    SPMNode<Idx,T> * node = map_[arg_idx];
+    SMLNode<Idx,T> * t, *tpre;
+    SMLNode<Idx,T> * node = map_[arg_idx];
 
     //Head is a special case
     if(front_->data_ == node->data_)
@@ -517,7 +514,7 @@ namespace sutil
   template <typename Idx, typename T>
   bool CMappedList<Idx,T>::clear()
   {
-    SPMNode<Idx,T> *tpre;
+    SMLNode<Idx,T> *tpre;
     tpre = front_;
 
     if(tpre == NULL)

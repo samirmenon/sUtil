@@ -175,7 +175,6 @@ namespace sutil
     }
   }
 
-
 }
 
 #endif /* CMEMCOPIER_HPP_ */
