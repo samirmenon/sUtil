@@ -39,14 +39,14 @@ namespace sutil
 {
   /** This template class contains a branching structure.
    *
-   * It is an extension of a PileMap, which itself is a
+   * It is an extension of a MappedList, which itself is a
    * collection of pointers (memory managed) stored in a
    * linked list.
    *
-   * The branching structure extends the PileMap by using
+   * The branching structure extends the MappedList by using
    * a tree representation where root nodes are connected to
    * subtrees of nodes. This representation is overlaid on
-   * the PileMap's linked list so iterating over both is
+   * the MappedList's linked list so iterating over both is
    * possible.
    * The tree can branch arbitrarily.
    *
@@ -78,7 +78,7 @@ namespace sutil
     /** Copy-Constructor : Does a deep copy of the branching structure to
      * get a new one.
      *
-     * NOTE : This uses the passed pilemap's iterator construct. */
+     * NOTE : This uses the passed mappedlist's iterator construct. */
     virtual bool deepCopy(CBranchingStructure<TIdx,TNode>* arg_br);
 
     /** Adds a node to the branching structure. The passed node is

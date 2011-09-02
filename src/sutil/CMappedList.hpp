@@ -70,11 +70,11 @@ namespace sutil
     virtual void resetIterator()
     { iterator_ = static_cast<const SPMNode<Idx,T> *>(front_); }
 
-    /** Constructor : Resets the pilemap. */
+    /** Constructor : Resets the mappedlist. */
     CMappedList()
     { front_ = NULL; back_ = NULL; map_.clear(); size_ = 0; }
 
-    /** Copy-Constructor : Does a deep copy of the pilemap to
+    /** Copy-Constructor : Does a deep copy of the mappedlist to
      * get a new one. This is VERY SLOW. */
     virtual bool deepCopy(const CMappedList<Idx,T>* const arg_pmap);
 
@@ -124,7 +124,7 @@ namespace sutil
      * NOTE : This uses the std::map (and is rather slow) */
     virtual bool erase(const Idx& arg_idx);
 
-    /** Returns the size of the pile */
+    /** Returns the size of the mapped list */
     virtual inline std::size_t size(){ return size_; }
 
     /** Clears all elements from the list */
@@ -134,7 +134,7 @@ namespace sutil
     virtual T* operator[](const std::size_t arg_idx)
     { return at(arg_idx); }
 
-    /** Copy-Constructor : Does a deep copy of the pilemap to
+    /** Copy-Constructor : Does a deep copy of the mappedlist to
      * get a new one. This is VERY SLOW. */
     virtual CMappedList<Idx,T>& operator = (const CMappedList<Idx,T>& arg_rhs)
     {
@@ -182,9 +182,9 @@ namespace sutil
   template <typename Idx, typename T>
   bool CMappedList<Idx,T>::deepCopy(const CMappedList<Idx,T>* const arg_pmap)
   {//Deep copy.
-    this->~CMappedList(); //Delete everything in the pilemap
+    this->~CMappedList(); //Delete everything in the mappedlist
 
-    /**Set the current pilemap to the new pilemap**/
+    /**Set the current mappedlist to the new mappedlist**/
     if(0 == arg_pmap->size_)
     { front_ = NULL; back_ = NULL; map_.clear(); size_ = 0; }
     else
@@ -198,9 +198,9 @@ namespace sutil
         {
 #ifdef DEBUG
           std::cout<<"\nCMappedList<Idx,T>::CMappedList(const CMappedList<Idx,T>& arg_pmap) : ";
-          std::cout<<"ERROR : Copy constructor failed. Resetting pilemap.";
+          std::cout<<"ERROR : Copy constructor failed. Resetting mappedlist.";
 #endif
-          this->~CMappedList();//Reset the pilemap.
+          this->~CMappedList();//Reset the mappedlist.
           return false;
         }
         iterator = iterator->next_;

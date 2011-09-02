@@ -55,18 +55,18 @@ namespace sutil
      * done so. */
     virtual ~CMappedMultiLevelList();
 
-    /** Adds a node to the pilemap and inserts its vector into
+    /** Adds a node to the mapped list and inserts its vector into
      * the appropriate slot in the vector-list */
     virtual T* create(const Idx& arg_idx, const T &arg_node2add,
         const std::size_t arg_priority);
 
-    /** Adds a node to the pilemap and inserts its vector into
+    /** Adds a node to the mapped list and inserts its vector into
      * the appropriate slot in the vector-list. Uses the copy-constructor. */
     virtual T* create(const Idx& arg_idx, const std::size_t arg_priority);
 
     /** Copy-Constructor : Does a deep copy of the branching structure to
      *  get a new one.
-     * NOTE : This uses the passed pilemap's iterator construct. */
+     * NOTE : This uses the passed mapped list's iterator construct. */
     virtual bool deepCopy(CMappedMultiLevelList<Idx,T>* arg_br);
 
     /** Erases an element from the list.
@@ -97,8 +97,8 @@ namespace sutil
      * condition*/
     int getPriorityLevel(const Idx & arg_idx);
 
-    /** Create a node on the pilemap and also insert it into the vector
-     * of lists. That way someone can lookup or iterate over the pilemap
+    /** Create a node on the mapped list and also insert it into the vector
+     * of lists. That way someone can lookup or iterate over the mapped list
      * and can also exploit the structure of the vec<list>
      */
     std::vector<std::vector<T*> > mlvec_;
@@ -183,9 +183,9 @@ namespace sutil
   bool CMappedMultiLevelList<Idx,T>::
   deepCopy(CMappedMultiLevelList<Idx,T>* arg_br)
   {//Deep copy.
-    this->~CMappedMultiLevelList(); //Delete everything in the pilemap
+    this->~CMappedMultiLevelList(); //Delete everything in the mapped list
 
-    /**Set the current pilemap to the new pilemap**/
+    /**Set the current mapped list to the new mapped list**/
     if(0 == arg_br->size())
     {
       CMappedList<Idx,T>::front_ = NULL;
@@ -203,7 +203,7 @@ namespace sutil
         if(NULL == tmp)
         {
 #ifdef DEBUG
-          std::cout<<"\nCMultiLevelPileMap<Idx,T>::deepCopy() Error :Deep copy failed. Resetting multi-level pilemap.";
+          std::cout<<"\nCMultiLevelPileMap<Idx,T>::deepCopy() Error :Deep copy failed. Resetting multi-level mapped list.";
 #endif
           clear(); return false;
         }
@@ -284,7 +284,7 @@ namespace sutil
       //Remove it from the nodeptr2pri map
       map_nodeptr2pri_.erase(arg_t);
 
-      //Remove it from the pilemap (deallocate memory)
+      //Remove it from the mapped list (deallocate memory)
       flag = CMappedList<Idx,T>::erase(arg_t);
       if(false == flag)
       { return false; }
@@ -343,7 +343,7 @@ namespace sutil
       //Remove it from the nodeptr2pri map
       map_nodeptr2pri_.erase(t_ptr);
 
-      //Remove it from the pilemap (deallocate memory)
+      //Remove it from the mapped list (deallocate memory)
       flag = CMappedList<Idx,T>::erase(arg_idx);
       if(false == flag)
       { return false; }
