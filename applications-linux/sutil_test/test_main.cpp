@@ -28,7 +28,7 @@ sUtil. If not, see <http://www.gnu.org/licenses/>.
 
 #include "test-singleton.hpp"
 #include "test-mappedlist.hpp"
-#include "test-branching-struct.hpp"
+#include "test-mapped-tree.hpp"
 #include "test-memcopier.hpp"
 
 #include <sutil/CSingleton.hpp>
@@ -110,7 +110,7 @@ int main(int argc, char** argv)
       <<" "
       <<sutil::CSystemClock::getSimTime()
       <<"]";
-      sutil_test::test_branching_struct(id);
+      sutil_test::test_mapped_tree(id);
     }
     ++id;
 

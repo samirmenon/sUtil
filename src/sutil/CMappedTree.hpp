@@ -19,7 +19,7 @@ You should have received a copy of the GNU Lesser General Public
 License and a copy of the GNU General Public License along with
 sUtil. If not, see <http://www.gnu.org/licenses/>.
  */
-/* \file CBranchingStructure.hpp
+/* \file CMappedTree.hpp
  *
  *  Created on: Dec 27, 2010
  *
@@ -56,14 +56,14 @@ namespace sutil
    * c) TNode* parent_addr_;
    * d) std::vector<TNode*> child_addrs_;
    *
-   * NOTE : You MUST call CBranchingStructure's create functions.
+   * NOTE : You MUST call CMappedTree's create functions.
    *
    * NOTE 2 : You MUST set the name_ and parent_name_ fields for the objects
    *          in the branching structure. The linkNodes function requires this
    *          to organize your (unordered) list of nodes into a tree.
    */
   template <typename TIdx, typename TNode>
-  class CBranchingStructure : public sutil::CMappedList<TIdx,TNode>
+  class CMappedTree : public sutil::CMappedList<TIdx,TNode>
   {
   protected:
     /** The root of the branching structure */
@@ -73,13 +73,13 @@ namespace sutil
     bool has_been_init_;
 
   public:
-    CBranchingStructure();
-    virtual ~CBranchingStructure();
+    CMappedTree();
+    virtual ~CMappedTree();
     /** Copy-Constructor : Does a deep copy of the branching structure to
      * get a new one.
      *
      * NOTE : This uses the passed mappedlist's iterator construct. */
-    virtual bool deepCopy(CBranchingStructure<TIdx,TNode>* arg_br);
+    virtual bool deepCopy(CMappedTree<TIdx,TNode>* arg_br);
 
     /** Adds a node to the branching structure. The passed node is
      * copied and stored in a vector. A map between the idx and the
@@ -122,7 +122,7 @@ namespace sutil
    * Constructor. Sets default values.
    */
   template <typename TIdx, typename TNode>
-  CBranchingStructure<TIdx,TNode>::CBranchingStructure()
+  CMappedTree<TIdx,TNode>::CMappedTree()
   {
     root_node_ = NULL;
     has_been_init_ = false;
@@ -135,12 +135,12 @@ namespace sutil
    * nodes in the node-vector.
    */
   template <typename TIdx, typename TNode>
-  CBranchingStructure<TIdx,TNode>::~CBranchingStructure()
+  CMappedTree<TIdx,TNode>::~CMappedTree()
   {}
 
   template <typename TIdx, typename TNode>
-  bool CBranchingStructure<TIdx,TNode>::
-  deepCopy(CBranchingStructure<TIdx,TNode>* arg_br)
+  bool CMappedTree<TIdx,TNode>::
+  deepCopy(CMappedTree<TIdx,TNode>* arg_br)
   {//Deep copy.
     bool flag;
     flag = sutil::CMappedList<TIdx,TNode>::
@@ -165,7 +165,7 @@ namespace sutil
    * Passed: node to add, its index name and whether it is a root.
    */
   template <typename TIdx, typename TNode>
-  TNode* CBranchingStructure<TIdx,TNode>::create(
+  TNode* CMappedTree<TIdx,TNode>::create(
       const TIdx& arg_idx, const TNode & arg_node2add,
       const bool arg_is_root_)
       {
@@ -194,7 +194,7 @@ namespace sutil
    * Passed: node to add, its index name and whether it is a root.
    */
   template <typename TIdx, typename TNode>
-  TNode* CBranchingStructure<TIdx,TNode>::create(
+  TNode* CMappedTree<TIdx,TNode>::create(
       const TIdx& arg_idx, const bool arg_is_root_)
       {
     if((arg_is_root_)&&(NULL!=root_node_))
@@ -222,7 +222,7 @@ namespace sutil
    * O(n*log(n))
    */
   template <typename TIdx, typename TNode>
-  bool CBranchingStructure<TIdx,TNode>::linkNodes()
+  bool CMappedTree<TIdx,TNode>::linkNodes()
   {
     //Clear previous links (if any)
     typename sutil::CMappedList<TIdx,TNode>::template SPMNode<TIdx,TNode> *iterator;

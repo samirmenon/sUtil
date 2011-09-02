@@ -29,7 +29,7 @@ sUtil. If not, see <http://www.gnu.org/licenses/>.
 #ifndef TEST_BRANCHING_STRUCT_HPP_
 #define TEST_BRANCHING_STRUCT_HPP_
 
-#include <sutil/CBranchingStructure.hpp>
+#include <sutil/CMappedTree.hpp>
 
 #include <string>
 #include <stdexcept>
@@ -40,15 +40,15 @@ namespace sutil_test
 {
 
   /**
-   * Test Structure - Branching Representation Node
+   * Test Structure - Mapped tree Node
    */
-  struct _testSBRNode
+  struct _testSMTNode
   {
   public:
     std::string name_;
     std::string parent_name_;
-    _testSBRNode* parent_addr_;
-    std::vector<_testSBRNode*> child_addrs_;
+    _testSMTNode* parent_addr_;
+    std::vector<_testSMTNode*> child_addrs_;
 
     /**
      * Init/Reset the object
@@ -63,7 +63,7 @@ namespace sutil_test
   };
 
   /**
-   * Tests the branching representation with the tree:
+   * Tests the mapped tree with the tree:
    *            ground (not a link)
    *              --
    *             root
@@ -72,14 +72,14 @@ namespace sutil_test
    *          /  \     \
    *         l2  l3     r2
    */
-  void test_branching_struct(int arg_id)
+  void test_mapped_tree(int arg_id)
   {
     unsigned int test_id=0;
     try
     {
       //0. Create a br struct
-      sutil::CBranchingStructure<std::string,_testSBRNode> br;
-      _testSBRNode node;
+      sutil::CMappedTree<std::string,_testSMTNode> br;
+      _testSMTNode node;
 
       //1. Test adding a node (l1)
       node.name_ = "l1";
@@ -142,10 +142,10 @@ namespace sutil_test
       std::cout<<"\nTest Result ("<<test_id++<<") : Printing tree :";
       while(br.iterator_!=NULL)
       {
-        _testSBRNode* tmp_node = br.iterator_->data_;
+        _testSMTNode* tmp_node = br.iterator_->data_;
         printf("\n\tNode: %s. Children:",tmp_node->name_.c_str());
 
-        std::vector<_testSBRNode*>::const_iterator it2, ite2;
+        std::vector<_testSMTNode*>::const_iterator it2, ite2;
         ite2 = tmp_node->child_addrs_.end();
         for(it2 = tmp_node->child_addrs_.begin();it2!=ite2;++it2)
         {
@@ -156,7 +156,7 @@ namespace sutil_test
       }
 
       //7. Test Map (Idx and name of pointed object should match)
-      _testSBRNode* tmp_mapped_node = br.at("l1");
+      _testSMTNode* tmp_mapped_node = br.at("l1");
 
       if(tmp_mapped_node->name_ != "l1")
       { throw(std::runtime_error("String-AddressPointer map is incorrect Node l1 : Failed")); }
