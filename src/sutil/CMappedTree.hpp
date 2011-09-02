@@ -26,8 +26,8 @@ sUtil. If not, see <http://www.gnu.org/licenses/>.
  *  Copyright (C) 2010, Samir Menon <smenon@stanford.edu>
  */
 
-#ifndef CBRANCHINGSTRUCTURE_HPP_
-#define CBRANCHINGSTRUCTURE_HPP_
+#ifndef CMAPPEDTREE_HPP_
+#define CMAPPEDTREE_HPP_
 
 #include <sutil/CMappedList.hpp>
 
@@ -79,7 +79,7 @@ namespace sutil
      * get a new one.
      *
      * NOTE : This uses the passed mappedlist's iterator construct. */
-    virtual bool deepCopy(CMappedTree<TIdx,TNode>* arg_br);
+    virtual bool deepCopy(CMappedTree<TIdx,TNode>* arg_mt);
 
     /** Adds a node to the mapped tree. The passed node is
      * copied and stored in a vector. A map between the idx and the
@@ -140,15 +140,15 @@ namespace sutil
 
   template <typename TIdx, typename TNode>
   bool CMappedTree<TIdx,TNode>::
-  deepCopy(CMappedTree<TIdx,TNode>* arg_br)
+  deepCopy(CMappedTree<TIdx,TNode>* arg_mt)
   {//Deep copy.
     bool flag;
     flag = sutil::CMappedList<TIdx,TNode>::
-        deepCopy(arg_br);
+        deepCopy(arg_mt);
     if(true == flag)
     {
-      this->root_node_ = at(arg_br->getRootNode()->name_);
-      this->has_been_init_ = arg_br->has_been_init_;
+      this->root_node_ = at(arg_mt->getRootNode()->name_);
+      this->has_been_init_ = arg_mt->has_been_init_;
       return true;
     }
     else
@@ -281,4 +281,4 @@ namespace sutil
   }
 }//End of namespace sutil
 
-#endif /*CBRANCHINGSTRUCTURE_HPP_*/
+#endif /*CMAPPEDTREE_HPP_*/
