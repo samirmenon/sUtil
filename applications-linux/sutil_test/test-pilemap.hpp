@@ -33,7 +33,7 @@ sUtil. If not, see <http://www.gnu.org/licenses/>.
 #include <sutil/CSystemClock.hpp>
 
 #include <sutil/CMemCopier.hpp>
-#include <sutil/CPileMap.hpp>
+#include <sutil/CMappedList.hpp>
 #include <sutil/CMultiLevelPileMap.hpp>
 
 #include <iostream>
@@ -57,35 +57,35 @@ namespace sutil_test
 
       //Initialize the buffers and the mem copier
       double *t1, *t2, *t3, *t4;
-      sutil::CMappedList<std::string,double> pilemap;
+      sutil::CMappedList<std::string,double> mappedlist;
 
       std::string tstr;
 
       // Test 1 : Create nodes
       tstr = "t1";
-      t1 = pilemap.create(tstr);
-      if((NULL == t1) || (NULL==pilemap.at(tstr)))
+      t1 = mappedlist.create(tstr);
+      if((NULL == t1) || (NULL==mappedlist.at(tstr)))
       { throw(std::runtime_error("Failed to create node 1"));  }
       else
       { std::cout<<"\nTest Result ("<<test_id++<<") Created node 1"; }
 
       tstr = "t2";
-      t2 = pilemap.create(tstr);
-      if((NULL == t2) || (NULL==pilemap.at(tstr)))
+      t2 = mappedlist.create(tstr);
+      if((NULL == t2) || (NULL==mappedlist.at(tstr)))
       { throw(std::runtime_error("Failed to create node 2"));  }
       else
       { std::cout<<"\nTest Result ("<<test_id++<<") Created node 2"; }
 
       tstr = "t3";
-      t3 = pilemap.create(tstr);
-      if((NULL == t3) || (NULL==pilemap.at(tstr)))
+      t3 = mappedlist.create(tstr);
+      if((NULL == t3) || (NULL==mappedlist.at(tstr)))
       { throw(std::runtime_error("Failed to create node 3"));  }
       else
       { std::cout<<"\nTest Result ("<<test_id++<<") Created node 3"; }
 
       tstr = "t4";
-      t4 = pilemap.create(tstr);
-      if((NULL == t4) || (NULL==pilemap.at(tstr)))
+      t4 = mappedlist.create(tstr);
+      if((NULL == t4) || (NULL==mappedlist.at(tstr)))
       { throw(std::runtime_error("Failed to create node 4"));  }
       else
       { std::cout<<"\nTest Result ("<<test_id++<<") Created node 4"; }
@@ -94,98 +94,98 @@ namespace sutil_test
       *t1 = 1; *t2 = 2; *t3 = 3; *t4 = 4;
       std::cout<<"\nTest Result ("<<test_id++<<") Nodes created: "<<*t1<<" "<<*t2<<" "<<*t3<<" "<<*t4;
 
-      if(4 != pilemap.size())
-      { throw(std::runtime_error("Pilemap size is not 4 after creating 4 nodes")); }
+      if(4 != mappedlist.size())
+      { throw(std::runtime_error("Mapped list size is not 4 after creating 4 nodes")); }
       else
-      { std::cout<<"\nTest Result ("<<test_id++<<") Pile size is 4 with 4 nodes"; }
+      { std::cout<<"\nTest Result ("<<test_id++<<") Mapped list size is 4 with 4 nodes"; }
 
-      if( (4==*(pilemap.at(0))) && (3==*(pilemap.at(1))) &&
-          (2==*(pilemap.at(2))) && (1==*(pilemap.at(3))) )
-      { std::cout<<"\nTest Result ("<<test_id++<<") Pile values correctly set"; }
+      if( (4==*(mappedlist.at(0))) && (3==*(mappedlist.at(1))) &&
+          (2==*(mappedlist.at(2))) && (1==*(mappedlist.at(3))) )
+      { std::cout<<"\nTest Result ("<<test_id++<<") Mapped list values correctly set"; }
       else
       { throw(std::runtime_error("Failed to set pilemap values correctly")); }
 
-      if((1==*(pilemap.at("t1"))) &&
-         (2==*(pilemap.at("t2"))) &&
-         (3==*(pilemap.at("t3"))) &&
-         (4==*(pilemap.at("t4")))
+      if((1==*(mappedlist.at("t1"))) &&
+         (2==*(mappedlist.at("t2"))) &&
+         (3==*(mappedlist.at("t3"))) &&
+         (4==*(mappedlist.at("t4")))
         )
-      { std::cout<<"\nTest Result ("<<test_id++<<") Pile map access correctly initialized"; }
+      { std::cout<<"\nTest Result ("<<test_id++<<") Mapped list map access correctly initialized"; }
       else
       {
-        std::cout<<"\nValues:"<<*(pilemap.at("t1"))<<" "
-            <<*(pilemap.at("t2"))<<" "
-            <<*(pilemap.at("t3"))<<" "
-            <<*(pilemap.at("t4"));
+        std::cout<<"\nValues:"<<*(mappedlist.at("t1"))<<" "
+            <<*(mappedlist.at("t2"))<<" "
+            <<*(mappedlist.at("t3"))<<" "
+            <<*(mappedlist.at("t4"));
         throw(std::runtime_error("Failed to initialize pile map access"));
       }
 
       //Test 4 : Erase one node.
-      flag = pilemap.erase(t2);
-      if( (false==flag) || (NULL != pilemap.at("t2")) )
+      flag = mappedlist.erase(t2);
+      if( (false==flag) || (NULL != mappedlist.at("t2")) )
       { throw(std::runtime_error("Failed to delete node")); }
       else  { std::cout<<"\nTest Result ("<<test_id++<<") Deleted node successfully"; }
 
-      if(3 != pilemap.size())
+      if(3 != mappedlist.size())
       { throw(std::runtime_error("Unexpected pilemap size after deleting node")); }
-      else  { std::cout<<"\nTest Result ("<<test_id++<<") Pile size is 3 after deleting one node"; }
+      else  { std::cout<<"\nTest Result ("<<test_id++<<") Mapped list size is 3 after deleting one node"; }
 
-      if( (4==*(pilemap.at(0))) && (3==*(pilemap.at(1))) && (1==*(pilemap.at(2))) )
-      { std::cout<<"\nTest Result ("<<test_id++<<") Pile values correctly set"; }
+      if( (4==*(mappedlist.at(0))) && (3==*(mappedlist.at(1))) && (1==*(mappedlist.at(2))) )
+      { std::cout<<"\nTest Result ("<<test_id++<<") Mapped list values correctly set"; }
       else
-      { throw(std::runtime_error("Pile values incorrect after deleting node")); }
+      { throw(std::runtime_error("Mapped list values incorrect after deleting node")); }
 
       //Test 5 : Test copy constructor.
       time1 = 5.12;
       tstr="t2";
-      t2 = pilemap.create(tstr,time1);
-      if( (NULL==t2) || (5.12!=*(pilemap.at(0))) || (4!=pilemap.size()))
+      t2 = mappedlist.create(tstr,time1);
+      if( (NULL==t2) || (5.12!=*(mappedlist.at(0))) || (4!=mappedlist.size()))
       { throw(std::runtime_error("Failed to create pilemap node with copy-constructor")); }
       else
       { std::cout<<"\nTest Result ("<<test_id++<<") Created pilemap node with copy constructor"; }
 
       //Test 6 : Test clear
-      flag = pilemap.clear();
+      flag = mappedlist.clear();
 
-      if( (!flag) || ( NULL != pilemap.at(0)))
+      if( (!flag) || ( NULL != mappedlist.at(0)))
       { throw(std::runtime_error("Failed to clear pilemap"));  }
       else  { std::cout<<"\nTest Result ("<<test_id++<<") Cleared pilemap"; }
 
-      //Test 7 : Pile stress
+      //Test 7 : Mapped list stress
       std::stringstream ss;
       std::cout<<"\nTest Result ("<<test_id++<<") Initializing large pilemap: 0%";
       const unsigned int pilemap_sz=1000;
       for(unsigned int i=0;i<pilemap_sz;i++)
       {
         ss<<"t2_"<<i;
-        t2 = pilemap.create(ss.str());
+        t2 = mappedlist.create(ss.str());
         if(NULL == t2)
         { throw(std::runtime_error("Failed to initialize 1,000 pilemap")); }
         if(i%((int)(pilemap_sz/10)) == 0)
         { std::cout<<"+10%"; std::flush(std::cout);  }
       }
 
-      if( pilemap_sz != pilemap.size())
-      { throw(std::runtime_error("Pilemap size should be 1,000, but isn't")); }
+      if( pilemap_sz != mappedlist.size())
+      { throw(std::runtime_error("Mapped list size should be 1,000, but isn't")); }
       else  { std::cout<<"\nTest Result ("<<test_id++<<") Correctly initialized "<<pilemap_sz<<" pilemap"; }
 
       //Test the access speed
       time1 = sutil::CSystemClock::getSysTime();
       for(long long i=0;i<10000;i++)
       {
-        t2 = pilemap.at(pilemap_sz-1);
+        t2 = mappedlist.at(pilemap_sz-1);
       }
       time2 = sutil::CSystemClock::getSysTime();
-      std::cout<<"\nTest Result ("<<test_id++<<") Pile Retrieve Stress : "<<pilemap_sz
+      std::cout<<"\nTest Result ("<<test_id++<<") Mapped list Retrieve Stress : "<<pilemap_sz
           <<" <double> entry ("<<*t2<<") 10,000 times"
           <<" in "<<time2-time1<<" seconds";
 
-      std::cout<<"\nTest #"<<arg_id<<" (Pilemap Test) Successful";
+      std::cout<<"\nTest #"<<arg_id<<" (Mapped list Test) Succeeded.";
     }
     catch(std::exception& ee)
     {
       std::cout<<"\nTest Error ("<<test_id++<<") "<<ee.what();
-      std::cout<<"\nTest #"<<arg_id<<" (Pilemap Test) Failed";
+      std::cout<<"\nTest #"<<arg_id<<" (Mapped list Test) Failed";
     }
   }
 
@@ -308,7 +308,7 @@ namespace sutil_test
       { throw(std::runtime_error("Failed to clear mlpmap"));  }
       else  { std::cout<<"\nTest Result ("<<test_id++<<") Cleared mlpmap"; }
 
-      std::cout<<"\nTest #"<<arg_id<<" (MultiLevelPmap Test) Successful";
+      std::cout<<"\nTest #"<<arg_id<<" (MultiLevelPmap Test) Succeeded.";
     }
     catch(std::exception &e)
     {

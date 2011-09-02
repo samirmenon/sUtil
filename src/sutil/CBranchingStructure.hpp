@@ -29,7 +29,7 @@ sUtil. If not, see <http://www.gnu.org/licenses/>.
 #ifndef CBRANCHINGSTRUCTURE_HPP_
 #define CBRANCHINGSTRUCTURE_HPP_
 
-#include <sutil/CPileMap.hpp>
+#include <sutil/CMappedList.hpp>
 
 #ifdef DEBUG
 #include <iostream>

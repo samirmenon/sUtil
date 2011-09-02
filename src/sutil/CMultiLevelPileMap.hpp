@@ -29,7 +29,7 @@ sUtil. If not, see <http://www.gnu.org/licenses/>.
 #ifndef CMULTILEVELPILEMAP_HPP_
 #define CMULTILEVELPILEMAP_HPP_
 
-#include <sutil/CPileMap.hpp>
+#include <sutil/CMappedList.hpp>
 
 #include <vector>
 
@@ -122,7 +122,7 @@ namespace sutil
   /** Constructor. Sets default values.   */
   template <typename Idx, typename T>
   CMultiLevelPileMap<Idx,T>::CMultiLevelPileMap() :
-  CMappedList<Idx,T>::CPileMap()
+  CMappedList<Idx,T>::CMappedList()
   { mlvec_.clear(); pri_levels_ = 0; }
 
   /** Does nothing itself.

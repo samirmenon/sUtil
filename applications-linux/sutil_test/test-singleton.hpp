@@ -91,7 +91,7 @@ namespace sutil_test
       }
       std::cout<<"\nTest Result ("<<test_id++<<") Singleton works for "<<test_iters<<" calls on data structure 2";
 
-      std::cout<<"\nTest #"<<arg_id<<" (Singleton Test) Successful";
+      std::cout<<"\nTest #"<<arg_id<<" (Singleton Test) Succeeded.";
     }
     catch(std::exception& ee)
     {

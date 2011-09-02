@@ -26,8 +26,8 @@ sUtil. If not, see <http://www.gnu.org/licenses/>.
  *  Copyright (C) 2010, Samir Menon <smenon@stanford.edu>
  */
 
-#ifndef CPILEMAP_HPP_
-#define CPILEMAP_HPP_
+#ifndef CMAPPEDLIST_HPP_
+#define CMAPPEDLIST_HPP_
 
 #include <map>
 
@@ -197,7 +197,7 @@ namespace sutil
         if(NULL == tmp)
         {
 #ifdef DEBUG
-          std::cout<<"\nCPileMap<Idx,T>::CPileMap(const CPileMap<Idx,T>& arg_pmap) : ";
+          std::cout<<"\nCMappedList<Idx,T>::CMappedList(const CMappedList<Idx,T>& arg_pmap) : ";
           std::cout<<"ERROR : Copy constructor failed. Resetting pilemap.";
 #endif
           this->~CMappedList();//Reset the pilemap.
@@ -247,7 +247,7 @@ namespace sutil
     if(map_.find(arg_idx) != map_.end())
     {
 #ifdef DEBUG
-      std::cout<<"\nCPileMap<Idx,T>::create() ERROR : Idx exists. Tried to add duplicate entry";
+      std::cout<<"\nCMappedList<Idx,T>::create() ERROR : Idx exists. Tried to add duplicate entry";
 #endif
       return NULL;
     }
@@ -279,7 +279,7 @@ namespace sutil
     if(map_.find(arg_idx) != map_.end())
     {
 #ifdef DEBUG
-      std::cout<<"\nCPileMap<Idx,T>::create() ERROR : Idx exists. Tried to add duplicate entry";
+      std::cout<<"\nCMappedList<Idx,T>::create() ERROR : Idx exists. Tried to add duplicate entry";
 #endif
       return NULL;
     }
@@ -450,7 +450,7 @@ namespace sutil
     if(map_.find(arg_idx) == map_.end())
     {
 #ifdef DEBUG
-      std::cout<<"\nCPileMap<Idx,T>::erase() WARNING : Tried to erase a nonexistent entry";
+      std::cout<<"\nCMappedList<Idx,T>::erase() WARNING : Tried to erase a nonexistent entry";
 #endif
       return false;
     }
@@ -553,5 +553,5 @@ namespace sutil
 
 }
 
-#endif /* CPILEMAP_HPP_ */
+#endif /* CMAPPEDLIST_HPP_ */
 
