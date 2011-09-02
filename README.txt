@@ -26,3 +26,14 @@ sUtil. If not, see <http://www.gnu.org/licenses/>.
 About: 
 
 sUtil is a collection of useful utility classes and functions, collected together in a header-only library. Simply include the files and use them. No linking required.
+
+To see example code for the different header files, look at the tests in applications-linux.
+
+
+Supported Platforms:
+
+1. Linux 2.6.38, gcc 4.5, x86
+2. Linux 2.6.38, gcc 4.5, x64
+
+* However, the code should work on most non windows platforms and on windows with minor changes.
+

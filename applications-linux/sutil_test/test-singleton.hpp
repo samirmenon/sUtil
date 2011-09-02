@@ -26,8 +26,8 @@ sUtil. If not, see <http://www.gnu.org/licenses/>.
  *  Copyright (C) 2011, Samir Menon <smenon@stanford.edu>
  */
 
-#ifndef TEST_DATABASE_HPP_
-#define TEST_DATABASE_HPP_
+#ifndef TEST_SINGLETON_HPP_
+#define TEST_SINGLETON_HPP_
 
 #include <sutil/CSingleton.hpp>
 
@@ -103,4 +103,4 @@ namespace sutil_test
 }
 
 
-#endif /* TEST_DATABASE_HPP_ */
+#endif /* TEST_SINGLETON_HPP_ */
