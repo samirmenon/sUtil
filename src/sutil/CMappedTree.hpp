@@ -37,13 +37,13 @@ sUtil. If not, see <http://www.gnu.org/licenses/>.
 
 namespace sutil
 {
-  /** This template class contains a branching structure.
+  /** This template class contains a mapped tree.
    *
    * It is an extension of a MappedList, which itself is a
    * collection of pointers (memory managed) stored in a
    * linked list.
    *
-   * The branching structure extends the MappedList by using
+   * The mapped tree extends the MappedList by using
    * a tree representation where root nodes are connected to
    * subtrees of nodes. This representation is overlaid on
    * the MappedList's linked list so iterating over both is
@@ -59,29 +59,29 @@ namespace sutil
    * NOTE : You MUST call CMappedTree's create functions.
    *
    * NOTE 2 : You MUST set the name_ and parent_name_ fields for the objects
-   *          in the branching structure. The linkNodes function requires this
+   *          in the mapped tree. The linkNodes function requires this
    *          to organize your (unordered) list of nodes into a tree.
    */
   template <typename TIdx, typename TNode>
   class CMappedTree : public sutil::CMappedList<TIdx,TNode>
   {
   protected:
-    /** The root of the branching structure */
+    /** The root of the mapped tree */
     TNode* root_node_;
 
-    /** True if the branching structure has a root. */
+    /** True if the mapped tree has a root. */
     bool has_been_init_;
 
   public:
     CMappedTree();
     virtual ~CMappedTree();
-    /** Copy-Constructor : Does a deep copy of the branching structure to
+    /** Copy-Constructor : Does a deep copy of the mapped tree to
      * get a new one.
      *
      * NOTE : This uses the passed mappedlist's iterator construct. */
     virtual bool deepCopy(CMappedTree<TIdx,TNode>* arg_br);
 
-    /** Adds a node to the branching structure. The passed node is
+    /** Adds a node to the mapped tree. The passed node is
      * copied and stored in a vector. A map between the idx and the
      * node is also stored.
      *
@@ -92,7 +92,7 @@ namespace sutil
     virtual TNode* create(const TIdx& arg_idx, const TNode & arg_node2add,
         const bool arg_is_root_);
 
-    /** Adds a node to the branching structure.
+    /** Adds a node to the mapped tree.
      *
      * NOTE : Assumes you will set the name_  and parent_name_ fields
      * in the returned arg_node2add

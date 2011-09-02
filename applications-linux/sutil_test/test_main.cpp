@@ -54,7 +54,7 @@ int main(int argc, char** argv)
     cout<<"\n"<<tid++<<" : Run singleton tests";
     cout<<"\n"<<tid++<<" : Run mapped listmap tests";
     cout<<"\n"<<tid++<<" : Run multi-level mapped list tests";
-    cout<<"\n"<<tid++<<" : Run branching structure tests";
+    cout<<"\n"<<tid++<<" : Run mapped tree tests";
     cout<<"\n"<<tid++<<" : Run memcopier tests";
     cout<<"\n";
   }
@@ -104,7 +104,7 @@ int main(int argc, char** argv)
     ++id;
 
     if((tid==0)||(tid==id))
-    {//Test branching structure
+    {//Test mapped tree
       std::cout<<"\n\nTest #"<<id<<". System Clock [Sys time, Sim time :"
           <<sutil::CSystemClock::getSysTime()
       <<" "

@@ -64,7 +64,7 @@ namespace sutil
      * the appropriate slot in the vector-list. Uses the copy-constructor. */
     virtual T* create(const Idx& arg_idx, const std::size_t arg_priority);
 
-    /** Copy-Constructor : Does a deep copy of the branching structure to
+    /** Copy-Constructor : Does a deep copy of the mapped multi level list to
      *  get a new one.
      * NOTE : This uses the passed mapped list's iterator construct. */
     virtual bool deepCopy(CMappedMultiLevelList<Idx,T>* arg_br);
