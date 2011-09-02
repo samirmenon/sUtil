@@ -20,7 +20,7 @@ License and a copy of the GNU General Public License along with
 sUtil. If not, see <http://www.gnu.org/licenses/>.
  */
 /*
- * test-pilemap.hpp
+ * test-mappedlist.hpp
  *
  *  Created on: Jul 17, 2011
  *
@@ -34,7 +34,7 @@ sUtil. If not, see <http://www.gnu.org/licenses/>.
 
 #include <sutil/CMemCopier.hpp>
 #include <sutil/CMappedList.hpp>
-#include <sutil/CMultiLevelPileMap.hpp>
+#include <sutil/CMappedMultiLevelList.hpp>
 
 #include <iostream>
 #include <math.h>
@@ -44,7 +44,7 @@ sUtil. If not, see <http://www.gnu.org/licenses/>.
 
 namespace sutil_test
 {
-  /** Tests the pilemap utility
+  /** Tests the mapped list utility
    * @param arg_id : The id of the test */
   void test_mappedlist(const int arg_id)
   {
@@ -103,7 +103,7 @@ namespace sutil_test
           (2==*(mappedlist.at(2))) && (1==*(mappedlist.at(3))) )
       { std::cout<<"\nTest Result ("<<test_id++<<") Mapped list values correctly set"; }
       else
-      { throw(std::runtime_error("Failed to set pilemap values correctly")); }
+      { throw(std::runtime_error("Failed to set mapped list values correctly")); }
 
       if((1==*(mappedlist.at("t1"))) &&
          (2==*(mappedlist.at("t2"))) &&
@@ -127,7 +127,7 @@ namespace sutil_test
       else  { std::cout<<"\nTest Result ("<<test_id++<<") Deleted node successfully"; }
 
       if(3 != mappedlist.size())
-      { throw(std::runtime_error("Unexpected pilemap size after deleting node")); }
+      { throw(std::runtime_error("Unexpected mapped list size after deleting node")); }
       else  { std::cout<<"\nTest Result ("<<test_id++<<") Mapped list size is 3 after deleting one node"; }
 
       if( (4==*(mappedlist.at(0))) && (3==*(mappedlist.at(1))) && (1==*(mappedlist.at(2))) )
@@ -140,43 +140,43 @@ namespace sutil_test
       tstr="t2";
       t2 = mappedlist.create(tstr,time1);
       if( (NULL==t2) || (5.12!=*(mappedlist.at(0))) || (4!=mappedlist.size()))
-      { throw(std::runtime_error("Failed to create pilemap node with copy-constructor")); }
+      { throw(std::runtime_error("Failed to create mapped list node with copy-constructor")); }
       else
-      { std::cout<<"\nTest Result ("<<test_id++<<") Created pilemap node with copy constructor"; }
+      { std::cout<<"\nTest Result ("<<test_id++<<") Created mapped list node with copy constructor"; }
 
       //Test 6 : Test clear
       flag = mappedlist.clear();
 
       if( (!flag) || ( NULL != mappedlist.at(0)))
-      { throw(std::runtime_error("Failed to clear pilemap"));  }
-      else  { std::cout<<"\nTest Result ("<<test_id++<<") Cleared pilemap"; }
+      { throw(std::runtime_error("Failed to clear mapped list"));  }
+      else  { std::cout<<"\nTest Result ("<<test_id++<<") Cleared mapped list"; }
 
       //Test 7 : Mapped list stress
       std::stringstream ss;
-      std::cout<<"\nTest Result ("<<test_id++<<") Initializing large pilemap: 0%";
-      const unsigned int pilemap_sz=1000;
-      for(unsigned int i=0;i<pilemap_sz;i++)
+      std::cout<<"\nTest Result ("<<test_id++<<") Initializing large mapped list: 0%";
+      const unsigned int maplist_sz=1000;
+      for(unsigned int i=0;i<maplist_sz;i++)
       {
         ss<<"t2_"<<i;
         t2 = mappedlist.create(ss.str());
         if(NULL == t2)
-        { throw(std::runtime_error("Failed to initialize 1,000 pilemap")); }
-        if(i%((int)(pilemap_sz/10)) == 0)
+        { throw(std::runtime_error("Failed to initialize 1,000 mapped list")); }
+        if(i%((int)(maplist_sz/10)) == 0)
         { std::cout<<"+10%"; std::flush(std::cout);  }
       }
 
-      if( pilemap_sz != mappedlist.size())
+      if( maplist_sz != mappedlist.size())
       { throw(std::runtime_error("Mapped list size should be 1,000, but isn't")); }
-      else  { std::cout<<"\nTest Result ("<<test_id++<<") Correctly initialized "<<pilemap_sz<<" pilemap"; }
+      else  { std::cout<<"\nTest Result ("<<test_id++<<") Correctly initialized "<<maplist_sz<<" mapped list"; }
 
       //Test the access speed
       time1 = sutil::CSystemClock::getSysTime();
       for(long long i=0;i<10000;i++)
       {
-        t2 = mappedlist.at(pilemap_sz-1);
+        t2 = mappedlist.at(maplist_sz-1);
       }
       time2 = sutil::CSystemClock::getSysTime();
-      std::cout<<"\nTest Result ("<<test_id++<<") Mapped list Retrieve Stress : "<<pilemap_sz
+      std::cout<<"\nTest Result ("<<test_id++<<") Mapped list Retrieve Stress : "<<maplist_sz
           <<" <double> entry ("<<*t2<<") 10,000 times"
           <<" in "<<time2-time1<<" seconds";
 
@@ -190,12 +190,12 @@ namespace sutil_test
   }
 
 
-  /** A data structure to test the multi-level pilemap, which requires a value and priority */
+  /** A data structure to test the multi-level mapped list, which requires a value and priority */
   struct SMapTester{ double val; unsigned int pri; };
 
-  /** Tests the multi-level pilemap utility
+  /** Tests the multi-level mapped list utility
    * @param arg_id : The id of the test */
-  void test_multi_pilemap(const int arg_id)
+  void test_mapped_multi_level_list(const int arg_id)
   {
     bool flag = true;
     unsigned int test_id=0;
@@ -203,42 +203,42 @@ namespace sutil_test
     {
       //Initialize the buffers and the mem copier
       SMapTester *t1, *t2, *t3, *t4;
-      sutil::CMappedMultiLevelList<std::string,SMapTester> mlpmap;
+      sutil::CMappedMultiLevelList<std::string,SMapTester> mapmllist;
 
       std::string tstr;
 
       // Test 1 : Create nodes
       tstr = "t1";
-      t1 = mlpmap.create(tstr,0); t1->val = 1; t1->pri = 0;
-      if((NULL == t1) || (NULL==mlpmap.at(tstr)))
+      t1 = mapmllist.create(tstr,0); t1->val = 1; t1->pri = 0;
+      if((NULL == t1) || (NULL==mapmllist.at(tstr)))
       { throw(std::runtime_error("Failed to create node 1")); }
 
       tstr = "t2";
-      t2 = mlpmap.create(tstr,2); t2->val = 2; t2->pri = 2;
-      if((NULL == t2) || (NULL==mlpmap.at(tstr)))
+      t2 = mapmllist.create(tstr,2); t2->val = 2; t2->pri = 2;
+      if((NULL == t2) || (NULL==mapmllist.at(tstr)))
       { throw(std::runtime_error("Failed to create node 2")); }
 
       tstr = "t3";
-      t3 = mlpmap.create(tstr,2); t3->val = 3; t3->pri = 2;
-      if((NULL == t3) || (NULL==mlpmap.at(tstr)))
+      t3 = mapmllist.create(tstr,2); t3->val = 3; t3->pri = 2;
+      if((NULL == t3) || (NULL==mapmllist.at(tstr)))
       { throw(std::runtime_error("Failed to create node 3")); }
 
       tstr = "t4";
-      t4 = mlpmap.create(tstr,8); t4->val = 4; t4->pri = 8;
-      if((NULL == t4) || (NULL==mlpmap.at(tstr)))
+      t4 = mapmllist.create(tstr,8); t4->val = 4; t4->pri = 8;
+      if((NULL == t4) || (NULL==mapmllist.at(tstr)))
       { throw(std::runtime_error("Failed to create node 4")); }
 
-      if(9!=mlpmap.getNumPriorityLevels())
+      if(9!=mapmllist.getNumPriorityLevels())
       { throw(std::runtime_error("Incorrectly added task levels")); }
 
-      if((t1->pri != (unsigned int) mlpmap.getPriorityLevel(t1)) ||
-          (t1->pri != (unsigned int) mlpmap.getPriorityLevel("t1")) ||
-          (t2->pri != (unsigned int) mlpmap.getPriorityLevel(t2)) ||
-          (t2->pri != (unsigned int) mlpmap.getPriorityLevel("t2")) ||
-          (t3->pri != (unsigned int) mlpmap.getPriorityLevel(t3)) ||
-          (t3->pri != (unsigned int) mlpmap.getPriorityLevel("t3")) ||
-          (t4->pri != (unsigned int) mlpmap.getPriorityLevel(t4)) ||
-          (t4->pri != (unsigned int) mlpmap.getPriorityLevel("t4"))
+      if((t1->pri != (unsigned int) mapmllist.getPriorityLevel(t1)) ||
+          (t1->pri != (unsigned int) mapmllist.getPriorityLevel("t1")) ||
+          (t2->pri != (unsigned int) mapmllist.getPriorityLevel(t2)) ||
+          (t2->pri != (unsigned int) mapmllist.getPriorityLevel("t2")) ||
+          (t3->pri != (unsigned int) mapmllist.getPriorityLevel(t3)) ||
+          (t3->pri != (unsigned int) mapmllist.getPriorityLevel("t3")) ||
+          (t4->pri != (unsigned int) mapmllist.getPriorityLevel(t4)) ||
+          (t4->pri != (unsigned int) mapmllist.getPriorityLevel("t4"))
       )
       { throw(std::runtime_error("Incorrect priority level recall")); }
 
@@ -250,70 +250,70 @@ namespace sutil_test
           <<t3->val<<","<<t3->pri<<" "
           <<t4->val<<","<<t4->pri;
 
-      if(4 != mlpmap.size())
+      if(4 != mapmllist.size())
       { throw(std::runtime_error("Failed. Unexpected mlpmap size")); }
-      else  { std::cout<<"\nTest Result ("<<test_id++<<") MultiLevelPmap size is 4 with 4 nodes"; }
+      else  { std::cout<<"\nTest Result ("<<test_id++<<") MappedMultiLevelList size is 4 with 4 nodes"; }
 
-      if( (4==(mlpmap.at(0))->val) && (3==(mlpmap.at(1))->val) &&
-          (2==(mlpmap.at(2))->val) && (1==(mlpmap.at(3))->val) )
-      { std::cout<<"\nTest Result ("<<test_id++<<") MultiLevelPmap values correctly set"; }
+      if( (4==(mapmllist.at(0))->val) && (3==(mapmllist.at(1))->val) &&
+          (2==(mapmllist.at(2))->val) && (1==(mapmllist.at(3))->val) )
+      { std::cout<<"\nTest Result ("<<test_id++<<") MappedMultiLevelList values correctly set"; }
       else
       { throw(std::runtime_error("Failed to set mlpmap values correctly")); }
 
-      if((0==(mlpmap.at("t1"))->pri) &&
-          (2==(mlpmap.at("t2"))->pri) &&
-          (2==(mlpmap.at("t3"))->pri) &&
-          (8==(mlpmap.at("t4"))->pri)
+      if((0==(mapmllist.at("t1"))->pri) &&
+          (2==(mapmllist.at("t2"))->pri) &&
+          (2==(mapmllist.at("t3"))->pri) &&
+          (8==(mapmllist.at("t4"))->pri)
       )
-      { std::cout<<"\nTest Result ("<<test_id++<<") MultiLevelPmap map access correctly initialized"; }
+      { std::cout<<"\nTest Result ("<<test_id++<<") MappedMultiLevelList map access correctly initialized"; }
       else
       { throw(std::runtime_error("Failed to initialize pile map access"));  }
 
       //Test 4 : Erase one node.
-      flag = mlpmap.erase(t4);
-      if( (false==flag) || (NULL != mlpmap.at("t4")) )
+      flag = mapmllist.erase(t4);
+      if( (false==flag) || (NULL != mapmllist.at("t4")) )
       { throw(std::runtime_error("Failed to delete node")); }
       else  { std::cout<<"\nTest Result ("<<test_id++<<") Deleted node successfully"; }
 
-      if(3 != mlpmap.getNumPriorityLevels())
+      if(3 != mapmllist.getNumPriorityLevels())
       { throw(std::runtime_error("Failed. Unexpected mlpmap priority levels after deleting node."));  }
-      else  { std::cout<<"\nTest Result ("<<test_id++<<") MultiLevelPmap has 3 levels after deleting level 8 node"; }
+      else  { std::cout<<"\nTest Result ("<<test_id++<<") MappedMultiLevelList has 3 levels after deleting level 8 node"; }
 
-      flag = mlpmap.erase("t1");
-      if( (false==flag) || (NULL != mlpmap.at("t1")) )
+      flag = mapmllist.erase("t1");
+      if( (false==flag) || (NULL != mapmllist.at("t1")) )
       { throw(std::runtime_error("Failed to delete node")); }
       else  { std::cout<<"\nTest Result ("<<test_id++<<") Deleted node successfully"; }
 
-      if(3 != mlpmap.getNumPriorityLevels())
+      if(3 != mapmllist.getNumPriorityLevels())
       { throw(std::runtime_error("Failed. Unexpected mlpmap priority levels after deleting node."));  }
-      else  { std::cout<<"\nTest Result ("<<test_id++<<") MultiLevelPmap has 3 levels after deleting level 0 node"; }
+      else  { std::cout<<"\nTest Result ("<<test_id++<<") MappedMultiLevelList has 3 levels after deleting level 0 node"; }
 
       //Test 5 : Test copy constructor.
       SMapTester tmp_var; tmp_var.pri = 9; tmp_var.val = 6;
       tstr="t1";
-      t2 = mlpmap.create(tstr,tmp_var,tmp_var.pri);
-      if( (NULL==t2) || (tmp_var.pri!=(mlpmap.at("t1")->pri)) ||
-          ((tmp_var.pri+1)!=mlpmap.getNumPriorityLevels()))
+      t2 = mapmllist.create(tstr,tmp_var,tmp_var.pri);
+      if( (NULL==t2) || (tmp_var.pri!=(mapmllist.at("t1")->pri)) ||
+          ((tmp_var.pri+1)!=mapmllist.getNumPriorityLevels()))
       { throw(std::runtime_error("Failed to create mlpmap node with copy-constructor"));  }
       else  { std::cout<<"\nTest Result ("<<test_id++<<") Created mlpmap node with copy constructor"; }
 
-      if(tmp_var.val!=mlpmap.getSinglePriorityLevel(tmp_var.pri)->at(0)->val)
+      if(tmp_var.val!=mapmllist.getSinglePriorityLevel(tmp_var.pri)->at(0)->val)
       { throw(std::runtime_error("Failed to access single priority level"));  }
       else  { std::cout<<"\nTest Result ("<<test_id++<<") Correctly accessed single priority level"; }
 
       //Test 6 : Test clear
-      flag = mlpmap.clear();
+      flag = mapmllist.clear();
 
-      if( (!flag) || ( NULL != mlpmap.at(0)))
+      if( (!flag) || ( NULL != mapmllist.at(0)))
       { throw(std::runtime_error("Failed to clear mlpmap"));  }
       else  { std::cout<<"\nTest Result ("<<test_id++<<") Cleared mlpmap"; }
 
-      std::cout<<"\nTest #"<<arg_id<<" (MultiLevelPmap Test) Succeeded.";
+      std::cout<<"\nTest #"<<arg_id<<" (MappedMultiLevelList Test) Succeeded.";
     }
     catch(std::exception &e)
     {
       std::cout<<"\nTest Result ("<<test_id++<<") "<<e.what();
-      std::cout<<"\nTest #"<<arg_id<<" (MultiLevelPmap Test) Failed";
+      std::cout<<"\nTest #"<<arg_id<<" (MappedMultiLevelList Test) Failed";
     }
   }
 

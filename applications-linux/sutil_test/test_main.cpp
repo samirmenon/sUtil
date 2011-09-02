@@ -99,7 +99,7 @@ int main(int argc, char** argv)
       <<" "
       <<sutil::CSystemClock::getSimTime()
       <<"]";
-      sutil_test::test_multi_pilemap(id);
+      sutil_test::test_mapped_multi_level_list(id);
     }
     ++id;
 
