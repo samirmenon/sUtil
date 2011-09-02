@@ -27,8 +27,8 @@ sUtil. If not, see <http://www.gnu.org/licenses/>.
  *  Copyright (C) 2011, Samir Menon <smenon@stanford.edu>
  */
 
-#ifndef UTIL_DS_TESTS_HPP_
-#define UTIL_DS_TESTS_HPP_
+#ifndef TEST_MAPPEDLIST_HPP_
+#define TEST_MAPPEDLIST_HPP_
 
 #include <sutil/CSystemClock.hpp>
 
@@ -318,4 +318,4 @@ namespace sutil_test
   }
 
 }
-#endif /* UTIL_DS_TESTS_HPP_ */
+#endif /* TEST_MAPPEDLIST_HPP_ */

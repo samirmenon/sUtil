@@ -27,7 +27,7 @@ sUtil. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "test-singleton.hpp"
-#include "test-pilemap.hpp"
+#include "test-mappedlist.hpp"
 #include "test-branching-struct.hpp"
 #include "test-memcopier.hpp"
 
