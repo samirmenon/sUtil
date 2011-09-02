@@ -117,7 +117,7 @@ namespace sutil_test
             <<*(mappedlist.at("t2"))<<" "
             <<*(mappedlist.at("t3"))<<" "
             <<*(mappedlist.at("t4"));
-        throw(std::runtime_error("Failed to initialize pile map access"));
+        throw(std::runtime_error("Failed to initialize mapped list access"));
       }
 
       //Test 4 : Erase one node.
@@ -267,7 +267,7 @@ namespace sutil_test
       )
       { std::cout<<"\nTest Result ("<<test_id++<<") MappedMultiLevelList map access correctly initialized"; }
       else
-      { throw(std::runtime_error("Failed to initialize pile map access"));  }
+      { throw(std::runtime_error("Failed to initialize mapped list access"));  }
 
       //Test 4 : Erase one node.
       flag = mapmllist.erase(t4);

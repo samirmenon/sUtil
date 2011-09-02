@@ -52,8 +52,8 @@ int main(int argc, char** argv)
     cout<<"\nThe command line input is: ./<executable> <test_number>";
     cout<<"\n"<<tid++<<" : Run all tests";
     cout<<"\n"<<tid++<<" : Run singleton tests";
-    cout<<"\n"<<tid++<<" : Run pilemap tests";
-    cout<<"\n"<<tid++<<" : Run multi-level pilemap tests";
+    cout<<"\n"<<tid++<<" : Run mapped listmap tests";
+    cout<<"\n"<<tid++<<" : Run multi-level mapped list tests";
     cout<<"\n"<<tid++<<" : Run branching structure tests";
     cout<<"\n"<<tid++<<" : Run memcopier tests";
     cout<<"\n";
@@ -82,7 +82,7 @@ int main(int argc, char** argv)
     ++id;
 
     if((tid==0)||(tid==id))
-    {//Test pilemap
+    {//Test mapped list
       std::cout<<"\n\nTest #"<<id<<". System Clock [Sys time, Sim time :"
           <<sutil::CSystemClock::getSysTime()
       <<" "
@@ -93,7 +93,7 @@ int main(int argc, char** argv)
     ++id;
 
     if((tid==0)||(tid==id))
-    {//Test multi-level pilemap
+    {//Test multi-level mapped list
       std::cout<<"\n\nTest #"<<id<<". System Clock [Sys time, Sim time :"
           <<sutil::CSystemClock::getSysTime()
       <<" "

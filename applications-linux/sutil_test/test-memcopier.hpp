@@ -20,7 +20,7 @@ License and a copy of the GNU General Public License along with
 sUtil. If not, see <http://www.gnu.org/licenses/>.
  */
 /*
- * test-pilemap.hpp
+ * test-memcopier.hpp
  *
  *  Created on: Jul 17, 2011
  *
