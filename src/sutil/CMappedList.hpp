@@ -71,32 +71,82 @@ namespace sutil
   class CMappedList
   {
   public:
-    /** STL container specific code:
+    /** ***************************
+     * STL container specific code:
      * (a) A set of typedefs
      * (b) An iterator definition
-     * (c) Standard methods */
+     * (c) Standard methods
+     * *************************** */
 
-    //The typedefs:
+    /** ***************************
+     * The typedefs:
+     * ************************** */
     typedef T value_type;
     typedef T& reference;
     typedef const T& const_reference;
     typedef size_t size_type;
     typedef ptrdiff_t difference_type;
 
-    //The iterator definition
-  private:
-    template <typename Node> class __iterator; //Forward declaration
+    /** ***************************
+     * The iterator definition
+     * ************************** */
   public:
-    typedef __iterator<SMLNode<Idx,T> > iterator;
-    typedef __iterator<const SMLNode<Idx,T> > const_iterator;
+    template <typename Node, typename Data> class __iterator; //Forward declaration
+  public:
+    typedef __iterator<SMLNode<Idx,T>,T> iterator;
+    typedef __iterator<const SMLNode<Idx,T>,const T> const_iterator;
 
-    //The standard methods:
+    /** ***************************
+     * The iterator functions
+     * ************************** */
+    iterator begin()
+    {
+      iterator a(front_);
+      return a;
+    }
+
+    iterator end()
+    { return iterator(); }
+
+    /** ***************************
+     * The standard methods
+     * ************************** */
     /** Constructor : Resets the pilemap. */
     CMappedList() : front_(NULL), back_(NULL),size_(0) {}
 
+//    /** Copy Constructor : Performs a deep-copy (std container requirement).
+//     * Beware; This can be quite slow.
+//     * 'explicit' makes sure that only a CMappedList can be copied. Ie. Implicit
+//     * copy-constructor use is disallowed.*/
+//    explicit CMappedList(const CMappedList<Idx,T>& arg_pm);
+//
+//    /** Assignment operator : Performs a deep-copy (std container requirement).
+//     * Beware; This can be quite slow. */
+//    CMappedList<Idx,T>& operator = (const CMappedList<Idx,T>& rhs);
+//
     /** Destructor : Deallocates all the nodes if someone already hasn't
      * done so. */
     virtual ~CMappedList();
+//
+//    /** Comparison operator : Performs an element-by-element check (std container requirement).
+//     * Beware; This can be quite slow. */
+//    bool operator == (const CMappedList<Idx,T>& lhs, const CMappedList<Idx,T>& rhs);
+//
+//    /** Comparison operator : Performs an element-by-element check (std container requirement).
+//     * Beware; This can be quite slow. */
+//    bool operator != (const CMappedList<Idx,T>& lhs, const CMappedList<Idx,T>& rhs);
+//
+//    /** Swaps the elements with the passed pilemap */
+//    void swap(CMappedList<Idx,T>& arg_swap_obj);
+//
+//    /** The current size of the container */
+//    size_type size() const;
+//
+//    /** The maximum size of the container */
+//    size_type max_size() const;
+//
+//    /** Is the container empty */
+//    bool empty() const;
 
   public:
     /** Const pointer access to the list.
@@ -110,7 +160,11 @@ namespace sutil
     virtual void resetIterator()
     { iterator_ = static_cast<const SMLNode<Idx,T> *>(front_); }
 
-    /** Copy-Constructor : Does a deep copy of the mappedlist to
+    /** *******************************
+     * The mapped list specific methods
+     * ****************************** */
+
+    /** Does a deep copy of the mappedlist to
      * get a new one. This is VERY SLOW. */
     virtual bool deepCopy(const CMappedList<Idx,T>* const arg_pmap);
 
@@ -188,18 +242,21 @@ namespace sutil
     /** The size of the MappedList */
     std::size_t size_;
 
-  private:
+  public:
     /** An stl style iterator for CMappedList */
-    template <typename Node>
-    class __iterator : public std::iterator<std::forward_iterator_tag, T>
+    template <typename Node, typename Data>
+    class __iterator : public std::iterator<std::forward_iterator_tag, Data>
     {
       Node *pos_;
     public:
-      __iterator(): pos_(NULL){}
+      explicit __iterator(): pos_(NULL){}
 
       /** Explicit so that other iterators don't typecast into this one*/
       explicit __iterator(const iterator& other)
       { pos_ = other.pos_; }
+
+      explicit __iterator(Node* front_node)
+      { pos_ = front_node; }
 
       iterator& operator = (const iterator& other)
       { pos_ = other.pos_; return (*this);  }
@@ -210,8 +267,8 @@ namespace sutil
       bool operator != (const iterator& other)
       { return (pos_ != other.pos_);  }
 
-      Node& operator * (const iterator& me)
-      { return *(me.pos_);  }
+      Data& operator * (const iterator& me)
+      { return *(me.pos_->data_);  }
 
       /** Postfix x++ */
       iterator& operator ++(const iterator& me)

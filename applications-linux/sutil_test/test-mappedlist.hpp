@@ -180,6 +180,19 @@ namespace sutil_test
           <<" <double> entry ("<<*t2<<") 10,000 times"
           <<" in "<<time2-time1<<" seconds";
 
+      //Test the iterator speed
+      time1 = sutil::CSystemClock::getSysTime();
+      sutil::CMappedList<std::string,double>::iterator it, ite;
+      for(it = mappedlist.begin(), ite = mappedlist.end();
+          it!=ite;++it)
+      {
+
+      }
+      time2 = sutil::CSystemClock::getSysTime();
+      std::cout<<"\nTest Result ("<<test_id++<<") Mapped list Iterator Retrieve Stress : "<<maplist_sz
+          <<" mlist size ("<<mappedlist.size()<<")"
+          <<" in "<<time2-time1<<" seconds";
+
       std::cout<<"\nTest #"<<arg_id<<" (Mapped list Test) Succeeded.";
     }
     catch(std::exception& ee)
