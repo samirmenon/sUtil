@@ -71,6 +71,34 @@ namespace sutil
   class CMappedList
   {
   public:
+    /** STL container specific code:
+     * (a) A set of typedefs
+     * (b) An iterator definition
+     * (c) Standard methods */
+
+    //The typedefs:
+    typedef T value_type;
+    typedef T& reference;
+    typedef const T& const_reference;
+    typedef size_t size_type;
+    typedef ptrdiff_t difference_type;
+
+    //The iterator definition
+  private:
+    template <typename Node> class __iterator; //Forward declaration
+  public:
+    typedef __iterator<SMLNode<Idx,T> > iterator;
+    typedef __iterator<const SMLNode<Idx,T> > const_iterator;
+
+    //The standard methods:
+    /** Constructor : Resets the pilemap. */
+    CMappedList() : front_(NULL), back_(NULL),size_(0) {}
+
+    /** Destructor : Deallocates all the nodes if someone already hasn't
+     * done so. */
+    virtual ~CMappedList();
+
+  public:
     /** Const pointer access to the list.
      *
      * 1. Can be moved across the list manually to iterate over all the nodes
@@ -82,17 +110,9 @@ namespace sutil
     virtual void resetIterator()
     { iterator_ = static_cast<const SMLNode<Idx,T> *>(front_); }
 
-    /** Constructor : Resets the mappedlist. */
-    CMappedList()
-    { front_ = NULL; back_ = NULL; map_.clear(); size_ = 0; }
-
     /** Copy-Constructor : Does a deep copy of the mappedlist to
      * get a new one. This is VERY SLOW. */
     virtual bool deepCopy(const CMappedList<Idx,T>* const arg_pmap);
-
-    /** Destructor : Deallocates all the nodes if someone already hasn't
-     * done so. */
-    virtual ~CMappedList();
 
     /** Creates an element, inserts an element into the list
      * and returns the pointer   */
@@ -165,13 +185,52 @@ namespace sutil
     /** The map that will enable Idx based data lookup */
     std::map<Idx, SMLNode<Idx,T>*> map_;
 
-    /** The size of the PileMap */
+    /** The size of the MappedList */
     std::size_t size_;
 
   private:
-    /** Copy Constructor : Private. */
-    CMappedList(const CMappedList<Idx,T>& arg_pm);
+    /** An stl style iterator for CMappedList */
+    template <typename Node>
+    class __iterator : public std::iterator<std::forward_iterator_tag, T>
+    {
+      Node *pos_;
+    public:
+      __iterator(): pos_(NULL){}
+
+      /** Explicit so that other iterators don't typecast into this one*/
+      explicit __iterator(const iterator& other)
+      { pos_ = other.pos_; }
+
+      iterator& operator = (const iterator& other)
+      { pos_ = other.pos_; return (*this);  }
+
+      bool operator == (const iterator& other)
+      { return (pos_ == other.pos_);  }
+
+      bool operator != (const iterator& other)
+      { return (pos_ != other.pos_);  }
+
+      Node& operator * (const iterator& me)
+      { return *(me.pos_);  }
+
+      /** Postfix x++ */
+      iterator& operator ++(const iterator& me)
+      {
+        if(NULL!= me.pos_)
+        { me.pos_ = me.pos_->next_; }
+        return me;
+      }
+
+      /** Prefix ++x */
+      iterator& operator ++()
+      {
+        if(NULL!= pos_)
+        { pos_ = pos_->next_; }
+        return *this;
+      }
+    };
   };
+
 
   template <typename Idx, typename T>
   bool CMappedList<Idx,T>::deepCopy(const CMappedList<Idx,T>* const arg_pmap)
