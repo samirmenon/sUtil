@@ -159,6 +159,7 @@ namespace sutil_test
       {
         ss<<"t2_"<<i;
         t2 = mappedlist.create(ss.str());
+        *t2 = i; //Initialize the node's (double) value to the index of insertion
         if(NULL == t2)
         { throw(std::runtime_error("Failed to initialize 1,000 mapped list")); }
         if(i%((int)(maplist_sz/10)) == 0)
@@ -172,26 +173,101 @@ namespace sutil_test
       //Test the access speed
       time1 = sutil::CSystemClock::getSysTime();
       for(long long i=0;i<10000;i++)
-      {
-        t2 = mappedlist.at(maplist_sz-1);
-      }
+      { t2 = mappedlist.at(maplist_sz-1); }
       time2 = sutil::CSystemClock::getSysTime();
-      std::cout<<"\nTest Result ("<<test_id++<<") Mapped list Retrieve Stress : "<<maplist_sz
+      std::cout<<"\nTest Result ("<<test_id++<<") Mapped list Retrieve Last Element Stress : "<<maplist_sz
           <<" <double> entry ("<<*t2<<") 10,000 times"
           <<" in "<<time2-time1<<" seconds";
 
-      //Test the iterator speed
-      time1 = sutil::CSystemClock::getSysTime();
+      /** **********************
+       * Iterator tests
+       * *********************** */
       sutil::CMappedList<std::string,double>::iterator it, ite;
+
+      //Test the iterator's access speed
+      time1 = sutil::CSystemClock::getSysTime();
+      for(long long i=0;i<10000;i++)
+      {
+        for(it = mappedlist.begin(), ite = mappedlist.end();
+            it!=ite;++it);
+        *t2 = i;
+      } //Assign the element to make sure it takes some time
+      time2 = sutil::CSystemClock::getSysTime();
+      std::cout<<"\nTest Result ("<<test_id++<<") Mapped list Iterator Retrieve Last Element Stress : "<<maplist_sz
+          <<" <double> entries 10,000 times in "<<time2-time1<<" seconds";
+
+      //Test the iterator's access speed
+      time1 = sutil::CSystemClock::getSysTime();
+      for(long long i=0;i<10000;i++)
+      {
+        mappedlist.resetIterator();
+        while(NULL!=mappedlist.iterator_)
+        { mappedlist.iterator_ = mappedlist.iterator_->next_; }
+        *t2 = i;
+      } //Assign the element to make sure it takes some time
+      time2 = sutil::CSystemClock::getSysTime();
+      std::cout<<"\nTest Result ("<<test_id++<<") Mapped list OLD Iterator Retrieve Last Element Stress : "<<maplist_sz
+          <<" <double> entries 10,000 times in "<<time2-time1<<" seconds";
+
+      //Test the iterator's iteration speed
+      time1 = sutil::CSystemClock::getSysTime();
+      for(it = mappedlist.begin(), ite = mappedlist.end();
+          it!=ite;++it)
+      { *t2 = *it; } //Assign the element to make sure it takes some time
+      time2 = sutil::CSystemClock::getSysTime();
+      std::cout<<"\nTest Result ("<<test_id++<<") Mapped list Iterator Copy Each Element : "<<maplist_sz
+          <<" <double> entries in "<<time2-time1<<" seconds";
+
+      //Test the iterator's access
+      time1 = sutil::CSystemClock::getSysTime();
+      int i=0;
       for(it = mappedlist.begin(), ite = mappedlist.end();
           it!=ite;++it)
       {
-
+        *it = i;
+        i++;
       }
       time2 = sutil::CSystemClock::getSysTime();
-      std::cout<<"\nTest Result ("<<test_id++<<") Mapped list Iterator Retrieve Stress : "<<maplist_sz
-          <<" mlist size ("<<mappedlist.size()<<")"
-          <<" in "<<time2-time1<<" seconds";
+      std::cout<<"\nTest Result ("<<test_id++<<") Mapped list Iterator Change Each Element : "<<maplist_sz
+                <<" <double> entries in "<<time2-time1<<" seconds";
+
+      i=0;
+      for(it = mappedlist.begin(), ite = mappedlist.end();
+          it!=ite;++it)
+      {
+        if(*it != i)
+        { throw(std::runtime_error("Mapped list Iterator Change Each Element failed")); }
+        i++;
+      }
+      time2 = sutil::CSystemClock::getSysTime();
+      std::cout<<"\nTest Result ("<<test_id++<<") Mapped list Iterator Change Each Element : Verified";
+
+      /** **********************
+       * Const Iterator tests
+       * *********************** */
+
+      sutil::CMappedList<std::string,double>::const_iterator cit, cite;
+
+      //Test the citerator's access speed
+      time1 = sutil::CSystemClock::getSysTime();
+      for(long long i=0;i<10000;i++)
+      {
+        for(cit = mappedlist.begin(), cite = mappedlist.end();
+            cit!=cite;++cit);
+        *t2 = i;
+      } //Assign the element to make sure it takes some time
+      time2 = sutil::CSystemClock::getSysTime();
+      std::cout<<"\nTest Result ("<<test_id++<<") Mapped list Const Iterator Retrieve Last Element Stress : "<<maplist_sz
+          <<" <double> entries 10,000 times in "<<time2-time1<<" seconds";
+
+      //Test the citerator's iteration speed
+      time1 = sutil::CSystemClock::getSysTime();
+      for(cit = mappedlist.begin(), cite = mappedlist.end();
+          cit!=cite;++cit)
+      { *t2 = *cit; } //Assign the element to make sure it takes some time
+      time2 = sutil::CSystemClock::getSysTime();
+      std::cout<<"\nTest Result ("<<test_id++<<") Mapped list Const Iterator Copy Each Element : "<<maplist_sz
+          <<" <double> entries in "<<time2-time1<<" seconds";
 
       std::cout<<"\nTest #"<<arg_id<<" (Mapped list Test) Succeeded.";
     }
