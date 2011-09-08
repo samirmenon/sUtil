@@ -112,37 +112,50 @@ namespace sutil
     /** Constructor : Resets the pilemap. */
     CMappedList() : front_(NULL), back_(NULL),size_(0) {}
 
-//    /** Copy Constructor : Performs a deep-copy (std container requirement).
-//     * Beware; This can be quite slow.
-//     * 'explicit' makes sure that only a CMappedList can be copied. Ie. Implicit
-//     * copy-constructor use is disallowed.*/
-//    explicit CMappedList(const CMappedList<Idx,T>& arg_pm);
-//
-//    /** Assignment operator : Performs a deep-copy (std container requirement).
-//     * Beware; This can be quite slow. */
-//    CMappedList<Idx,T>& operator = (const CMappedList<Idx,T>& rhs);
-//
+  protected:
+    /** Does a deep copy of the mappedlist to
+     * get a new one. This is VERY SLOW. */
+    virtual bool deepCopy(const CMappedList<Idx,T>* const arg_pmap);
+
+  public:
+    /** Copy Constructor : Performs a deep-copy (std container requirement).
+     * Beware; This can be quite slow.
+     * 'explicit' makes sure that only a CMappedList can be copied. Ie. Implicit
+     * copy-constructor use is disallowed.*/
+    explicit CMappedList(const CMappedList<Idx,T>& arg_pm)
+    {
+      deepCopy(&arg_pm);
+    }
+
+    /** Assignment operator : Performs a deep-copy (std container requirement).
+     * Beware; This can be quite slow. */
+    virtual CMappedList<Idx,T>& operator = (const CMappedList<Idx,T>& arg_rhs)
+    {
+      deepCopy(&arg_rhs);
+      return *this;
+    }
+
     /** Destructor : Deallocates all the nodes if someone already hasn't
      * done so. */
     virtual ~CMappedList();
-//
+
 //    /** Comparison operator : Performs an element-by-element check (std container requirement).
 //     * Beware; This can be quite slow. */
 //    bool operator == (const CMappedList<Idx,T>& lhs, const CMappedList<Idx,T>& rhs);
-//
+
 //    /** Comparison operator : Performs an element-by-element check (std container requirement).
 //     * Beware; This can be quite slow. */
 //    bool operator != (const CMappedList<Idx,T>& lhs, const CMappedList<Idx,T>& rhs);
-//
+
 //    /** Swaps the elements with the passed pilemap */
 //    void swap(CMappedList<Idx,T>& arg_swap_obj);
-//
+
 //    /** The current size of the container */
 //    size_type size() const;
-//
+
 //    /** The maximum size of the container */
 //    size_type max_size() const;
-//
+
 //    /** Is the container empty */
 //    bool empty() const;
 
@@ -167,10 +180,6 @@ namespace sutil
     /** *******************************
      * The mapped list specific methods
      * ****************************** */
-
-    /** Does a deep copy of the mappedlist to
-     * get a new one. This is VERY SLOW. */
-    virtual bool deepCopy(const CMappedList<Idx,T>* const arg_pmap);
 
     /** Creates an element, inserts an element into the list
      * and returns the pointer   */
@@ -223,14 +232,6 @@ namespace sutil
     /** Typical operator access */
     virtual T* operator[](const std::size_t arg_idx)
     { return at(arg_idx); }
-
-    /** Copy-Constructor : Does a deep copy of the mappedlist to
-     * get a new one. This is VERY SLOW. */
-    virtual CMappedList<Idx,T>& operator = (const CMappedList<Idx,T>& arg_rhs)
-    {
-      deepCopy(&arg_rhs);
-      return *this;
-    }
 
   protected:
 
