@@ -39,6 +39,25 @@ sUtil. If not, see <http://www.gnu.org/licenses/>.
 namespace sutil
 {
 
+  /** A node in the linked list */
+  template <typename IdxS, typename TS>
+  class SMLNode
+  {
+  public:
+    TS* data_;
+    IdxS* id_;
+
+    //For the linked list
+    SMLNode<IdxS,TS> *next_;
+
+    SMLNode()
+    {
+      data_=NULL;
+      id_=NULL;
+      next_=NULL;
+    }
+  };
+
   /** A linked list to allocate memory for objects and
    * store them, allowing pointer access.
    *
@@ -47,37 +66,100 @@ namespace sutil
    *
    * Main use : Manage a single data store for memory
    * that many must access.
+   *
+   * When to use:
+   * (a) You want to store pointers to the contained objects
+   *     and guarantee that the pointed-to memory doesn't change
+   *     (Eg. Adding an element to a vector or a map might
+   *     invalidate the contained objects's addresses)
+   * (b) You usage is. Access a contained object once, and then
+   *     perform lots of operations on it.
+   * (c) You don't want to manage either map access or memory for
+   *     contained objects
+   * (d) You want the leanest possible code that does the above
    */
   template <typename Idx, typename T>
   class CMappedList
   {
-  protected:
-    /** A node in the linked list */
-    template <typename IdxS, typename TS> class SPMNode;
-
   public:
-    /** Const pointer access to the list.
-     *
-     * 1. Can be moved across the list manually to iterate over all the nodes
-     * 2. Can be reset to the head of the list.
-     */
-    const SPMNode<Idx,T> *iterator_;
+    /** ***************************
+     * STL container specific code:
+     * (a) A set of typedefs
+     * (b) An iterator definition
+     * (c) Standard methods
+     * *************************** */
 
-    /** Reset iterator to head */
-    virtual void resetIterator()
-    { iterator_ = static_cast<const SPMNode<Idx,T> *>(front_); }
+    /** ***************************
+     * The standard stl typedefs:
+     * ************************** */
+    typedef size_t     size_type;
+    typedef ptrdiff_t  difference_type;
+    typedef T*       pointer;
+    typedef const T* const_pointer;
+    typedef T&       reference;
+    typedef const T& const_reference;
+    typedef T        value_type;
 
-    /** Constructor : Resets the mappedlist. */
-    CMappedList()
-    { front_ = NULL; back_ = NULL; map_.clear(); size_ = 0; }
+    /** ***************************
+     * The iterator definition
+     * ************************** */
+    class iterator; //Forward declaration
+    class const_iterator;
 
-    /** Copy-Constructor : Does a deep copy of the mappedlist to
+    /** ***************************
+     * The standard methods
+     * ************************** */
+    /** Constructor : Resets the pilemap. */
+    CMappedList() : front_(NULL), back_(NULL),size_(0) {}
+
+  protected:
+    /** Does a deep copy of the mappedlist to
      * get a new one. This is VERY SLOW. */
     virtual bool deepCopy(const CMappedList<Idx,T>* const arg_pmap);
+
+  public:
+    /** Copy Constructor : Performs a deep-copy (std container requirement).
+     * Beware; This can be quite slow.
+     * 'explicit' makes sure that only a CMappedList can be copied. Ie. Implicit
+     * copy-constructor use is disallowed.*/
+    explicit CMappedList(const CMappedList<Idx,T>& arg_pm)
+    {
+      deepCopy(&arg_pm);
+    }
+
+    /** Assignment operator : Performs a deep-copy (std container requirement).
+     * Beware; This can be quite slow. */
+    virtual CMappedList<Idx,T>& operator = (const CMappedList<Idx,T>& arg_rhs)
+    {
+      deepCopy(&arg_rhs);
+      return *this;
+    }
 
     /** Destructor : Deallocates all the nodes if someone already hasn't
      * done so. */
     virtual ~CMappedList();
+
+//    /** Comparison operator : Performs an element-by-element check (std container requirement).
+//     * Beware; This can be quite slow. */
+//    bool operator == (const CMappedList<Idx,T>& lhs, const CMappedList<Idx,T>& rhs);
+
+//    /** Comparison operator : Performs an element-by-element check (std container requirement).
+//     * Beware; This can be quite slow. */
+//    bool operator != (const CMappedList<Idx,T>& lhs, const CMappedList<Idx,T>& rhs);
+
+//    /** Swaps the elements with the passed pilemap */
+//    void swap(CMappedList<Idx,T>& arg_swap_obj);
+
+//    /** Example usage:
+//     *   first.assign (7,100);                      // 7 ints with value 100
+//     *   second.assign (first.begin(),first.end()); // a copy of first */
+//    void assign ( iterator first, iterator last );
+//    void assign ( size_type n, const T& u );
+
+    /** *******************************
+     * The mapped list specific methods
+     * ****************************** */
+  public:
 
     /** Creates an element, inserts an element into the list
      * and returns the pointer   */
@@ -96,7 +178,7 @@ namespace sutil
 
     /** Returns the element referenced by the index
      *
-     * NOTE : This uses the std::map (and is rather slow) */
+     * NOTE : This uses the std::map (and is somewhat slow) */
     virtual T* at(const Idx & arg_idx);
 
     /** Returns the element at the given numerical index
@@ -122,7 +204,12 @@ namespace sutil
     virtual bool erase(const Idx& arg_idx);
 
     /** Returns the size of the mapped list */
-    virtual inline std::size_t size(){ return size_; }
+    virtual std::size_t size() const
+    { return size_; }
+
+    /** Is the container empty */
+    virtual bool empty() const
+    { return (size_ == 0);  }
 
     /** Clears all elements from the list */
     virtual bool clear();
@@ -131,50 +218,142 @@ namespace sutil
     virtual T* operator[](const std::size_t arg_idx)
     { return at(arg_idx); }
 
-    /** Copy-Constructor : Does a deep copy of the mappedlist to
-     * get a new one. This is VERY SLOW. */
-    virtual CMappedList<Idx,T>& operator = (const CMappedList<Idx,T>& arg_rhs)
-    {
-      deepCopy(&arg_rhs);
-      return *this;
-    }
-
   protected:
-    /** A node in the linked list */
-    template <typename IdxS, typename TS>
-    class SPMNode
+
+    /** Pointer to the head/front/insertion-end of the list */
+    SMLNode<Idx,T> *front_;
+
+    /** Pointer to the tail/back/dangling-end of the list */
+    SMLNode<Idx,T> *back_;
+
+    /** The map that will enable Idx based data lookup */
+    std::map<Idx, SMLNode<Idx,T>*> map_;
+
+    /** The size of the MappedList */
+    std::size_t size_;
+
+  public:
+    /** An stl style iterator for CMappedList */
+    class iterator : public std::iterator<std::forward_iterator_tag, T>
     {
+      //To allow : const_iterator x = iterator();
+      friend class const_iterator;
+
+      SMLNode<Idx,T> *pos_;
     public:
-      TS* data_;
-      IdxS* id_;
+      explicit iterator(): pos_(NULL){}
 
-      //For the linked list
-      SPMNode<IdxS,TS> *next_;
+      /** Explicit so that other iterators don't typecast into this one*/
+      iterator(const iterator& other)
+      { pos_ = other.pos_; }
 
-      SPMNode()
+      explicit iterator(SMLNode<Idx,T>* front_node)
+      { pos_ = front_node; }
+
+      iterator&
+      operator = (const iterator& other)
+      { pos_ = other.pos_; return (*this);  }
+
+      bool
+      operator == (const iterator& other)
+      { return (pos_ == other.pos_);  }
+
+      bool
+      operator != (const iterator& other)
+      { return (pos_ != other.pos_);  }
+
+      T&
+      operator * ()
+      { return *(pos_->data_);  }
+
+      T*
+      operator -> ()
+      { return pos_->data_;  }
+
+      /** Postfix x++. Note that its argument must be an int */
+      iterator&
+      operator ++(int unused)
       {
-        data_=NULL;
-        id_=NULL;
-        next_=NULL;
+        if(NULL!= pos_)
+        { pos_ = pos_->next_; }
+        return *this;
+      }
+
+      /** Prefix ++x */
+      iterator&
+      operator ++()
+      {
+        if(NULL!= pos_)
+        { pos_ = pos_->next_; }
+        return *this;
       }
     };
 
-    /** Pointer to the head/front/insertion-end of the list */
-    SPMNode<Idx,T> *front_;
+    /** An stl style const_iterator for CMappedList */
+    class const_iterator : public std::iterator<std::forward_iterator_tag, T>
+    {
+      const SMLNode<Idx,T> *pos_;
+    public:
+      explicit const_iterator(): pos_(NULL){}
 
-    /** Pointer to the tail/back/dangling-end of the list */
-    SPMNode<Idx,T> *back_;
+      /** Explicit so that other const_iterators don't typecast into this one*/
+      const_iterator(const const_iterator& other)
+      { pos_ = other.pos_; }
 
-    /** The map that will enable Idx based data lookup */
-    std::map<Idx, SPMNode<Idx,T>*> map_;
+      explicit const_iterator(const SMLNode<Idx,T>* front_node)
+      { pos_ = front_node; }
 
-    /** The size of the PileMap */
-    std::size_t size_;
+      const const_iterator& operator = (const const_iterator& other)
+      { pos_ = other.pos_; return (*this);  }
 
-  private:
-    /** Copy Constructor : Private. */
-    CMappedList(const CMappedList<Idx,T>& arg_pm);
+      const const_iterator& operator = (const iterator& other)
+      { pos_ = static_cast<const SMLNode<Idx,T> *>(other.pos_); return (*this);  }
+
+      bool
+      operator == (const const_iterator& other)
+      { return (pos_ == other.pos_);  }
+
+      bool
+      operator != (const const_iterator& other)
+      { return (pos_ != other.pos_);  }
+
+      const T&
+      operator * ()
+      { return *(pos_->data_);  }
+
+      const T*
+      operator -> ()
+      { return pos_->data_;  }
+
+      /** Postfix x++. Note that its argument must be an int */
+      const_iterator&
+      operator ++(int unused)
+      {
+        if(NULL!= pos_)
+        { pos_ = pos_->next_; }
+        return *this;
+      }
+
+      /** Prefix ++x */
+      const_iterator&
+      operator ++()
+      {
+        if(NULL!= pos_)
+        { pos_ = pos_->next_; }
+        return *this;
+      }
+    };
+
+    /** ***************************
+     * The iterator functions
+     * ************************** */
+    iterator begin()
+    { return iterator(front_); }
+
+    iterator end()
+    { return iterator(); }
   };
+
 
   template <typename Idx, typename T>
   bool CMappedList<Idx,T>::deepCopy(const CMappedList<Idx,T>* const arg_pmap)
@@ -186,7 +365,7 @@ namespace sutil
     { front_ = NULL; back_ = NULL; map_.clear(); size_ = 0; }
     else
     {
-      SPMNode<Idx,T> *iterator = arg_pmap->front_;
+      SMLNode<Idx,T> *iterator = arg_pmap->front_;
       while(iterator!=NULL)
       {
         T* tmp = create(*(iterator->id_),
@@ -209,7 +388,7 @@ namespace sutil
   template <typename Idx, typename T>
   CMappedList<Idx,T>::~CMappedList()
   {
-    SPMNode<Idx,T> *t, *t2;
+    SMLNode<Idx,T> *t, *t2;
     t = front_;
     if(NULL!=t)
     { t2 = front_->next_;  }
@@ -235,7 +414,7 @@ namespace sutil
   template <typename Idx, typename T>
   T* CMappedList<Idx,T>::create(const Idx & arg_idx)
   {
-    SPMNode<Idx,T> * tmp = new SPMNode<Idx,T>();
+    SMLNode<Idx,T> * tmp = new SMLNode<Idx,T>();
 
     if(NULL==tmp) //Memory not allocated
     { return NULL; }
@@ -259,7 +438,7 @@ namespace sutil
     if(1 == size_)
     { back_ = front_; }
 
-    map_.insert( std::pair<Idx, SPMNode<Idx,T> *>(arg_idx, front_) );
+    map_.insert( std::pair<Idx, SMLNode<Idx,T> *>(arg_idx, front_) );
 
     return front_->data_;
   }
@@ -267,7 +446,7 @@ namespace sutil
   template <typename Idx, typename T>
   T* CMappedList<Idx,T>::create(const Idx & arg_idx, const T& arg_t)
   {
-    SPMNode<Idx,T> * tmp = new SPMNode<Idx,T>();
+    SMLNode<Idx,T> * tmp = new SMLNode<Idx,T>();
 
     if(NULL==tmp) //Memory not allocated
     { return NULL; }
@@ -291,7 +470,7 @@ namespace sutil
     if(1 == size_)
     { back_ = front_; }
 
-    map_.insert( std::pair<Idx, SPMNode<Idx,T> *>(arg_idx, front_) );
+    map_.insert( std::pair<Idx, SMLNode<Idx,T> *>(arg_idx, front_) );
 
     return front_->data_;
   }
@@ -305,7 +484,7 @@ namespace sutil
     {
       if(arg_idx > size_)
       { return NULL; }
-      SPMNode<Idx,T> * t = front_;
+      SMLNode<Idx,T> * t = front_;
 
       for(std::size_t i=0; i<arg_idx; ++i)
       {
@@ -338,7 +517,7 @@ namespace sutil
           return NULL;
         }
 
-        SPMNode<Idx,T> * t = map_[arg_idx];
+        SMLNode<Idx,T> * t = map_[arg_idx];
 
         if(NULL==t)
         { return NULL;  }
@@ -370,7 +549,7 @@ namespace sutil
     if((NULL==front_) || (NULL==arg_t))
     { return false;  }
 
-    SPMNode<Idx,T> * t, *tpre;
+    SMLNode<Idx,T> * t, *tpre;
 
     //Head is a special case
     if(front_->data_ == arg_t)
@@ -452,8 +631,8 @@ namespace sutil
       return false;
     }
 
-    SPMNode<Idx,T> * t, *tpre;
-    SPMNode<Idx,T> * node = map_[arg_idx];
+    SMLNode<Idx,T> * t, *tpre;
+    SMLNode<Idx,T> * node = map_[arg_idx];
 
     //Head is a special case
     if(front_->data_ == node->data_)
@@ -517,7 +696,7 @@ namespace sutil
   template <typename Idx, typename T>
   bool CMappedList<Idx,T>::clear()
   {
-    SPMNode<Idx,T> *tpre;
+    SMLNode<Idx,T> *tpre;
     tpre = front_;
 
     if(tpre == NULL)

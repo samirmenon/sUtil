@@ -225,7 +225,7 @@ namespace sutil
   bool CMappedTree<TIdx,TNode>::linkNodes()
   {
     //Clear previous links (if any)
-    typename sutil::CMappedList<TIdx,TNode>::template SPMNode<TIdx,TNode> *iterator;
+    SMLNode<TIdx,TNode> *iterator;
     iterator = this->CMappedList<TIdx,TNode>::front_;
     while(iterator != NULL)
     {
