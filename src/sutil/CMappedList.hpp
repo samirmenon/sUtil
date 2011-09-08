@@ -66,6 +66,17 @@ namespace sutil
    *
    * Main use : Manage a single data store for memory
    * that many must access.
+   *
+   * When to use:
+   * (a) You want to store pointers to the contained objects
+   *     and guarantee that the pointed-to memory doesn't change
+   *     (Eg. Adding an element to a vector or a map might
+   *     invalidate the contained objects's addresses)
+   * (b) You usage is. Access a contained object once, and then
+   *     perform lots of operations on it.
+   * (c) You don't want to manage either map access or memory for
+   *     contained objects
+   * (d) You want the leanest possible code that does the above
    */
   template <typename Idx, typename T>
   class CMappedList
@@ -79,34 +90,21 @@ namespace sutil
      * *************************** */
 
     /** ***************************
-     * The typedefs:
+     * The standard stl typedefs:
      * ************************** */
-    typedef T value_type;
-    typedef T& reference;
+    typedef size_t     size_type;
+    typedef ptrdiff_t  difference_type;
+    typedef T*       pointer;
+    typedef const T* const_pointer;
+    typedef T&       reference;
     typedef const T& const_reference;
-    typedef size_t size_type;
-    typedef ptrdiff_t difference_type;
+    typedef T        value_type;
 
     /** ***************************
      * The iterator definition
      * ************************** */
-  public:
-    template <typename Node, typename Data> class __iterator; //Forward declaration
-  public:
-    typedef __iterator<SMLNode<Idx,T>,T> iterator;
-    typedef __iterator<const SMLNode<Idx,T>,const T> const_iterator;
-
-    /** ***************************
-     * The iterator functions
-     * ************************** */
-    iterator begin()
-    {
-      iterator a(front_);
-      return a;
-    }
-
-    iterator end()
-    { return iterator(); }
+    class iterator; //Forward declaration
+    class const_iterator;
 
     /** ***************************
      * The standard methods
@@ -147,6 +145,12 @@ namespace sutil
 //
 //    /** Is the container empty */
 //    bool empty() const;
+
+//    /** Example usage:
+//     *   first.assign (7,100);                      // 7 ints with value 100
+//     *   second.assign (first.begin(),first.end()); // a copy of first */
+//    void assign ( iterator first, iterator last );
+//    void assign ( size_type n, const T& u );
 
   public:
     /** Const pointer access to the list.
@@ -244,48 +248,116 @@ namespace sutil
 
   public:
     /** An stl style iterator for CMappedList */
-    template <typename Node, typename Data>
-    class __iterator : public std::iterator<std::forward_iterator_tag, Data>
+    class iterator : public std::iterator<std::forward_iterator_tag, T>
     {
-      Node *pos_;
+      //To allow : const_iterator x = iterator();
+      friend class const_iterator;
+
+      SMLNode<Idx,T> *pos_;
     public:
-      explicit __iterator(): pos_(NULL){}
+      explicit iterator(): pos_(NULL){}
 
       /** Explicit so that other iterators don't typecast into this one*/
-      explicit __iterator(const iterator& other)
+      iterator(const iterator& other)
       { pos_ = other.pos_; }
 
-      explicit __iterator(Node* front_node)
+      explicit iterator(SMLNode<Idx,T>* front_node)
       { pos_ = front_node; }
 
-      iterator& operator = (const iterator& other)
+      iterator&
+      operator = (const iterator& other)
       { pos_ = other.pos_; return (*this);  }
 
-      bool operator == (const iterator& other)
+      bool
+      operator == (const iterator& other)
       { return (pos_ == other.pos_);  }
 
-      bool operator != (const iterator& other)
+      bool
+      operator != (const iterator& other)
       { return (pos_ != other.pos_);  }
 
-      Data& operator * (const iterator& me)
-      { return *(me.pos_->data_);  }
+      T&
+      operator * ()
+      { return *(pos_->data_);  }
 
-      /** Postfix x++ */
-      iterator& operator ++(const iterator& me)
+      /** Postfix x++. Note that its argument must be an int */
+      iterator&
+      operator ++(int unused)
       {
-        if(NULL!= me.pos_)
-        { me.pos_ = me.pos_->next_; }
-        return me;
+        if(NULL!= pos_)
+        { pos_ = pos_->next_; }
+        return *this;
       }
 
       /** Prefix ++x */
-      iterator& operator ++()
+      iterator&
+      operator ++()
       {
         if(NULL!= pos_)
         { pos_ = pos_->next_; }
         return *this;
       }
     };
+
+    /** An stl style const_iterator for CMappedList */
+    class const_iterator : public std::iterator<std::forward_iterator_tag, T>
+    {
+      const SMLNode<Idx,T> *pos_;
+    public:
+      explicit const_iterator(): pos_(NULL){}
+
+      /** Explicit so that other const_iterators don't typecast into this one*/
+      const_iterator(const const_iterator& other)
+      { pos_ = other.pos_; }
+
+      explicit const_iterator(const SMLNode<Idx,T>* front_node)
+      { pos_ = front_node; }
+
+      const const_iterator& operator = (const const_iterator& other)
+      { pos_ = other.pos_; return (*this);  }
+
+      const const_iterator& operator = (const iterator& other)
+      { pos_ = static_cast<const SMLNode<Idx,T> *>(other.pos_); return (*this);  }
+
+      bool
+      operator == (const const_iterator& other)
+      { return (pos_ == other.pos_);  }
+
+      bool
+      operator != (const const_iterator& other)
+      { return (pos_ != other.pos_);  }
+
+      const T&
+      operator * ()
+      { return *(pos_->data_);  }
+
+      /** Postfix x++. Note that its argument must be an int */
+      const_iterator&
+      operator ++(int unused)
+      {
+        if(NULL!= pos_)
+        { pos_ = pos_->next_; }
+        return *this;
+      }
+
+      /** Prefix ++x */
+      const_iterator&
+      operator ++()
+      {
+        if(NULL!= pos_)
+        { pos_ = pos_->next_; }
+        return *this;
+      }
+    };
+
+    /** ***************************
+     * The iterator functions
+     * ************************** */
+    iterator begin()
+    { return iterator(front_); }
+
+    iterator end()
+    { return iterator(); }
   };
 
 
