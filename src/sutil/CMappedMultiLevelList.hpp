@@ -195,11 +195,12 @@ namespace sutil
     }
     else
     {
-      arg_br->resetIterator();
-      while(arg_br->iterator_!=NULL)
+      //Copy over each element.
+      const SMLNode<Idx,T> * iterator = arg_br->CMappedList<Idx,T>::front_;
+      while(iterator!=NULL)
       {
-        T* tmp = CMappedList<Idx,T>::create(*(arg_br->iterator_->id_),
-            *(arg_br->iterator_->data_));
+        T* tmp = CMappedList<Idx,T>::create(*(iterator->id_),
+            *(iterator->data_));
         if(NULL == tmp)
         {
 #ifdef DEBUG
@@ -231,9 +232,8 @@ namespace sutil
         mlvec_[pri].push_back(tmp);
 
         //Move the iterator along
-        arg_br->iterator_ = arg_br->iterator_->next_;
+        iterator = iterator->next_;
       }
-      arg_br->resetIterator();
     }
     return true;
   }

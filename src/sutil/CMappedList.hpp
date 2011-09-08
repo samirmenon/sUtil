@@ -150,36 +150,16 @@ namespace sutil
 //    /** Swaps the elements with the passed pilemap */
 //    void swap(CMappedList<Idx,T>& arg_swap_obj);
 
-//    /** The current size of the container */
-//    size_type size() const;
-
-//    /** The maximum size of the container */
-//    size_type max_size() const;
-
-//    /** Is the container empty */
-//    bool empty() const;
-
 //    /** Example usage:
 //     *   first.assign (7,100);                      // 7 ints with value 100
 //     *   second.assign (first.begin(),first.end()); // a copy of first */
 //    void assign ( iterator first, iterator last );
 //    void assign ( size_type n, const T& u );
 
-  public:
-    /** Const pointer access to the list.
-     *
-     * 1. Can be moved across the list manually to iterate over all the nodes
-     * 2. Can be reset to the head of the list.
-     */
-    const SMLNode<Idx,T> *iterator_;
-
-    /** Reset iterator to head */
-    virtual void resetIterator()
-    { iterator_ = static_cast<const SMLNode<Idx,T> *>(front_); }
-
     /** *******************************
      * The mapped list specific methods
      * ****************************** */
+  public:
 
     /** Creates an element, inserts an element into the list
      * and returns the pointer   */
@@ -198,7 +178,7 @@ namespace sutil
 
     /** Returns the element referenced by the index
      *
-     * NOTE : This uses the std::map (and is rather slow) */
+     * NOTE : This uses the std::map (and is somewhat slow) */
     virtual T* at(const Idx & arg_idx);
 
     /** Returns the element at the given numerical index
@@ -224,7 +204,12 @@ namespace sutil
     virtual bool erase(const Idx& arg_idx);
 
     /** Returns the size of the mapped list */
-    virtual inline std::size_t size(){ return size_; }
+    virtual std::size_t size() const
+    { return size_; }
+
+    /** Is the container empty */
+    virtual bool empty() const
+    { return (size_ == 0);  }
 
     /** Clears all elements from the list */
     virtual bool clear();
@@ -281,6 +266,10 @@ namespace sutil
       operator * ()
       { return *(pos_->data_);  }
 
+      T*
+      operator -> ()
+      { return pos_->data_;  }
+
       /** Postfix x++. Note that its argument must be an int */
       iterator&
       operator ++(int unused)
@@ -331,6 +320,10 @@ namespace sutil
       const T&
       operator * ()
       { return *(pos_->data_);  }
+
+      const T*
+      operator -> ()
+      { return pos_->data_;  }
 
       /** Postfix x++. Note that its argument must be an int */
       const_iterator&

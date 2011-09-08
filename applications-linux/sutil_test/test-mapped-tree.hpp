@@ -138,21 +138,18 @@ namespace sutil_test
       else { std::cout<<"\nTest Result ("<<test_id++<<") : Linked nodes into a \'banching representation\' tree";  }
 
       //Print tree:
-      mtree.resetIterator();
+      sutil::CMappedTree<std::string,_testSMTNode>::iterator it, ite;
       std::cout<<"\nTest Result ("<<test_id++<<") : Printing tree :";
-      while(mtree.iterator_!=NULL)
+      for(it = mtree.begin(), ite = mtree.end();
+          it!=ite; ++it)
       {
-        _testSMTNode* tmp_node = mtree.iterator_->data_;
-        printf("\n\tNode: %s. Children:",tmp_node->name_.c_str());
+        printf("\n\tNode: %s. Children:",it->name_.c_str());
 
+        _testSMTNode& tmp_node = *it;
         std::vector<_testSMTNode*>::const_iterator it2, ite2;
-        ite2 = tmp_node->child_addrs_.end();
-        for(it2 = tmp_node->child_addrs_.begin();it2!=ite2;++it2)
-        {
-          printf(" %s",(*it2)->name_.c_str());
-        }
-
-        mtree.iterator_ = mtree.iterator_->next_;
+        ite2 = tmp_node.child_addrs_.end();
+        for(it2 = tmp_node.child_addrs_.begin();it2!=ite2;++it2)
+        { printf(" %s",(*it2)->name_.c_str()); }
       }
 
       //7. Test Map (Idx and name of pointed object should match)

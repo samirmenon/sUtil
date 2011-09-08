@@ -196,19 +196,6 @@ namespace sutil_test
       std::cout<<"\nTest Result ("<<test_id++<<") Mapped list Iterator Retrieve Last Element Stress : "<<maplist_sz
           <<" <double> entries 10,000 times in "<<time2-time1<<" seconds";
 
-      //Test the iterator's access speed
-      time1 = sutil::CSystemClock::getSysTime();
-      for(long long i=0;i<10000;i++)
-      {
-        mappedlist.resetIterator();
-        while(NULL!=mappedlist.iterator_)
-        { mappedlist.iterator_ = mappedlist.iterator_->next_; }
-        *t2 = i;
-      } //Assign the element to make sure it takes some time
-      time2 = sutil::CSystemClock::getSysTime();
-      std::cout<<"\nTest Result ("<<test_id++<<") Mapped list OLD Iterator Retrieve Last Element Stress : "<<maplist_sz
-          <<" <double> entries 10,000 times in "<<time2-time1<<" seconds";
-
       //Test the iterator's iteration speed
       time1 = sutil::CSystemClock::getSysTime();
       for(it = mappedlist.begin(), ite = mappedlist.end();
