@@ -181,6 +181,12 @@ namespace sutil
      * NOTE : This uses the std::map (and is somewhat slow) */
     virtual T* at(const Idx & arg_idx);
 
+    /** Returns the typed index at the given numerical index
+     * in the linked list
+     *
+     * NOTE : The index starts at 0   */
+    virtual const Idx* getIndexAt(const std::size_t arg_idx);
+
     /** Returns the element at the given numerical index
      * in the linked list (usually useful only for
      * debugging)
@@ -532,7 +538,33 @@ namespace sutil
     }
   }
 
+  template <typename Idx, typename T>
+  const Idx* CMappedList<Idx,T>::getIndexAt(const std::size_t arg_idx)
+  {
+    if(NULL==front_)
+    { return NULL;  }
+    else
+    {
+      if(arg_idx > size_)
+      { return NULL; }
+      SMLNode<Idx,T> * t = front_;
 
+      for(std::size_t i=0; i<arg_idx; ++i)
+      {
+#ifdef DEBUG
+        assert(i<=size_);
+#endif
+
+        if(NULL==t)
+        { return NULL;  }
+        t = t->next_;
+      }
+      if(NULL==t)
+      { return NULL;  }
+
+      return t->id_;
+    }
+  }
 
   template <typename Idx, typename T>
   const T* CMappedList<Idx,T>::at_const(const std::size_t arg_idx)
