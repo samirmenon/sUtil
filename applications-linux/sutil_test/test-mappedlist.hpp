@@ -182,7 +182,51 @@ namespace sutil_test
       /** **********************
        * Iterator tests
        * *********************** */
+      sutil::CMappedList<std::string,double> mappedlist2;
+      mappedlist2.create("0",0);
+      mappedlist2.create("1",1);
+      mappedlist2.create("2",2);
+
       sutil::CMappedList<std::string,double>::iterator it, ite;
+
+      //Test the iterator's * operator
+      it = mappedlist2.begin();
+      if(2 != *it) { throw(std::runtime_error("Iterator * operator failed")); }
+      else  { std::cout<<"\nTest Result ("<<test_id++<<") Iterator * operator works"; }
+
+      //Test the iterator's ! operator
+      it = mappedlist2.begin();
+      if(std::string("2") != !it) { throw(std::runtime_error("Iterator ! operator failed")); }
+      else  { std::cout<<"\nTest Result ("<<test_id++<<") Iterator ! operator works"; }
+
+      //Test the iterator's ++ operators
+      it = mappedlist2.begin();
+      ++it;
+      if(1 != *it) { throw(std::runtime_error("Iterator prefix ++ operator failed")); }
+      else  { std::cout<<"\nTest Result ("<<test_id++<<") Iterator prefix ++ operator works"; }
+
+      it = mappedlist2.begin();
+      it++;
+      if(1 != *it) { throw(std::runtime_error("Iterator postfix ++ operator failed")); }
+      else  { std::cout<<"\nTest Result ("<<test_id++<<") Iterator postfix ++ operator works"; }
+
+      //Test the iterator's + operator
+      it = mappedlist2.begin();
+      ite = it+1;
+      it++;
+      if(it != ite) { throw(std::runtime_error("Iterator + operator failed")); }
+
+      it = mappedlist2.begin();
+      ite = it+2;
+      it++; it++;
+      if(it != ite) { throw(std::runtime_error("Iterator + operator failed at second iteration")); }
+
+      std::cout<<"\nTest Result ("<<test_id++<<") Iterator + operator works";
+
+      it = mappedlist2.begin();
+      ite = it + mappedlist2.size() + 2;
+      if(mappedlist2.end() != ite) { throw(std::runtime_error("Iterator + operator failed at overflow")); }
+      else  { std::cout<<"\nTest Result ("<<test_id++<<") Iterator + operator works at overflow"; }
 
       //Test the iterator's access speed
       time1 = sutil::CSystemClock::getSysTime();

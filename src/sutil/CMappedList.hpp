@@ -181,6 +181,12 @@ namespace sutil
      * NOTE : This uses the std::map (and is somewhat slow) */
     virtual T* at(const Idx & arg_idx);
 
+    /** Returns the typed index at the given numerical index
+     * in the linked list
+     *
+     * NOTE : The index starts at 0   */
+    virtual const Idx* getIndexAt(const std::size_t arg_idx);
+
     /** Returns the element at the given numerical index
      * in the linked list (usually useful only for
      * debugging)
@@ -247,8 +253,8 @@ namespace sutil
       iterator(const iterator& other)
       { pos_ = other.pos_; }
 
-      explicit iterator(SMLNode<Idx,T>* front_node)
-      { pos_ = front_node; }
+      explicit iterator(SMLNode<Idx,T>* node_ptr)
+      { pos_ = node_ptr; }
 
       iterator&
       operator = (const iterator& other)
@@ -270,6 +276,10 @@ namespace sutil
       operator -> ()
       { return pos_->data_;  }
 
+      Idx&
+      operator ! ()
+      { return *(pos_->id_);  }
+
       /** Postfix x++. Note that its argument must be an int */
       iterator&
       operator ++(int unused)
@@ -287,6 +297,19 @@ namespace sutil
         { pos_ = pos_->next_; }
         return *this;
       }
+
+      iterator
+      operator +(int offset)
+      {
+        SMLNode<Idx,T> *ptr = this->pos_;
+        for(int i=0; i <offset; ++i)
+        {
+          if(NULL== ptr) { break; }
+          ptr = ptr->next_;
+        }
+
+        return iterator(ptr);
+      }
     };
 
     /** An stl style const_iterator for CMappedList */
@@ -300,8 +323,8 @@ namespace sutil
       const_iterator(const const_iterator& other)
       { pos_ = other.pos_; }
 
-      explicit const_iterator(const SMLNode<Idx,T>* front_node)
-      { pos_ = front_node; }
+      explicit const_iterator(const SMLNode<Idx,T>* node_ptr)
+      { pos_ = node_ptr; }
 
       const const_iterator& operator = (const const_iterator& other)
       { pos_ = other.pos_; return (*this);  }
@@ -325,6 +348,10 @@ namespace sutil
       operator -> ()
       { return pos_->data_;  }
 
+      const Idx&
+      operator ! ()
+      { return *(pos_->id_);  }
+
       /** Postfix x++. Note that its argument must be an int */
       const_iterator&
       operator ++(int unused)
@@ -341,6 +368,19 @@ namespace sutil
         if(NULL!= pos_)
         { pos_ = pos_->next_; }
         return *this;
+      }
+
+      const_iterator
+      operator +(int offset)
+      {
+        const SMLNode<Idx,T> *ptr = this->pos_;
+        for(int i=0; i <offset; ++i)
+        {
+          if(NULL== ptr) { break; }
+          ptr = ptr->next_;
+        }
+
+        return const_iterator(ptr);
       }
     };
 
@@ -532,7 +572,33 @@ namespace sutil
     }
   }
 
+  template <typename Idx, typename T>
+  const Idx* CMappedList<Idx,T>::getIndexAt(const std::size_t arg_idx)
+  {
+    if(NULL==front_)
+    { return NULL;  }
+    else
+    {
+      if(arg_idx > size_)
+      { return NULL; }
+      SMLNode<Idx,T> * t = front_;
 
+      for(std::size_t i=0; i<arg_idx; ++i)
+      {
+#ifdef DEBUG
+        assert(i<=size_);
+#endif
+
+        if(NULL==t)
+        { return NULL;  }
+        t = t->next_;
+      }
+      if(NULL==t)
+      { return NULL;  }
+
+      return t->id_;
+    }
+  }
 
   template <typename Idx, typename T>
   const T* CMappedList<Idx,T>::at_const(const std::size_t arg_idx)
