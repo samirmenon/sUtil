@@ -17,15 +17,15 @@ You should have received a copy of the GNU Lesser General Public
 License and a copy of the GNU General Public License along with
 this file. If not, see <http://www.gnu.org/licenses/>.
 */
-/* \file CDynamicTypeBase.hpp
+/* \file CDynamicTypeFactory.hpp
  *
  *  Created on: Sep 9, 2011
  *
  *  Copyright (C) 2011, Samir Menon <smenon@stanford.edu>
  */
 
-#ifndef CDYNAMICTYPEBASE_HPP_
-#define CDYNAMICTYPEBASE_HPP_
+#ifndef CDYNAMICTYPEFACTORY_HPP_
+#define CDYNAMICTYPEFACTORY_HPP_
 
 #include <sutil/CMappedList.hpp>
 
@@ -265,4 +265,4 @@ namespace sutil
 
 }
 
-#endif /* CDYNAMICTYPEBASE_HPP_ */
+#endif /* CDYNAMICTYPEFACTORY_HPP_ */
