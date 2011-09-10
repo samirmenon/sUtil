@@ -76,9 +76,6 @@ namespace sutil_test
     unsigned int test_id=0;
     try
     {
-      //Timers
-      //double time1,time2;
-
       //Initialize the buffers and the mem copier
       sutil::CDynamicType<std::string,SType1> type1(std::string("SType1"));
       sutil::CDynamicType<std::string,SType2> type2(std::string("SType2"));

@@ -42,10 +42,36 @@ namespace sutil
    * it is a one-of-a-kind class that can give you an object based on
    * its name.
    *
-   * NOTE : Enabling this requires creating a DynamicTypeBase (like the
+   * Enabling this requires creating a DynamicTypeBase (like the
    * one specified above). The factory creates an object of the DynamicTypeBase
    * and uses that object to generate more of its kind.
-   * It uses a map to find the right object create. */
+   * It uses a map to find the right object create.
+   *
+   * Use Case : This is mostly useful when your types are
+   * subclassed from some generic class and implement its
+   * functions differently.
+   *
+   * Eg. This would work very well for dynamic typing:
+   * CPainter { void paintScreen() = 0;}
+   * CBluePainter
+   * CRedPainter
+   * CGreenPainter
+   * etc..
+   *  --- Dynamic typing saves you tons of if/else statements here.
+   *  --- It also helps you create generic code that you can package in a library
+   *
+   * Example usage:
+   *   sutil::CDynamicType<IndexType,Type> type(IndexType("Type"));
+   *   type.registerType();
+   *   OR:
+   *   sutil::CDynamicType<std::string,int> type(std::string("int"));
+   *   type.registerType();
+   *
+   *   void *obj=NULL;
+   *   sutil::CDynamicTypeFactory<std::string>::getObjectForType(std::string("int"), obj);
+   *   int *x = reinterpret_cast<int*>(obj);
+   *
+   * */
   template <typename Idx>
   class CDynamicTypeFactory :
     /** Private inheritance from a singleton, with private constructors for
@@ -165,22 +191,9 @@ namespace sutil
     CDynamicTypeFactory& operator= (const CDynamicTypeFactory&);
   };
 
-  /** To support string inputs for dynamic object allocation,
-   * subclass CDynamicTypeBase and implement the createObject()
-   * function to return an object of the type you want.
-   *
-   * Use Case : This is mostly useful when your types are
-   * subclassed from some generic class and implement its
-   * functions differently.
-   *
-   * Eg. This would work very well for dynamic typing:
-   * CPainter { void paintScreen() = 0;}
-   * CBluePainter
-   * CRedPainter
-   * CGreenPainter
-   * etc..
-   *
-   * Here dynamic typing will save you tons of if/else statements. */
+  /** To support indexed querying for dynamic object allocation:
+   * Subclass CDynamicTypeBase and implement the createObject()
+   * function to return an object of the wanted type. */
   template <typename Idx>
   class CDynamicTypeBase
   {
@@ -213,6 +226,8 @@ namespace sutil
     CDynamicTypeBase& operator= (const CDynamicTypeBase&);
   };
 
+  /** This enables supporting dynamic typing for arbitrary
+   * index and object types. */
   template <typename Idx, typename Type>
   class CDynamicType : public CDynamicTypeBase<Idx>
   {
