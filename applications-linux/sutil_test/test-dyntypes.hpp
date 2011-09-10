@@ -91,19 +91,19 @@ namespace sutil_test
       if(true == flag)
       { throw(std::runtime_error("Re-registered type SType1"));  }
       else
-      { std::cout<<"\nTest Result ("<<test_id++<<") Didn't re-registered type SType1"; }
+      { std::cout<<"\nTest Result ("<<test_id++<<") Didn't re-register type SType1"; }
 
       flag = type2.registerType();
       if(true == flag)
       { throw(std::runtime_error("Re-registered type SType1"));  }
       else
-      { std::cout<<"\nTest Result ("<<test_id++<<") Didn't re-registered type SType2"; }
+      { std::cout<<"\nTest Result ("<<test_id++<<") Didn't re-register type SType2"; }
 
       flag = type3.registerType();
       if(true == flag)
       { throw(std::runtime_error("Re-registered type SType1"));  }
       else
-      { std::cout<<"\nTest Result ("<<test_id++<<") Didn't re-registered type SType3"; }
+      { std::cout<<"\nTest Result ("<<test_id++<<") Didn't re-register type SType3"; }
 
       std::cout<<"\nTest #"<<arg_id<<" (Dynamic Typing Test) Succeeded.";
     }

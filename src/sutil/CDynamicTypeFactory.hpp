@@ -74,13 +74,7 @@ namespace sutil
       CDynamicTypeBase<Idx>** mapped_type = singleton::getData()->at(arg_type_name);
 
       if(NULL == mapped_type)
-      {
-#ifdef DEBUG
-        std::cerr<<"\nCDynamicTypeFactory::getObjectForType() Error :"
-            <<" The passed type has not been registered.";
-#endif
-        return false;
-      }
+      { return false; }
 
       return true;
     }
@@ -139,16 +133,25 @@ namespace sutil
     static bool registerType(const Idx& arg_type_name,
         CDynamicTypeBase<Idx>* arg_type_object)
     {
-      if(NULL != singleton::getData()->at(arg_type_name))
+      if(typeRegistered(arg_type_name))
       {
 #ifdef DEBUG
-        std::cerr<<"\nCDynamicTypeFactory::registerType() Error :"
+        std::cerr<<"\nCDynamicTypeFactory::registerType() Warning :"
             <<" The passed type is already registered.";
 #endif
         return false;
       }
 
-      singleton::getData()->create(arg_type_name,arg_type_object);
+      CDynamicTypeBase<Idx>** t = singleton::getData()->create(arg_type_name,arg_type_object);
+      if(NULL == t)
+      {
+#ifdef DEBUG
+        std::cerr<<"\nCDynamicTypeFactory::registerType() Error :"
+            <<" Failed to create type in the type mapped list.";
+#endif
+        return false;
+      }
+
       return true;
     }
 
@@ -234,7 +237,16 @@ namespace sutil
     {
       bool flag;
       flag = CDynamicTypeFactory<Idx>::typeRegistered(CDynamicTypeBase<Idx>::type_name_);
-      if(!flag)
+
+      if(flag)//Type already registered. Do nothing and return false.
+      {
+#ifdef DEBUG
+        std::cerr<<"\nCDynamicType::registerType() Warning :"
+            <<" This object's type has already been registered.";
+#endif
+        return false;
+      }
+      else
       {
         CDynamicType<Idx,Type>* obj = new CDynamicType<Idx,Type>(
             CDynamicTypeBase<Idx>::type_name_);
