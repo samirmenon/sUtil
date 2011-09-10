@@ -394,6 +394,29 @@ namespace sutil
     { return iterator(); }
   };
 
+  /** This is to delete the second pointers in the destructor. Useful
+   * if you want to manage pointers to pointers.
+   *
+   * Ie. if T is actually something like CSuperClass*, and so
+   * the objects the pilemap stores are CSuperClass**.
+   *
+   * This implementation will delete the objects all through. */
+  template <typename Idx, typename T>
+  class CMappedPointerList : public CMappedList<Idx,T*>
+  {
+  public:
+    virtual ~CMappedPointerList()
+    {
+      typename CMappedList<Idx,T*>::iterator it,ite;
+      for(it = this->begin(), ite = this->end();
+          it!=ite; ++it)
+      {
+        T*& tmp = *it;
+        delete tmp;
+        tmp = NULL;
+      }
+    }
+  };
 
   template <typename Idx, typename T>
   bool CMappedList<Idx,T>::deepCopy(const CMappedList<Idx,T>* const arg_pmap)

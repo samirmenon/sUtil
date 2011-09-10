@@ -30,6 +30,7 @@ sUtil. If not, see <http://www.gnu.org/licenses/>.
 #include "test-mappedlist.hpp"
 #include "test-mapped-tree.hpp"
 #include "test-memcopier.hpp"
+#include "test-dyntypes.hpp"
 
 #include <sutil/CSingleton.hpp>
 #include <sutil/CSystemClock.hpp>
@@ -122,6 +123,17 @@ int main(int argc, char** argv)
       <<sutil::CSystemClock::getSimTime()
       <<"]";
       sutil_test::test_memcopier(id);
+    }
+    ++id;
+
+    if((tid==0)||(tid==id))
+    {//Test dyntypes
+      std::cout<<"\n\nTest #"<<id<<". System Clock [Sys time, Sim time :"
+          <<sutil::CSystemClock::getSysTime()
+      <<" "
+      <<sutil::CSystemClock::getSimTime()
+      <<"]";
+      sutil_test::test_dyntypes(id);
     }
     ++id;
 
