@@ -29,6 +29,10 @@ this file. If not, see <http://www.gnu.org/licenses/>.
 
 #include <sutil/CMappedList.hpp>
 
+#ifdef DEBUG
+#include <iostream>
+#endif
+
 namespace sutil
 {
   // Read the class comments below
@@ -42,12 +46,7 @@ namespace sutil
    * one specified above). The factory creates an object of the DynamicTypeBase
    * and uses that object to generate more of its kind.
    * It uses a map to find the right object create. */
-  template <
-  /** Must require some index type. Typically a std::string */
-  typename Idx,
-  /** See the CDynamicTypeBase implementation below to see what
-   * is required of a TypeBase */
-  typename TypeBase=CDynamicTypeBase<Idx> >
+  template <typename Idx>
   class CDynamicTypeFactory :
     /** Private inheritance from a singleton, with private constructors for
      * this class, make this class a singleton and hide the singleton's methods
@@ -61,41 +60,28 @@ namespace sutil
      * the actual constructor and destructor are called for the singleton.
      * So we can't call a destructor here to deallocate all the TypeBase**
      * objects.*/
-    private CSingleton<CPointerDeletingMappedList<Idx,TypeBase*> >
+    private CSingleton<CMappedPointerList<Idx,CDynamicTypeBase<Idx> > >
   {
     //A typedef for easy use;
-    typedef CSingleton<CPointerDeletingMappedList<Idx,TypeBase*> > singleton;
+    typedef CSingleton<CMappedPointerList<Idx,CDynamicTypeBase<Idx> > > singleton;
+
+    friend class CDynamicTypeBase<Idx>;
 
   public:
-    /** This function registers new dynamic types with the factory.
-     * You can get objects of this type by calling the getObjectForType function */
-    static bool registerType(const Idx& arg_type_name,
-        const TypeBase& arg_type_object)
+    /** Checks whether this type has been registered with the factory */
+    static bool typeRegistered(const Idx& arg_type_name)
     {
-      //We will create a new object of this type and use it to create other
-      //objects of this type.
+      CDynamicTypeBase<Idx>** mapped_type = singleton::getData()->at(arg_type_name);
 
-      TypeBase* tmp;
-      tmp = dynamic_cast<TypeBase*>(arg_type_object.createDynamicTypeSubclass());
-      if(tmp == NULL)
+      if(NULL == mapped_type)
       {
 #ifdef DEBUG
-        std::cerr<<"\nCDynamicTypeFactory::registerType() Error :"
-            <<" The passed object's createObject() function did not work.";
+        std::cerr<<"\nCDynamicTypeFactory::getObjectForType() Error :"
+            <<" The passed type has not been registered.";
 #endif
         return false;
       }
 
-      if(NULL != singleton::getData()->at(arg_type_name))
-      {
-#ifdef DEBUG
-        std::cerr<<"\nCDynamicTypeFactory::registerType() Error :"
-            <<" The passed type is already registered.";
-#endif
-        return false;
-      }
-
-      singleton::getData()->create(arg_type_name,tmp);
       return true;
     }
 
@@ -104,9 +90,9 @@ namespace sutil
     static bool getObjectForType(const Idx& arg_type_name,
         void*& ret_object)
     {
-      TypeBase* map_pos = singleton::getData()->at(arg_type);
+      const CDynamicTypeBase<Idx>** mapped_type = singleton::getData()->at(arg_type_name);
 
-      if(NULL == map_pos)
+      if(NULL == mapped_type)
       {
 #ifdef DEBUG
         std::cerr<<"\nCDynamicTypeFactory::getObjectForType() Error :"
@@ -125,7 +111,7 @@ namespace sutil
       }
 
 
-      if(NULL == *map_pos)
+      if(NULL == *mapped_type)
       {
 #ifdef DEBUG
         std::cerr<<"\nCDynamicTypeFactory::getObjectForType() Error :"
@@ -135,7 +121,7 @@ namespace sutil
       }
 
       //Be really careful.
-      ret_object = map_pos->createObject();
+      ret_object = (*mapped_type)->createObject();
       if(NULL == ret_object)
       {
 #ifdef DEBUG
@@ -148,48 +134,37 @@ namespace sutil
     }
 
   private:
-      /** Private for the singleton */
-      CDynamicTypeFactory();
+    /** This function registers new dynamic types with the factory.
+     * You can get objects of this type by calling the getObjectForType function */
+    static bool registerType(const Idx& arg_type_name,
+        CDynamicTypeBase<Idx>* arg_type_object)
+    {
+      if(NULL != singleton::getData()->at(arg_type_name))
+      {
+#ifdef DEBUG
+        std::cerr<<"\nCDynamicTypeFactory::registerType() Error :"
+            <<" The passed type is already registered.";
+#endif
+        return false;
+      }
 
-      /** Private for the singleton */
-      CDynamicTypeFactory(const CDynamicTypeFactory&);
+      singleton::getData()->create(arg_type_name,arg_type_object);
+      return true;
+    }
 
-      /** Private for the singleton */
-      CDynamicTypeFactory& operator= (const CDynamicTypeFactory&);
+    /** Private for the singleton */
+    CDynamicTypeFactory();
+
+    /** Private for the singleton */
+    CDynamicTypeFactory(const CDynamicTypeFactory&);
+
+    /** Private for the singleton */
+    CDynamicTypeFactory& operator= (const CDynamicTypeFactory&);
   };
 
   /** To support string inputs for dynamic object allocation,
    * subclass CDynamicTypeBase and implement the createObject()
    * function to return an object of the type you want.
-   *
-   * How To?
-   * 1. Store an object of the subclass in a string indexed map
-   * 2. Look up the object with the type-name
-   * 3. Call the createObject() function to get a void* pointing
-   *    to a new object of the type
-   *
-   * Example usage:
-   * {
-   *   //...
-   *   //Create a type map
-   *   std::map<std::string, CDynamicTypeBase*> typemap;
-   *
-   *   //Add a type (make sure you subclass and implement
-   *   //CDynamicTypeBase for your type first)
-   *   CYourType bobo;
-   *   typemap.insert( std::pair<std::string,
-   *     CDynamicTypeBase*>(std::string("CYourType"), bobo) );
-   *
-   *   //Get an object of the new type
-   *   void* new_obj =
-   *     typemap[std::string("CYourType")].second->createObject();
-   *
-   *   //Make sure you got the right object
-   *   CYourType* verified_obj = dynamic_cast<CYourType*>(new_obj);
-   *
-   *   delete verified_obj;//At the end
-   *   //...
-   * }
    *
    * Use Case : This is mostly useful when your types are
    * subclassed from some generic class and implement its
@@ -202,11 +177,30 @@ namespace sutil
    * CGreenPainter
    * etc..
    *
-   * Here dynamic typing will save you tons of if/else statements.
-   */
+   * Here dynamic typing will save you tons of if/else statements. */
   template <typename Idx>
   class CDynamicTypeBase
   {
+  public:
+    /** Must name a type while creating an object */
+    CDynamicTypeBase(const Idx &arg_type_name) : type_name_(arg_type_name){}
+
+    /** Default Destructor : Does nothing */
+    virtual ~CDynamicTypeBase(){}
+
+    /** Dynamically allocates an object of the type that any
+     * subclass implements, and returns it. */
+    virtual void* createObject()=0;
+
+  protected:
+    virtual bool registerMyType(CDynamicTypeBase* arg_obj)
+    {
+      return CDynamicTypeFactory<Idx>::registerType(type_name_,arg_obj);
+    }
+
+    /** The type of the object */
+    Idx type_name_;
+
   private:
     /** Must name a type while creating an object */
     CDynamicTypeBase();
@@ -214,53 +208,56 @@ namespace sutil
     CDynamicTypeBase(const CDynamicTypeBase&);
     /** Must name a type while creating an object */
     CDynamicTypeBase& operator= (const CDynamicTypeBase&);
+  };
 
-  protected:
-    /** The type of the object */
-    Idx type_;
-
+  template <typename Idx, typename Type>
+  class CDynamicType : public CDynamicTypeBase<Idx>
+  {
   public:
     /** Must name a type while creating an object */
-    CDynamicTypeBase(Idx arg_type)
-    { type_ = arg_type; }
+    CDynamicType(const Idx &arg_type_name) :
+      CDynamicTypeBase<Idx>::CDynamicTypeBase(arg_type_name)
+    { }
 
     /** Default Destructor : Does nothing */
-    virtual ~CDynamicTypeBase(){}
-
-    /** Returns an object's type */
-    virtual void getType(Idx & ret_str)
-    { ret_str = type_; }
+    virtual ~CDynamicType(){}
 
     /** Dynamically allocates an object of the type that any
-     * subclass implements, and returns it.
-     *
-     * Each subclass of CDynamicTypeBase enables another type,
-     * say CBobo. This function returns a CBobo object.
-     *
-     * A dynamic type will implement :
-     *  void* CDynamicTypeBobo::createObject()
-     *  {
-     *    CBobo* bobo = new CMyCoolType();
-     *    return static_cast<void*>(bobo);
-     *  }
-     */
-    virtual void* createObject()=0;
+     * subclass implements, and returns it. */
+    virtual void* createObject()
+    {
+      Type* obj = new Type();
+      return reinterpret_cast<void*>(obj);
+    }
 
-    /** Dynamically allocates an object of this API's implementation
-     * class and returns it.
-     *
-     * NOTE: This is not necessary but is useful. It allows some other
-     * class to create objects and own them (for instance a singleton
-     * database would store an object of this subclass, own it, and use
-     * it to create new dynamic type objects).
-     *
-     * void* CDynamicTypeBobo::createDynamicTypeSubclass()
-     *  {
-     *    CDynamicTypeBobo* bobo = new CDynamicTypeBobo();
-     *    return static_cast<void*>(bobo);
-     *  }
-     */
-    virtual CDynamicTypeBase* createDynamicTypeSubclass()=0;
+    bool registerType()
+    {
+      bool flag;
+      flag = CDynamicTypeFactory<Idx>::typeRegistered(CDynamicTypeBase<Idx>::type_name_);
+      if(!flag)
+      {
+        CDynamicType<Idx,Type>* obj = new CDynamicType<Idx,Type>(
+            CDynamicTypeBase<Idx>::type_name_);
+        flag = CDynamicTypeBase<Idx>::registerMyType(obj);
+        if(!flag)
+        {
+#ifdef DEBUG
+          std::cerr<<"\nCDynamicType::registerType() Error :"
+              <<" This object's type could not be registered.";
+#endif
+          return false;
+        }
+      }
+      return true;
+    }
+
+  private:
+      /** Must name a type while creating an object */
+      CDynamicType();
+      /** Must name a type while creating an object */
+      CDynamicType(const CDynamicType&);
+      /** Must name a type while creating an object */
+      CDynamicType& operator= (const CDynamicType&);
   };
 
 }

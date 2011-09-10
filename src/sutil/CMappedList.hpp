@@ -402,16 +402,19 @@ namespace sutil
    *
    * This implementation will delete the objects all through. */
   template <typename Idx, typename T>
-  class CPointerDeletingMappedList : public CMappedList<Idx,T>
+  class CMappedPointerList : public CMappedList<Idx,T*>
   {
   public:
-    virtual ~CPointerDeletingMappedList()
+    virtual ~CMappedPointerList()
     {
-      typename CMappedList<Idx,T>::iterator it,ite;
-      for(it = CMappedList<Idx,T>::begin(),
-          ite = CMappedList<Idx,T>::end();
+      typename CMappedList<Idx,T*>::iterator it,ite;
+      for(it = this->begin(), ite = this->end();
           it!=ite; ++it)
-      { delete **it; }
+      {
+        T*& tmp = *it;
+        delete tmp;
+        tmp = NULL;
+      }
     }
   };
 
