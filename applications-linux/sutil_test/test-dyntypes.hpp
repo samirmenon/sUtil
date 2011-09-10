@@ -42,14 +42,31 @@ sUtil. If not, see <http://www.gnu.org/licenses/>.
 
 namespace sutil_test
 {
-  struct SType1
-  { int x; };
+  class SType
+  {
+    /** This is so that down-casting is enabled in the subclasses.
+     *
+     * A virtual function is required to make a class "polymorphic" */
+    virtual void doesNothing(){}
+  };
 
-  struct SType2
-  { int x, y; };
+  class SType1 : public SType
+  {
+  public:
+    int x;
+  };
 
-  struct SType3
-  { int x, y, z; };
+  class SType2 : public SType1
+  {
+  public:
+    int y;
+  };
+
+  class SType3 : public SType2
+  {
+  public:
+    int z;
+  };
 
   /** Tests the dynamic typing utility
    * @param arg_id : The id of the test */
@@ -104,6 +121,63 @@ namespace sutil_test
       { throw(std::runtime_error("Re-registered type SType1"));  }
       else
       { std::cout<<"\nTest Result ("<<test_id++<<") Didn't re-register type SType3"; }
+
+
+      //Test 2 : Test type functionality.
+      typedef sutil::CDynamicTypeFactory<std::string> DynTypeFactory;
+      void* obj = NULL;
+
+      SType1* t1; SType2* t2; SType3* t3;
+
+      flag = DynTypeFactory::getObjectForType(std::string("SType1"), obj);
+      if(false == flag)
+      { throw(std::runtime_error("Could not create dynamic object for type SType1"));  }
+      else
+      { std::cout<<"\nTest Result ("<<test_id++<<") Created dynamic object for type SType1"; }
+
+      t1 = reinterpret_cast<SType1*>(obj);
+      t1->x = 10;
+      std::cout<<"\nTest Result ("<<test_id++<<") Set data in type SType1 : "<<t1->x;
+
+      delete t1;
+      obj = NULL;
+
+      flag = DynTypeFactory::getObjectForType(std::string("SType2"), obj);
+      if(false == flag)
+      { throw(std::runtime_error("Could not create dynamic object for type SType2"));  }
+      else
+      { std::cout<<"\nTest Result ("<<test_id++<<") Created dynamic object for type SType2"; }
+
+      t1 = reinterpret_cast<SType1*>(obj);
+      t2 = dynamic_cast<SType2*>(t1);
+      std::cout<<"\nTest Result ("<<test_id++<<") Tested dynamic cast for SType1 to SType2";
+
+      t2->x = 10;
+      t2->y = 20;
+      std::cout<<"\nTest Result ("<<test_id++<<") Set data in type SType2 : "<<t2->x<<" "<<t2->y;
+
+      delete t2;
+      obj = NULL;
+
+      flag = DynTypeFactory::getObjectForType(std::string("SType3"), obj);
+      if(false == flag)
+      { throw(std::runtime_error("Could not create dynamic object for type SType3"));  }
+      else
+      { std::cout<<"\nTest Result ("<<test_id++<<") Created dynamic object for type SType3"; }
+
+      t1 = reinterpret_cast<SType1*>(obj);
+      t2 = dynamic_cast<SType2*>(t1);
+      t3 = dynamic_cast<SType3*>(t1);
+      t3 = dynamic_cast<SType3*>(t2);
+      std::cout<<"\nTest Result ("<<test_id++<<") Tested dynamic cast for SType1 to SType2 to SType3";
+
+      t3->x = 10;
+      t3->y = 20;
+      t3->z = 30;
+      std::cout<<"\nTest Result ("<<test_id++<<") Set data in type SType3 : "<<t3->x<<" "<<t3->y<<" "<<t3->z;
+
+      delete t3;
+      obj = NULL;
 
       std::cout<<"\nTest #"<<arg_id<<" (Dynamic Typing Test) Succeeded.";
     }

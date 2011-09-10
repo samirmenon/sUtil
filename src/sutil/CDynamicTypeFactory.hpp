@@ -84,7 +84,7 @@ namespace sutil
     static bool getObjectForType(const Idx& arg_type_name,
         void*& ret_object)
     {
-      const CDynamicTypeBase<Idx>** mapped_type = singleton::getData()->at(arg_type_name);
+      CDynamicTypeBase<Idx>** mapped_type = singleton::getData()->at(arg_type_name);
 
       if(NULL == mapped_type)
       {
