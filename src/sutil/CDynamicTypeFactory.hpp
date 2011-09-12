@@ -155,6 +155,11 @@ namespace sutil
       return true;
     }
 
+    /** Deletes the singleton object and creates a new one
+     * in its stead */
+    static bool resetDynamicTypes()
+    { return singleton::resetData(); }
+
   private:
     /** This function registers new dynamic types with the factory.
      * You can get objects of this type by calling the getObjectForType function */

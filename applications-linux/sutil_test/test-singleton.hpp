@@ -60,6 +60,7 @@ namespace sutil_test
   void test_singleton(const unsigned int arg_id)
   {
     unsigned int test_id=0;
+    bool flag;
 
     try
     {
@@ -75,6 +76,23 @@ namespace sutil_test
       db_b = CDb::getData();
       if(db_b != db_a) { throw(std::runtime_error("Singleton failed: Singleton pointer changed after creation")); }
       else  { std::cout<<"\nTest Result ("<<test_id++<<") Singleton pointer remains the same for multiple calls on data structure 1"; }
+
+      //Set some data, which will be wiped out by the reset
+      db_a->lobo = "WipeThisStringOnReset";
+      db_a->bobo = 8080.00;
+
+      flag = CDb::resetData();
+      if(false == flag) { throw(std::runtime_error("Singleton reset failed")); }
+      else  { std::cout<<"\nTest Result ("<<test_id++<<") Reset the singleton"; }
+
+      db_a = CDb::getData();
+      if(static_cast<int>(db_a->bobo) == 8080)
+      { throw(std::runtime_error("Singleton failed: Singleton's double data didn't reset")); }
+      else  { std::cout<<"\nTest Result ("<<test_id++<<") Singleton's double data was reset successfully "; }
+
+      if(db_a->lobo == std::string("WipeThisStringOnReset") )
+      { throw(std::runtime_error("Singleton failed: Singleton's string data didn't reset")); }
+      else  { std::cout<<"\nTest Result ("<<test_id++<<") Singleton's string data was reset successfully "; }
 
       //Stress check the singleton with a different data structure
       typedef sutil::CSingleton<SSingletonTester2> CDb2;
