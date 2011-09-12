@@ -30,6 +30,7 @@ sUtil. If not, see <http://www.gnu.org/licenses/>.
 #define CDYNAMICTYPEFACTORY_HPP_
 
 #include <sutil/CMappedList.hpp>
+#include <sutil/CSingleton.hpp>
 
 #ifdef DEBUG
 #include <iostream>
