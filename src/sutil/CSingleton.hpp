@@ -46,11 +46,6 @@ namespace sutil
   template<typename SDataStruct>
   class CSingleton
   {
-  protected:
-    /** Shared Memory: The publicly available data that will be
-     * shared across the different subsystems */
-    SDataStruct data_;
-
   public:
     /** Creates a singleton if necessary and returns it.
      *
@@ -59,17 +54,24 @@ namespace sutil
      */
     static SDataStruct* getData();
 
+    /** Deletes the singleton instance and creates a new one. */
+    static bool resetData();
+
     /** Default destructor : Deletes the singleton instance if it exists */
     virtual ~CSingleton();
 
   protected:
-    /** Protected constructor : for the singleton */
-    CSingleton(){}
+    /** Shared Memory: The publicly available data that will be
+     * shared across the different subsystems */
+    SDataStruct data_;
 
     /** The singleton instance */
     static CSingleton* singleton_;
 
   private:
+    /** Private constructor : for the singleton */
+    CSingleton(){}
+
     /** Private constructor : for the singleton */
     CSingleton(const CSingleton&){}
 
@@ -102,11 +104,42 @@ namespace sutil
   }
 
   template<typename SDataStruct>
-  CSingleton<SDataStruct>::~CSingleton()
+  bool CSingleton<SDataStruct>::resetData()
   {
     if(0 != singleton_)
     {
+      CSingleton<SDataStruct>* tmp = singleton_;
+      singleton_ = 0;
+      delete tmp;
+      tmp = 0;
+
+      if(0 != getData())
+      {
+#ifdef DEBUG
+        std::cout<<"\nCSingleton::resetData() : Resetting the singleton";
+#endif
+        return true;
+      }
+      else
+      { return false; }
+    }
+#ifdef DEBUG
+        std::cout<<"\nCSingleton::resetData() : Reset not required";
+#endif
+    return true;
+  }
+
+  template<typename SDataStruct>
+  CSingleton<SDataStruct>::~CSingleton()
+  {
+    //NOTE : Because this doesn't delete the object, but deletes
+    //the singleton instead, you can't create two objects of this type
+    //EVEN within the member functions. Only one object must exist, else
+    //you will get segfaults.
+    if(0 != singleton_)
+    {
       delete singleton_;
+      singleton_ = 0;
 #ifdef DEBUG
       std::cout<<"\nCSingleton::~CSingleton() : Destroying singleton";
 #endif
