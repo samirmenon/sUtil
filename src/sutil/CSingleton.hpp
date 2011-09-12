@@ -116,7 +116,7 @@ namespace sutil
       if(0 != getData())
       {
 #ifdef DEBUG
-        std::cout<<"\nCSingleton::resetData() : Resetting the singleton";
+        std::cout<<"\nCSingleton::resetData() : Reset the singleton";
 #endif
         return true;
       }
