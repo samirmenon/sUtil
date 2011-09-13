@@ -123,7 +123,32 @@ namespace sutil
 
   private:
     /** Computes the elapsed time (in seconds) since the passed timeval */
-    static suClock computeTDiff(const timeval &t_start);
+    static suClock computeTDiff(const timeval &arg_t_start)
+    {
+      //To compute the elapsed time since the clock was initialized.
+      timeval t_tick,t_diff,t_start(arg_t_start);
+
+      //Get the current system time
+      gettimeofday(&t_tick,NULL);
+      if (t_tick.tv_usec < t_start.tv_usec)
+      {
+        long int nsec = (t_start.tv_usec - t_tick.tv_usec) / 1000000 + 1;
+        t_start.tv_usec -= 1000000 * nsec;
+        t_start.tv_sec += nsec;
+      }
+      if (t_tick.tv_usec - t_start.tv_usec > 1000000)
+      {
+        long int nsec = (t_tick.tv_usec - t_start.tv_usec) / 1000000;
+        t_start.tv_usec += 1000000 * nsec;
+        t_start.tv_sec -= nsec;
+      }
+
+      // Compute the remaining time. tv_usec is positive.
+      t_diff.tv_sec = t_tick.tv_sec - t_start.tv_sec;
+      t_diff.tv_usec = t_tick.tv_usec - t_start.tv_usec;
+
+      return static_cast<suClock>(t_diff.tv_sec)+(static_cast<suClock>(t_diff.tv_usec)/1000000.00);
+    }
 
     /** Private for the singleton */
     CSystemClock();
@@ -134,33 +159,6 @@ namespace sutil
     /** Private for the singleton */
     CSystemClock& operator= (const CSystemClock&);
   };
-
-  suClock CSystemClock::computeTDiff(const timeval &arg_t_start)
-  {
-    //To compute the elapsed time since the clock was initialized.
-    timeval t_tick,t_diff,t_start(arg_t_start);
-
-    //Get the current system time
-    gettimeofday(&t_tick,NULL);
-    if (t_tick.tv_usec < t_start.tv_usec)
-    {
-      long int nsec = (t_start.tv_usec - t_tick.tv_usec) / 1000000 + 1;
-      t_start.tv_usec -= 1000000 * nsec;
-      t_start.tv_sec += nsec;
-    }
-    if (t_tick.tv_usec - t_start.tv_usec > 1000000)
-    {
-      long int nsec = (t_tick.tv_usec - t_start.tv_usec) / 1000000;
-      t_start.tv_usec += 1000000 * nsec;
-      t_start.tv_sec -= nsec;
-    }
-
-    // Compute the remaining time. tv_usec is positive.
-    t_diff.tv_sec = t_tick.tv_sec - t_start.tv_sec;
-    t_diff.tv_usec = t_tick.tv_usec - t_start.tv_usec;
-
-    return static_cast<suClock>(t_diff.tv_sec)+(static_cast<suClock>(t_diff.tv_usec)/1000000.00);
-  }
 }
 
 #endif /*CSYSTEMCLOCK_HPP_*/

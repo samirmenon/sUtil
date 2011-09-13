@@ -104,8 +104,8 @@ namespace sutil
     virtual bool linkNodes();
 
     /** Returns a pointer to the root node */
-    virtual const TNode* getRootNodeConst()
-    { return (const TNode*) root_node_; }
+    virtual const TNode* getRootNodeConst() const
+    { return static_cast<const TNode*>(root_node_); }
 
     /** Returns a pointer to the root node */
     virtual TNode* getRootNode()
