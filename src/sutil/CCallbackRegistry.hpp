@@ -37,54 +37,96 @@ sUtil. If not, see <http://www.gnu.org/licenses/>.
 
 namespace sutil
 {
-  /*
-   *
-   * Usually this will be:
-   * std::tuple<argument_type1, argument_type2, ... argument_typeN>
-   *
-   * Er. std::tuple<int, double, std::string>
-   *
-   * Allows automatic code generation for callbacks with
-   * a variety of arguments.
-      typename ArgumentTuple,
-      typename Data,
-      typename ReturnType
-   */
-
-  // These are forward declarations. Read the class comments@definition.
+  // These are forward declarations. Read the class comments for details.
   template <typename Idx> class CCallbackSuperBase;
-  template <typename Idx, typename ArgumentTuple> class CCallbackBase;
+  template <typename Idx, typename ArgumentTuple, typename Data> class CCallbackBase;
+  template <typename Idx> class CCallbackRegistry;
+
+  /** Use this namespace to create and call callback
+   * functions
+   *
+   * Example usage:
+   *
+   *  // 1. Defining a callback function class
+   *
+   *  // NOTE: You can also use typename Data to
+   *  // customize different objects of this class and then
+   *  // register them.
+   *  class CCallbackFunc : public
+   *  sutil::CCallbackBase<std::string, std::vector<std::string> >
+   *  {
+   *    typedef sutil::CCallbackBase<std::string, std::vector<std::string> > base;
+   *  public:
+   *    virtual void call(std::vector<std::string>& args)
+   *    {//Do something with the argument
+   *      std::vector<std::string>::iterator it,ite;
+   *      for(it = args.begin(), ite = args.end(); it!=ite; ++it)
+   *      {  std::cout<<"\nPassed arg : "<<*it;  }
+   *
+   *      //And/or copy the result into it
+   *      std::string x;
+   *      std::cin>>x;
+   *      args.push_back(x);
+   *    }
+   *
+   *    virtual base* createObject()
+   *    { return dynamic_cast<base*>(new CCallbackFunc()); }
+   *  };
+   *
+   *  //2. Register the function
+   *  std::string name("BoboFunc");
+   *  std::vector<std::string> args;
+   *
+   *  flag = sutil::callbacks::add<CCallbackFunc,
+   *  std::string, std::vector<std::string> >(name);
+   *
+   *  //3. Call the function
+   *  sutil::callbacks::call<std::string,std::vector<std::string> >(callback_name,args);
+   */
+  namespace callbacks
+  {
+    /** This function returns an indexed callback (if the
+     * callback has already been registered with the singleton) */
+    template<typename Idx, typename ArgumentTuple, typename Data=bool >
+    static void call(const Idx& arg_callback_name, ArgumentTuple& args)
+    {
+      CCallbackSuperBase<Idx>** mapped_callback =
+          CCallbackRegistry<Idx>::getCallbacks()->at(arg_callback_name);
+
+      CCallbackBase<Idx, ArgumentTuple, Data>* callback =
+          dynamic_cast<CCallbackBase<Idx, ArgumentTuple, Data>*>(*mapped_callback);
+
+      callback->call(args);
+    }
+
+    /** Why do we allow specifying Data?
+     * Ans: Well a class might automatically and uniquely
+     * initialize the Data in the constructor */
+    template< typename CallbackClass, typename Idx,
+    typename ArgumentTuple, typename Data=bool >
+    static bool add(
+        const Idx& arg_callback_name)
+    {
+      CallbackClass f;
+      return f.sutil::CCallbackBase<Idx, ArgumentTuple, Data>::
+      registerCallback(arg_callback_name);
+    }
+
+    template< typename CallbackClass, typename Idx,
+    typename ArgumentTuple, typename Data>
+    static bool add(
+        const Idx& arg_callback_name,
+        const Data& arg_data)
+    {
+      CallbackClass f;
+      return f.sutil::CCallbackBase<Idx, ArgumentTuple, Data>::
+          registerCallback(arg_callback_name, arg_data);
+    }
+  }
 
   /** This class implements a callback factory singleton. In plain English,
    * it is a one-of-a-kind class that can give you an function based on
-   * its name.
-   *
-   * Example usage:
-   *  CCallbackRegistry<string>::call<tuple<int, double, string> >(string s,
-   *        tuple<int, double, string> t);
-   *
-   * Or more concretely:
-   *
-   * class CCallbackBoboFunc : public CCallbackBase<string, tuple<int, double, string> >
-   * {
-   * public:
-   *  CCallbackBoboFunc(const Idx &arg_callback_name) :
-   *    CCallbackBase<string, tuple<int,double,string> >::CCallbackBase(arg_callback_name)
-   *    { }
-   *
-   *  virtual void call(ArgumentTuple& args)
-   *  { cout<<"\nThe args are: "<<get<0>(args)<<", "<<get<1>(args)<<", "<<get<2>(args); }
-   *
-   *  virtual CCallbackBase<Idx, ArgumentTuple>* createObject()
-   *  { return dynamic_cast<CCallbackBase<Idx, ArgumentTuple>*>(new CCallbackBoboFunc()); }
-   * };
-   *
-   * string s("BoboFunc);
-   * CCallbackBoboFunc f("BoboFunc");
-   *
-   * CCallbackRegistry<string>::register<tuple<int, double, string> >(string s,
-   *        tuple<int, double, string> t);
-   * */
+   * its name. */
   template <typename Idx>
   class CCallbackRegistry : private CSingleton<CMappedPointerList<Idx,CCallbackSuperBase<Idx> > >
   {
@@ -108,6 +150,7 @@ namespace sutil
     static bool resetCallbacks()
     { return singleton::resetData(); }
 
+    /** Used to access the callback list */
     static CMappedPointerList<Idx,CCallbackSuperBase<Idx> >*getCallbacks()
     { return singleton::getData();  }
 
@@ -152,24 +195,6 @@ namespace sutil
     CCallbackRegistry& operator= (const CCallbackRegistry&);
   };
 
-  template<typename Idx, typename ArgumentTuple>
-  class CCallbacks
-  {
-  public:
-    /** This function returns an indexed callback (if the
-     * callback has already been registered with the singleton) */
-    static void call(const Idx& arg_callback_name, ArgumentTuple& args)
-    {
-      CCallbackSuperBase<Idx>** mapped_callback =
-          CCallbackRegistry<Idx>::getCallbacks()->at(arg_callback_name);
-
-      CCallbackBase<Idx, ArgumentTuple>* callback =
-          dynamic_cast<CCallbackBase<Idx, ArgumentTuple>*>(*mapped_callback);
-
-      callback->call(args);
-    }
-  };
-
   /** *********************************************************
    * To support indexed querying for dynamic object allocation:
    * Subclass CCallbackSuperBase and implement the createObject()
@@ -179,22 +204,23 @@ namespace sutil
   class CCallbackSuperBase
   {
   public:
-    /** Must name a callback while creating an object */
-    CCallbackSuperBase(const Idx &arg_callback_name) : callback_name_(arg_callback_name){}
-
     /** Default Destructor : Does nothing */
     virtual ~CCallbackSuperBase(){}
 
   protected:
-    virtual bool registerMyCallback(CCallbackSuperBase* arg_obj)
-    { return CCallbackRegistry<Idx>::registerCallback(callback_name_,arg_obj); }
+    /** The constructor may only be called by a subclass */
+    CCallbackSuperBase(){}
 
-    /** The callback of the object */
-    Idx callback_name_;
+    /** To allow the callback registry to create objects for itself */
+    virtual bool registerCallbackSuper(
+        const Idx &arg_callback_name,
+        CCallbackSuperBase* arg_obj)
+    {
+      return CCallbackRegistry<Idx>::
+          registerCallback(arg_callback_name,arg_obj);
+    }
 
   private:
-    /** Must name a callback while creating an object */
-    CCallbackSuperBase();
     /** Must name a callback while creating an object */
     CCallbackSuperBase(const CCallbackSuperBase&);
     /** Must name a callback while creating an object */
@@ -205,31 +231,24 @@ namespace sutil
    * This enables supporting dynamic typing for arbitrary
    * index and object callbacks.
    * ********************************************************* */
-  template <typename Idx, typename ArgumentTuple>
+  template <typename Idx, typename ArgumentTuple, typename Data=bool>
   class CCallbackBase : public CCallbackSuperBase<Idx>
   {
   public:
-    /** Must name a callback while creating an object */
-    CCallbackBase(const Idx &arg_callback_name) :
-      CCallbackSuperBase<Idx>::CCallbackSuperBase(arg_callback_name)
-      { }
-
-    /** Default Destructor : Does nothing */
-    virtual ~CCallbackBase(){}
-
     /** A subclass must implement this function.
      * You can choose to add a "return type" into
      * the ArgumentTuple and get data from the function. */
     virtual void call(ArgumentTuple& args) = 0;
 
     /** A subclass must implement this function */
-    virtual CCallbackBase<Idx, ArgumentTuple>* createObject()=0;
+    virtual CCallbackBase<Idx, ArgumentTuple, Data>* createObject()=0;
 
-    virtual bool registerCallback()
+    virtual bool registerCallback(
+        const Idx& arg_callback_name,
+        const Data* arg_data = 0)
     {
       bool flag;
-      flag = CCallbackRegistry<Idx>::callbackRegistered(
-          CCallbackSuperBase<Idx>::callback_name_);
+      flag = CCallbackRegistry<Idx>::callbackRegistered(arg_callback_name);
 
       if(flag)//Callback already registered. Do nothing and return false.
       { return false; }
@@ -238,7 +257,12 @@ namespace sutil
         //Duplicate this object and register the new one with the singleton
         CCallbackBase<Idx,ArgumentTuple>* obj = createObject();
 
-        flag = CCallbackSuperBase<Idx>::registerMyCallback(
+        //Set up data for this function object
+        if(0 != arg_data)
+        { obj->data_ = *arg_data; }
+
+        flag = CCallbackSuperBase<Idx>::registerCallbackSuper(
+            arg_callback_name,
             dynamic_cast<CCallbackSuperBase<Idx>*>(obj) );
         if(!flag)
         { delete obj; return false; }
@@ -246,12 +270,17 @@ namespace sutil
       return true;
     }
 
+    /** Default Destructor : Does nothing */
+    virtual ~CCallbackBase(){}
+
+  protected:
+    /** Only a subclass may create an object of this type */
+    CCallbackBase(){}
+
+    Data data_;
+
   private:
-    /** Must name a callback while creating an object */
-    CCallbackBase();
-    /** Must name a callback while creating an object */
     CCallbackBase(const CCallbackBase&);
-    /** Must name a callback while creating an object */
     CCallbackBase& operator= (const CCallbackBase&);
   };
 }

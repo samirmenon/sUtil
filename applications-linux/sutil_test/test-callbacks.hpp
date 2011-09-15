@@ -43,17 +43,12 @@ namespace sutil_test
 
   typedef std::tuple<int, double, std::string> ArgType;
 
-  class CCallbackBoboFunc : public
+  class CCallbackFunc : public
   sutil::CCallbackBase<std::string, ArgType >
   {
     typedef sutil::CCallbackBase<std::string, ArgType > base;
   public:
-    CCallbackBoboFunc(const std::string &arg_callback_name) :
-      base::CCallbackBase(arg_callback_name)
-      { }
-
-    virtual
-    void call(ArgType& args)
+    virtual void call(ArgType& args)
     {
       int x; x = std::get<0>(args);
       double y; y = std::get<1>(args);
@@ -61,12 +56,8 @@ namespace sutil_test
       std::cout<<"\nThe args are: "<<x<<", "<<y<<", "<<z;
     }
 
-    virtual
-    base* createObject()
-    {
-      std::string s("BoboFunc");
-      return dynamic_cast<base*>(new CCallbackBoboFunc(s));
-    }
+    virtual base* createObject()
+    { return dynamic_cast<base*>(new CCallbackFunc()); }
   };
 
   /** Tests the dynamic callback utility
@@ -77,27 +68,28 @@ namespace sutil_test
     unsigned int test_id=0;
     try
     {
-      //Initialize the buffers and the mem copier
-      CCallbackBoboFunc f("BoboFunc");
+      //Create callback object
+      std::string callback_name("BoboFunc");
 
       //Test 1 : Register callbacks. Should succeed.
-      flag = f.sutil::CCallbackBase<std::string, ArgType >::registerCallback();
+      flag = sutil::callbacks::add<CCallbackFunc,
+          std::string, ArgType>(callback_name);
       if(false == flag)
-      { throw(std::runtime_error("Failed to register callback : BoboFunc"));  }
+      { throw(std::runtime_error(std::string("Failed to register callback : ")+callback_name ));  }
       else
-      { std::cout<<"\nTest Result ("<<test_id++<<") Registered callback BoboFunc"; }
+      { std::cout<<"\nTest Result ("<<test_id++<<") Registered callback :" << callback_name; }
 
       //Test 2: Run callback
       //Set up an argument type to check whether it works
       ArgType t;
 
       std::get<0>(t) = 8080; std::get<1>(t) = 8080.80; std::get<2>(t) = "I am Bobo! >:) ";
-      sutil::CCallbacks<std::string,ArgType>::call("BoboFunc",t);
-      std::cout<<"\nTest Result ("<<test_id++<<") Ran callback BoboFunc";
+      sutil::callbacks::call<std::string,ArgType>(callback_name,t);
+      std::cout<<"\nTest Result ("<<test_id++<<") Ran callback "<<callback_name;
 
       std::get<0>(t) = 80; std::get<1>(t) = 80.80; std::get<2>(t) = "And I wish I was.. :-( ";
-      sutil::CCallbacks<std::string,ArgType>::call("BoboFunc",t);
-      std::cout<<"\nTest Result ("<<test_id++<<") Ran callback BoboFunc";
+      sutil::callbacks::call<std::string,ArgType>(callback_name,t);
+      std::cout<<"\nTest Result ("<<test_id++<<") Ran callback "<<callback_name;
 
       std::cout<<"\nTest #"<<arg_id<<" (Callback Registry Test) Succeeded.";
     }
