@@ -35,9 +35,9 @@ SU_DEFS_REL = -DRELEASE=1
 INCLUDEDIRS = -I$(SU_INC_DIR)
 
 ############################# Compile options ############################
-DBGFLAGS = -Wall -g -ggdb -pg -O0 $(INCLUDEDIRS) \
+DBGFLAGS = -Wall -g -ggdb -pg -O0 -std=c++0x $(INCLUDEDIRS) \
            $(SU_DEFS_DBG)
-RELFLAGS = -Wall -O3 $(INCLUDEDIRS) \
+RELFLAGS = -Wall -O3 -std=c++0x $(INCLUDEDIRS) \
            $(SU_DEFS_REL) 
 
 ############################ SOURCE FILES ############################
