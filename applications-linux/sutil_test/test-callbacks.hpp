@@ -80,17 +80,24 @@ namespace sutil_test
       //Initialize the buffers and the mem copier
       CCallbackBoboFunc f("BoboFunc");
 
-      //sutil::CCallbackFactory<std::string>::
-//      <tuple<int, double, string> >(string s,
-//          tuple<int, double, string> t);
-
       //Test 1 : Register callbacks. Should succeed.
-//      flag = type1.registerType();
+      flag = f.sutil::CCallbackBase<std::string, ArgType >::registerCallback();
       if(false == flag)
-      { throw(std::runtime_error("Failed to register type SType1"));  }
+      { throw(std::runtime_error("Failed to register callback : BoboFunc"));  }
       else
-      { std::cout<<"\nTest Result ("<<test_id++<<") Registered type SType1"; }
+      { std::cout<<"\nTest Result ("<<test_id++<<") Registered callback BoboFunc"; }
 
+      //Test 2: Run callback
+      //Set up an argument type to check whether it works
+      ArgType t;
+
+      std::get<0>(t) = 8080; std::get<1>(t) = 8080.80; std::get<2>(t) = "I am Bobo! >:) ";
+      sutil::CCallbacks<std::string,ArgType>::call("BoboFunc",t);
+      std::cout<<"\nTest Result ("<<test_id++<<") Ran callback BoboFunc";
+
+      std::get<0>(t) = 80; std::get<1>(t) = 80.80; std::get<2>(t) = "And I wish I was.. :-( ";
+      sutil::CCallbacks<std::string,ArgType>::call("BoboFunc",t);
+      std::cout<<"\nTest Result ("<<test_id++<<") Ran callback BoboFunc";
 
       std::cout<<"\nTest #"<<arg_id<<" (Callback Registry Test) Succeeded.";
     }

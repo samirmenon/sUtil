@@ -108,6 +108,9 @@ namespace sutil
     static bool resetCallbacks()
     { return singleton::resetData(); }
 
+    static CMappedPointerList<Idx,CCallbackSuperBase<Idx> >*getCallbacks()
+    { return singleton::getData();  }
+
   private:
     /** This function registers new dynamic callbacks with the factory.
      * You can get objects of this callback by calling the
@@ -158,7 +161,7 @@ namespace sutil
     static void call(const Idx& arg_callback_name, ArgumentTuple& args)
     {
       CCallbackSuperBase<Idx>** mapped_callback =
-          CCallbackRegistry<Idx>::getData()->at(arg_callback_name);
+          CCallbackRegistry<Idx>::getCallbacks()->at(arg_callback_name);
 
       CCallbackBase<Idx, ArgumentTuple>* callback =
           dynamic_cast<CCallbackBase<Idx, ArgumentTuple>*>(*mapped_callback);
