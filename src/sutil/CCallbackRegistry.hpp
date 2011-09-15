@@ -88,7 +88,7 @@ namespace sutil
     /** This function returns an indexed callback (if the
      * callback has already been registered with the singleton) */
     template<typename Idx, typename ArgumentTuple, typename Data=bool >
-    static void call(const Idx& arg_callback_name, ArgumentTuple& args)
+    void call(const Idx& arg_callback_name, ArgumentTuple& args)
     {
       CCallbackSuperBase<Idx>** mapped_callback =
           CCallbackRegistry<Idx>::getCallbacks()->at(arg_callback_name);
@@ -104,8 +104,7 @@ namespace sutil
      * initialize the Data in the constructor */
     template< typename CallbackClass, typename Idx,
     typename ArgumentTuple, typename Data=bool >
-    static bool add(
-        const Idx& arg_callback_name)
+    bool add(const Idx& arg_callback_name)
     {
       CallbackClass f;
       return f.sutil::CCallbackBase<Idx, ArgumentTuple, Data>::
@@ -114,9 +113,7 @@ namespace sutil
 
     template< typename CallbackClass, typename Idx,
     typename ArgumentTuple, typename Data>
-    static bool add(
-        const Idx& arg_callback_name,
-        const Data& arg_data)
+    bool add(const Idx& arg_callback_name, const Data& arg_data)
     {
       CallbackClass f;
       return f.sutil::CCallbackBase<Idx, ArgumentTuple, Data>::
