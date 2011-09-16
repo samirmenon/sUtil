@@ -58,7 +58,7 @@ namespace sutil_test
     try
     {
       //Create shared memory object, id 8080
-      sutil::CUnixSharedMemory<SShmObj> shmem(8080);
+      sutil::CUnixSharedMemory<SShmObj, char> shmem(8080,'x');
 
       std::cout<<std::flush;
 
