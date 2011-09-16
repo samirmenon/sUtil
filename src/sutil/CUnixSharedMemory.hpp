@@ -46,6 +46,9 @@ namespace sutil
    * structure with a fixed type. And the client and
    * server must share the same shared memory key code.
    *
+   * The signal type is usually a fast (atomic) data type
+   * like atomic_t in <asm/atomic.h> on Linux.
+   *
    * Functions that help you use the shared memory:
    * Server :
    *   Create : shmCreate()
@@ -59,12 +62,12 @@ namespace sutil
    *   Signal : *shmem.data_signal_
    *   Close  : shmDetach()
    *  */
-  template<typename MemType>
+  template<typename MemType, typename SignalType>
   class CUnixSharedMemory
   {
   public:
-    CUnixSharedMemory(const key_t& arg_shmem_key):
-      data_(0), data_signal_(0),
+    CUnixSharedMemory(const key_t& arg_shmem_key, const SignalType& arg_term_cond):
+      data_(0), data_signal_(0), data_terminate_(arg_term_cond),
       key_(arg_shmem_key), has_been_init_(false) {}
 
     ~CUnixSharedMemory(){}
@@ -76,9 +79,9 @@ namespace sutil
       if(has_been_init_)
       { return false; }
 
-      //Get the shared memory {MemType, char}. The char is for signaling.
+      //Get the shared memory {MemType, SignalType}. The SignalType is for signaling.
       //IPC_CREAT creates the mem, and 0666 sets a+rw access
-      shmem_id_ = shmget(key_, sizeof(MemType)+sizeof(char), IPC_CREAT | 0666);
+      shmem_id_ = shmget(key_, sizeof(MemType)+sizeof(SignalType), IPC_CREAT | 0666);
       if (shmem_id_ < 0)
       {
         perror("CUnixSharedMemory::create() : Error: shmget could not create shared memory");
@@ -94,8 +97,8 @@ namespace sutil
         return false;
       }
 
-      data_signal_ = reinterpret_cast<char*>(shmem);
-      data_ = reinterpret_cast<MemType*>(data_signal_+sizeof(char));
+      data_signal_ = reinterpret_cast<SignalType*>(shmem);
+      data_ = reinterpret_cast<MemType*>(data_signal_+sizeof(SignalType));
 
       //Server initialized
       has_been_init_ = true;
@@ -110,9 +113,9 @@ namespace sutil
       if(has_been_init_)
       { return false; }
 
-      //Get the shared memory {MemType, char}. The char is for signaling.
+      //Get the shared memory {MemType, SignalType}. The SignalType is for signaling.
       //0666 sets a+rw access
-      shmem_id_ = shmget(key_, sizeof(MemType)+sizeof(char), 0666);
+      shmem_id_ = shmget(key_, sizeof(MemType)+sizeof(SignalType), 0666);
       if (shmem_id_ < 0)
       {
         perror("CUnixSharedMemory::create() : Error: shmget could not create shared memory");
@@ -128,8 +131,8 @@ namespace sutil
         return false;
       }
 
-      data_signal_ = reinterpret_cast<char*>(shmem);
-      data_ = reinterpret_cast<MemType*>(data_signal_+sizeof(char));
+      data_signal_ = reinterpret_cast<SignalType*>(shmem);
+      data_ = reinterpret_cast<MemType*>(data_signal_+sizeof(SignalType));
 
       //Client initialized
       has_been_init_ = true;
@@ -137,20 +140,20 @@ namespace sutil
       return true;
     }
 
-    /** Terminates if *data_signal_ is set to 'x' */
+    /** Terminates if *data_signal_ is set to data_terminate_ */
     bool shmAlive()
     {
       if(has_been_init_)
-      { return (*data_signal_) != 'x'; }
+      { return (*data_signal_) != data_terminate_; }
       return false;
     }
 
-    /** Terminates if *data_signal_ is set to 'x' */
+    /** Terminates if *data_signal_ is set to data_terminate_ */
     bool shmCheckDetach()
     {
       if(has_been_init_)
       {
-        if(*data_signal_ != 'x')
+        if(*data_signal_ != data_terminate_)
         { return false; }
 
         if(0 != shmdt(reinterpret_cast<const void *>(data_signal_)))
@@ -170,7 +173,7 @@ namespace sutil
     {
       if(has_been_init_)
       {
-        *data_signal_ = 'x';
+        *data_signal_ = data_terminate_;
 
         if(0 != shmdt(reinterpret_cast<const void *>(data_signal_)))
         {
@@ -189,7 +192,10 @@ namespace sutil
     MemType *data_;
 
     /** The signal data type */
-    char* data_signal_;
+    SignalType *data_signal_;
+
+    /** The signal termination condition */
+    SignalType data_terminate_;
 
   private:
     int shmem_id_;
