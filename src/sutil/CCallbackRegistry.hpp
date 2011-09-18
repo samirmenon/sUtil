@@ -88,15 +88,19 @@ namespace sutil
     /** This function returns an indexed callback (if the
      * callback has already been registered with the singleton) */
     template<typename Idx, typename ArgumentTuple, typename Data=bool >
-    void call(const Idx& arg_callback_name, ArgumentTuple& args)
+    bool call(const Idx& arg_callback_name, ArgumentTuple& args)
     {
       CCallbackSuperBase<Idx>** mapped_callback =
           CCallbackRegistry<Idx>::getCallbacks()->at(arg_callback_name);
 
+      if(0 == mapped_callback) {  return false; } //Function not found.
+
       CCallbackBase<Idx, ArgumentTuple, Data>* callback =
           dynamic_cast<CCallbackBase<Idx, ArgumentTuple, Data>*>(*mapped_callback);
 
-      callback->call(args);
+      callback->call(args); //The actual function call
+
+      return true; //Everything worked out
     }
 
     /** Why do we allow specifying Data?
@@ -113,7 +117,7 @@ namespace sutil
 
     template< typename CallbackClass, typename Idx,
     typename ArgumentTuple, typename Data>
-    bool add(const Idx& arg_callback_name, const Data& arg_data)
+    bool add(const Idx& arg_callback_name, Data* arg_data)
     {
       CallbackClass f;
       return f.sutil::CCallbackBase<Idx, ArgumentTuple, Data>::
@@ -242,7 +246,7 @@ namespace sutil
 
     virtual bool registerCallback(
         const Idx& arg_callback_name,
-        const Data* arg_data = 0)
+        Data* arg_data = 0)
     {
       bool flag;
       flag = CCallbackRegistry<Idx>::callbackRegistered(arg_callback_name);
@@ -252,11 +256,11 @@ namespace sutil
       else
       {
         //Duplicate this object and register the new one with the singleton
-        CCallbackBase<Idx,ArgumentTuple>* obj = createObject();
+        CCallbackBase<Idx,ArgumentTuple,Data>* obj = createObject();
 
         //Set up data for this function object
         if(0 != arg_data)
-        { obj->data_ = *arg_data; }
+        { obj->data_ = arg_data; }
 
         flag = CCallbackSuperBase<Idx>::registerCallbackSuper(
             arg_callback_name,
@@ -274,7 +278,7 @@ namespace sutil
     /** Only a subclass may create an object of this type */
     CCallbackBase(){}
 
-    Data data_;
+    Data* data_;
 
   private:
     CCallbackBase(const CCallbackBase&);
