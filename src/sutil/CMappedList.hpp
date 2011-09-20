@@ -401,19 +401,22 @@ namespace sutil
    * the objects the pilemap stores are CSuperClass**.
    *
    * This implementation will delete the objects all through. */
-  template <typename Idx, typename T>
+  template <typename Idx, typename T, bool ManageMemory>
   class CMappedPointerList : public CMappedList<Idx,T*>
   {
   public:
     virtual ~CMappedPointerList()
     {
-      typename CMappedList<Idx,T*>::iterator it,ite;
-      for(it = this->begin(), ite = this->end();
-          it!=ite; ++it)
+      if(ManageMemory)
       {
-        T*& tmp = *it;
-        delete tmp;
-        tmp = NULL;
+        typename CMappedList<Idx,T*>::iterator it,ite;
+        for(it = this->begin(), ite = this->end();
+            it!=ite; ++it)
+        {
+          T*& tmp = *it;
+          delete tmp;
+          tmp = NULL;
+        }
       }
     }
   };
