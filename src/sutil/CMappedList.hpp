@@ -405,6 +405,9 @@ namespace sutil
   class CMappedPointerList : public CMappedList<Idx,T*>
   {
   public:
+    typedef typename CMappedList<Idx,T*>::iterator iterator;
+    typedef typename CMappedList<Idx,T*>::const_iterator const_iterator;
+
     virtual ~CMappedPointerList()
     {
       if(ManageMemory)

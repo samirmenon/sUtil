@@ -30,6 +30,7 @@ sUtil. If not, see <http://www.gnu.org/licenses/>.
 #define CCALLBACKREGISTRY_HPP_
 
 #include <sutil/CSingleton.hpp>
+#include <sutil/CMappedList.hpp>
 
 #ifdef DEBUG
 #include <iostream>
@@ -122,6 +123,19 @@ namespace sutil
       CallbackClass f;
       return f.sutil::CCallbackBase<Idx, ArgumentTuple, Data>::
           registerCallback(arg_callback_name, arg_data);
+    }
+
+    /** Return a list of the registered callbacks (a vector of indices) */
+    template<typename Idx>
+    bool list(std::vector<Idx>& idxlist)
+    { typedef CMappedPointerList<Idx,CCallbackSuperBase<Idx>,true> map;
+      map* m = CCallbackRegistry<Idx>::getCallbacks();
+      if(NULL == m) { return false; }
+      typename map::iterator it,ite;
+      idxlist.clear();
+      for(it = m->begin(), ite = m->end();it!=ite;++it)
+      { idxlist.push_back(!it); }//Add the index to the vector
+      return true;
     }
   }
 
