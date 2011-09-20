@@ -127,12 +127,14 @@ namespace sutil
 
   /** This class implements a callback factory singleton. In plain English,
    * it is a one-of-a-kind class that can give you an function based on
-   * its name. */
+   * its name.
+   *
+   * NOTE: The singleton manages its memory and deletes all the pointers. */
   template <typename Idx>
-  class CCallbackRegistry : private CSingleton<CMappedPointerList<Idx,CCallbackSuperBase<Idx> > >
+  class CCallbackRegistry : private CSingleton<CMappedPointerList<Idx,CCallbackSuperBase<Idx>,true> >
   {
     //A typedef for easy use;
-    typedef CSingleton<CMappedPointerList<Idx,CCallbackSuperBase<Idx> > > singleton;
+    typedef CSingleton<CMappedPointerList<Idx,CCallbackSuperBase<Idx>,true> > singleton;
 
     //So that the base class can call the register function
     friend class CCallbackSuperBase<Idx>;
@@ -152,7 +154,7 @@ namespace sutil
     { return singleton::resetData(); }
 
     /** Used to access the callback list */
-    static CMappedPointerList<Idx,CCallbackSuperBase<Idx> >*getCallbacks()
+    static CMappedPointerList<Idx,CCallbackSuperBase<Idx>,true>* getCallbacks()
     { return singleton::getData();  }
 
   private:

@@ -89,10 +89,10 @@ namespace sutil
      * the actual constructor and destructor are called for the singleton.
      * So we can't call a destructor here to deallocate all the TypeBase**
      * objects.*/
-    private CSingleton<CMappedPointerList<Idx,CDynamicTypeBase<Idx> > >
+    private CSingleton<CMappedPointerList<Idx,CDynamicTypeBase<Idx>,true> >
   {
     //A typedef for easy use;
-    typedef CSingleton<CMappedPointerList<Idx,CDynamicTypeBase<Idx> > > singleton;
+    typedef CSingleton<CMappedPointerList<Idx,CDynamicTypeBase<Idx>,true> > singleton;
 
     friend class CDynamicTypeBase<Idx>;
 
