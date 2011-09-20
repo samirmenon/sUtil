@@ -180,10 +180,8 @@ namespace sutil_test
       fp = fopen("delme.txt","w");//Delete the file
       fclose(fp);
 
-//*************************************************************************
-//Modified Code	- Rohan Kamath
-      delete[] buf; //ORIGINAL WAS delete buf;
-//*************************************************************************
+      delete[] buf; 
+
       delete delbuf;
 
       std::cout<<"\nTest #"<<arg_id<<" (Memcopier Test) Succeeded";

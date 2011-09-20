@@ -59,26 +59,21 @@ int main(int argc, char** argv)
     cout<<"\n"<<tid++<<" : Run multi-level mapped list tests";
     cout<<"\n"<<tid++<<" : Run mapped tree tests";
     cout<<"\n"<<tid++<<" : Run memcopier tests";
-//*************************************************************************
-//Modified Code - Rohan Kamath
     cout<<"\n"<<tid++<<" : Run dynamic type tests";
     cout<<"\n"<<tid++<<" : Run callback registry tests";
     cout<<"\n"<<tid++<<" : Run shared memory tests";
-//*************************************************************************
     cout<<"\n";
   }
   else
   {
     unsigned int tid, id = 1;
     tid = static_cast<unsigned int>(atoi(argv[1]));
-//*************************************************************************
-//Modified Code	- Rohan Kamath
-	if(tid<0 || tid>8)
+	if(tid>8)
 	{
 	cout<<"FAILED:- Option Unavailable"<<endl;
 	return 0;
 	}
-//*************************************************************************
+
     cout<<"\nRunning sutil tests for case: "<<tid;
 
     flag = sutil::CSystemClock::start(); //NOTE: Clock MUST be created and destroyed in main
