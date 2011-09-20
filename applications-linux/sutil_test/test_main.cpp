@@ -59,6 +59,9 @@ int main(int argc, char** argv)
     cout<<"\n"<<tid++<<" : Run multi-level mapped list tests";
     cout<<"\n"<<tid++<<" : Run mapped tree tests";
     cout<<"\n"<<tid++<<" : Run memcopier tests";
+    cout<<"\n"<<tid++<<" : Run dynamic type tests";
+    cout<<"\n"<<tid++<<" : Run callback registry tests";
+    cout<<"\n"<<tid++<<" : Run shared memory tests";
     cout<<"\n";
   }
   else
