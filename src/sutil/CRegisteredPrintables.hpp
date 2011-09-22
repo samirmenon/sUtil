@@ -36,6 +36,25 @@ sUtil. If not, see <http://www.gnu.org/licenses/>.
 
 namespace sutil
 {
+  /** You must define this function somewhere for each type that
+   *  you want to support for printing */
+  template<typename ObjectType>
+  void printToStream(std::ostream&, const ObjectType&);
+
+  // Forward declarations. Anything that subclasses this is printable on
+  // stl streams. Ie. Supports the 'stream<<object' operator style.
+  class SPrintableBase;
+
+  // This helps the map to work properly through typical object orientation.
+  // And saves you from writing redundant code for every type.
+  template<typename ObjectType> class SPrintable;
+
+  /** This maintains a map of all printable objects.
+   * Although you can directly access it, it is best to
+   * ignore it and use the helper functions in the "printable"
+   * namespace instead. */
+  typedef sutil::CSingleton<CMappedPointerList<std::string,SPrintableBase,true> > CRegisteredPrintables;
+
   /** To print any arbitrary type's contents, you have to do two things:
    * 1. Define a function that parses the object's data into
    *    an ostream
@@ -47,19 +66,59 @@ namespace sutil
    *
    * 1. Simply code this function somewhere in your callbacks:
    *
-   *     template <>
-   *     void printToStream<TYPE>(
-   *        std::ostream& ostr, const TYPE& arg_data)
-   *      { ostr<<arg_data.whatever_you_want_; }
+   *     namespace sutil //Remember to do this.
+   *     {
+   *       template <>
+   *       void printToStream<TYPE>(
+   *          std::ostream& ostr, const TYPE& arg_data)
+   *        { ostr<<arg_data.whatever_you_want_; }
+   *     }
    *
    * 2. Add these lines of code in your callbacks:
    *
-   *     CRegisteredPrintables::add(rob.name_, SPrintable<TYPE>(your_object));
+   *     printables::add<TYPE>("object_name", object);
    */
-  template<typename T> void printToStream(std::ostream&, const T&);
+  namespace printables
+  {
+    /** Enables access to the map of printable objects. An object in
+     * the map can be passed to an ostream, and will print its contents
+     * into the stream
+     *
+     * Eg. One such call could be:
+     * if(0!=printables::get(std::string("YourObject")))
+     *   std::cout<<*printables::get(std::string("YourObject"));
+     */
+    const SPrintableBase* get(const std::string& arg_name)
+    {
+      SPrintableBase** ret = CRegisteredPrintables::getData()->at(arg_name);
+      if(NULL == ret) { return NULL;  }
+      return static_cast<const SPrintableBase*>(*ret);
+    }
+
+    /** Enables adding an object to the map of printable objects. An object in
+     * the map can be passed to an ostream, and will print its contents
+     * into the stream */
+    template<typename ObjectType>
+    bool add(const std::string& arg_name,
+        const ObjectType& arg_obj)
+    {
+      SPrintable<ObjectType> tmp_printable_object(arg_obj);
+      SPrintableBase** obj = CRegisteredPrintables::getData()->create(arg_name);
+      if(NULL == obj){  return false; }
+      *obj = tmp_printable_object.createObject();
+      return true;
+    }
+
+    /** Deletes the all registered printable object definitions.
+     * Resets the singleton map that stores them. */
+    bool reset() { return CRegisteredPrintables::resetData(); }
+  }
 
   /** A generic printable object. All database objects should
-   * inherit from this. */
+   * inherit from this.
+   *
+   * Anything that subclasses this is printable on stl streams.
+   * Ie. This class supports the 'stream<<object' operator style.*/
   class SPrintableBase
   {
   public:
@@ -80,14 +139,24 @@ namespace sutil
     SPrintableBase& operator =(const SPrintableBase&);
   };
 
+  /** Enables printing SPrintableBase objects */
   std::ostream& operator<<(std::ostream& out, const SPrintableBase& me)
   { me.printDataToStream(out); return out; }
 
+  /** This helps the map to work properly (through typical object
+   * orientation).
+   * It also saves you from writing redundant code for every type.
+   *
+   * This class will be automatically generated for a type when you
+   * implement the:
+   *      printToStream<Type>(std::outstream&, Type&)
+   * function. Do so for every printable type you want to support. */
   template<typename T>
   class SPrintable : public SPrintableBase
   {
   public:
-    SPrintable(const T& arg_data) : data_(arg_data) {}
+    SPrintable(const T& arg_data) :
+      SPrintableBase(), data_(arg_data) {}
 
     virtual void printDataToStream(std::ostream& ostr) const
     { printToStream<T>(ostr, data_); }
@@ -101,51 +170,6 @@ namespace sutil
     SPrintable();
     SPrintable(const SPrintable&);
     SPrintable& operator=(const SPrintable&);
-  };
-
-
-  /** This maintains a map of all printable objects. Anything returned
-   * by this map can be passed to an ostream and will print its contents
-   * into the stream
-   *
-   * Eg. One such call could be:
-   * if(0!=CRegisteredPrintables::get(std::string("YourObject")))
-   *   std::cout<<*CRegisteredPrintables::get(std::string("YourObject"));
-   */
-  class  CRegisteredPrintables : private
-  sutil::CSingleton<CMappedPointerList<std::string,SPrintableBase,true> >
-  {typedef sutil::CSingleton<CMappedPointerList<std::string,SPrintableBase,true> > singleton;
-  public:
-  /** Gets a pointer to the database data structure */
-  static const SPrintableBase* get(const std::string& arg_name)
-  {
-    SPrintableBase** ret = singleton::getData()->at(arg_name);
-    if(NULL == ret) { return NULL;  }
-    return static_cast<const SPrintableBase*>(*ret);
-  }
-
-  /** Adds an object to the lookup */
-  static bool add(const std::string& arg_name,
-      const SPrintableBase& arg_obj)
-  {
-    SPrintableBase** obj = singleton::getData()->create(arg_name);
-    if(NULL == obj){  return false; }
-    *obj = arg_obj.createObject();
-    return true;
-  }
-
-  /** Deletes the singleton object and creates a new one
-   * in its stead */
-  static bool reset()
-  { return singleton::resetData(); }
-
-  private:
-  /** Private constructor : for the singleton */
-  CRegisteredPrintables();
-  /** Private constructor : for the singleton */
-  CRegisteredPrintables(const CRegisteredPrintables&);
-  /** Private operator : for the singleton */
-  CRegisteredPrintables& operator= (const CRegisteredPrintables&);
   };
 }
 
