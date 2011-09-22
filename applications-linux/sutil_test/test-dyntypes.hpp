@@ -32,7 +32,7 @@ sUtil. If not, see <http://www.gnu.org/licenses/>.
 
 #include <sutil/CSystemClock.hpp>
 
-#include <sutil/CDynamicTypeFactory.hpp>
+#include <sutil/CRegisteredDynamicTypes.hpp>
 
 #include <iostream>
 #include <math.h>
@@ -121,12 +121,12 @@ namespace sutil_test
 
 
       //Test 2 : Test type functionality.
-      typedef sutil::CDynamicTypeFactory<std::string> DynTypeFactory;
+      typedef sutil::CRegisteredDynamicTypes<std::string> RegDynTypes;
       void* obj = NULL;
 
       SType1* t1; SType2* t2; SType3* t3;
 
-      flag = DynTypeFactory::getObjectForType(std::string("SType1"), obj);
+      flag = RegDynTypes::getObjectForType(std::string("SType1"), obj);
       if(false == flag)
       { throw(std::runtime_error("Could not create dynamic object for type SType1"));  }
       else
@@ -139,7 +139,7 @@ namespace sutil_test
       delete t1;
       obj = NULL;
 
-      flag = DynTypeFactory::getObjectForType(std::string("SType2"), obj);
+      flag = RegDynTypes::getObjectForType(std::string("SType2"), obj);
       if(false == flag)
       { throw(std::runtime_error("Could not create dynamic object for type SType2"));  }
       else
@@ -156,7 +156,7 @@ namespace sutil_test
       delete t2;
       obj = NULL;
 
-      flag = DynTypeFactory::getObjectForType(std::string("SType3"), obj);
+      flag = RegDynTypes::getObjectForType(std::string("SType3"), obj);
       if(false == flag)
       { throw(std::runtime_error("Could not create dynamic object for type SType3"));  }
       else

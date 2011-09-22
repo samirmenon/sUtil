@@ -19,7 +19,7 @@ You should have received a copy of the GNU Lesser General Public
 License and a copy of the GNU General Public License along with
 sUtil. If not, see <http://www.gnu.org/licenses/>.
  */
-/* \file CDynamicTypeFactory.hpp
+/* \file CRegisteredDynamicTypes.hpp
  *
  *  Created on: Sep 9, 2011
  *
@@ -71,12 +71,12 @@ namespace sutil
    *   type.registerType();
    *
    *   void *obj=NULL;
-   *   sutil::CDynamicTypeFactory<std::string>::getObjectForType(std::string("int"), obj);
+   *   sutil::CRegisteredDynamicTypes<std::string>::getObjectForType(std::string("int"), obj);
    *   int *x = reinterpret_cast<int*>(obj);
    *
    * */
   template <typename Idx>
-  class CDynamicTypeFactory :
+  class CRegisteredDynamicTypes :
     /** Private inheritance from a singleton, with private constructors for
      * this class, make this class a singleton and hide the singleton's methods
      * from its users.
@@ -118,7 +118,7 @@ namespace sutil
       if(NULL == mapped_type)
       {
 #ifdef DEBUG
-        std::cerr<<"\nCDynamicTypeFactory::getObjectForType() Error :"
+        std::cerr<<"\nCRegisteredDynamicTypes::getObjectForType() Error :"
             <<" The passed type has not been registered.";
 #endif
         return false;
@@ -127,7 +127,7 @@ namespace sutil
       if(NULL != ret_object)
       {
 #ifdef DEBUG
-        std::cerr<<"\nCDynamicTypeFactory::getObjectForType() Error :"
+        std::cerr<<"\nCRegisteredDynamicTypes::getObjectForType() Error :"
             <<" The passed void* pointer is not NULL.";
 #endif
         return false;
@@ -137,7 +137,7 @@ namespace sutil
       if(NULL == *mapped_type)
       {
 #ifdef DEBUG
-        std::cerr<<"\nCDynamicTypeFactory::getObjectForType() Error :"
+        std::cerr<<"\nCRegisteredDynamicTypes::getObjectForType() Error :"
             <<" The typemap is corrupted. A type creator object pointer is NULL.";
 #endif
         return false;
@@ -148,7 +148,7 @@ namespace sutil
       if(NULL == ret_object)
       {
 #ifdef DEBUG
-        std::cerr<<"\nCDynamicTypeFactory::getObjectForType() Error :"
+        std::cerr<<"\nCRegisteredDynamicTypes::getObjectForType() Error :"
             <<" The type object's createObject() function did not work.";
 #endif
       }
@@ -170,7 +170,7 @@ namespace sutil
       if(typeRegistered(arg_type_name))
       {
 #ifdef DEBUG
-        std::cerr<<"\nCDynamicTypeFactory::registerType() Warning :"
+        std::cerr<<"\nCRegisteredDynamicTypes::registerType() Warning :"
             <<" The passed type is already registered.";
 #endif
         return false;
@@ -180,7 +180,7 @@ namespace sutil
       if(NULL == t)
       {
 #ifdef DEBUG
-        std::cerr<<"\nCDynamicTypeFactory::registerType() Error :"
+        std::cerr<<"\nCRegisteredDynamicTypes::registerType() Error :"
             <<" Failed to create type in the type mapped list.";
 #endif
         return false;
@@ -190,13 +190,13 @@ namespace sutil
     }
 
     /** Private for the singleton */
-    CDynamicTypeFactory();
+    CRegisteredDynamicTypes();
 
     /** Private for the singleton */
-    CDynamicTypeFactory(const CDynamicTypeFactory&);
+    CRegisteredDynamicTypes(const CRegisteredDynamicTypes&);
 
     /** Private for the singleton */
-    CDynamicTypeFactory& operator= (const CDynamicTypeFactory&);
+    CRegisteredDynamicTypes& operator= (const CRegisteredDynamicTypes&);
   };
 
   /** To support indexed querying for dynamic object allocation:
@@ -219,7 +219,7 @@ namespace sutil
   protected:
     virtual bool registerMyType(CDynamicTypeBase* arg_obj)
     {
-      return CDynamicTypeFactory<Idx>::registerType(type_name_,arg_obj);
+      return CRegisteredDynamicTypes<Idx>::registerType(type_name_,arg_obj);
     }
 
     /** The type of the object */
@@ -259,7 +259,7 @@ namespace sutil
     bool registerType()
     {
       bool flag;
-      flag = CDynamicTypeFactory<Idx>::typeRegistered(CDynamicTypeBase<Idx>::type_name_);
+      flag = CRegisteredDynamicTypes<Idx>::typeRegistered(CDynamicTypeBase<Idx>::type_name_);
 
       if(flag)//Type already registered. Do nothing and return false.
       {
