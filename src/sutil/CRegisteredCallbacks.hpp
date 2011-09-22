@@ -19,7 +19,7 @@ You should have received a copy of the GNU Lesser General Public
 License and a copy of the GNU General Public License along with
 sUtil. If not, see <http://www.gnu.org/licenses/>.
  */
-/* \file CCallbackRegistry.hpp
+/* \file CRegisteredCallbacks.hpp
  *
  *  Created on: Sep 13, 2011
  *
@@ -41,7 +41,7 @@ namespace sutil
   // These are forward declarations. Read the class comments for details.
   template <typename Idx> class CCallbackSuperBase;
   template <typename Idx, typename ArgumentTuple, typename Data> class CCallbackBase;
-  template <typename Idx> class CCallbackRegistry;
+  template <typename Idx> class CRegisteredCallbacks;
 
   /** Use this namespace to create and call callback
    * functions
@@ -92,7 +92,7 @@ namespace sutil
     bool call(const Idx& arg_callback_name, ArgumentTuple& args)
     {
       CCallbackSuperBase<Idx>** mapped_callback =
-          CCallbackRegistry<Idx>::getCallbacks()->at(arg_callback_name);
+          CRegisteredCallbacks<Idx>::getCallbacks()->at(arg_callback_name);
 
       if(0 == mapped_callback) {  return false; } //Function not found.
 
@@ -129,7 +129,7 @@ namespace sutil
     template<typename Idx>
     bool list(std::vector<Idx>& idxlist)
     { typedef CMappedPointerList<Idx,CCallbackSuperBase<Idx>,true> map;
-      map* m = CCallbackRegistry<Idx>::getCallbacks();
+      map* m = CRegisteredCallbacks<Idx>::getCallbacks();
       if(NULL == m) { return false; }
       typename map::iterator it,ite;
       idxlist.clear();
@@ -145,7 +145,7 @@ namespace sutil
    *
    * NOTE: The singleton manages its memory and deletes all the pointers. */
   template <typename Idx>
-  class CCallbackRegistry : private CSingleton<CMappedPointerList<Idx,CCallbackSuperBase<Idx>,true> >
+  class CRegisteredCallbacks : private CSingleton<CMappedPointerList<Idx,CCallbackSuperBase<Idx>,true> >
   {
     //A typedef for easy use;
     typedef CSingleton<CMappedPointerList<Idx,CCallbackSuperBase<Idx>,true> > singleton;
@@ -181,7 +181,7 @@ namespace sutil
       if(callbackRegistered(arg_callback_name))
       {
 #ifdef DEBUG
-        std::cerr<<"\nCCallbackRegistry::registerCallback() Warning :"
+        std::cerr<<"\nCRegisteredCallbacks::registerCallback() Warning :"
             <<" The passed callback is already registered.";
 #endif
         return false;
@@ -193,7 +193,7 @@ namespace sutil
       if(0 == t)
       {
 #ifdef DEBUG
-        std::cerr<<"\nCCallbackRegistry::registerCallback() Error :"
+        std::cerr<<"\nCRegisteredCallbacks::registerCallback() Error :"
             <<" Failed to create callback in the callback mapped list.";
 #endif
         return false;
@@ -203,13 +203,13 @@ namespace sutil
     }
 
     /** Private for the singleton */
-    CCallbackRegistry();
+    CRegisteredCallbacks();
 
     /** Private for the singleton */
-    CCallbackRegistry(const CCallbackRegistry&);
+    CRegisteredCallbacks(const CRegisteredCallbacks&);
 
     /** Private for the singleton */
-    CCallbackRegistry& operator= (const CCallbackRegistry&);
+    CRegisteredCallbacks& operator= (const CRegisteredCallbacks&);
   };
 
   /** *********************************************************
@@ -233,7 +233,7 @@ namespace sutil
         const Idx &arg_callback_name,
         CCallbackSuperBase* arg_obj)
     {
-      return CCallbackRegistry<Idx>::
+      return CRegisteredCallbacks<Idx>::
           registerCallback(arg_callback_name,arg_obj);
     }
 
@@ -265,7 +265,7 @@ namespace sutil
         Data* arg_data = 0)
     {
       bool flag;
-      flag = CCallbackRegistry<Idx>::callbackRegistered(arg_callback_name);
+      flag = CRegisteredCallbacks<Idx>::callbackRegistered(arg_callback_name);
 
       if(flag)//Callback already registered. Do nothing and return false.
       { return false; }

@@ -32,7 +32,7 @@ sUtil. If not, see <http://www.gnu.org/licenses/>.
 
 #include <sutil/CSystemClock.hpp>
 
-#include <sutil/CCallbackRegistry.hpp>
+#include <sutil/CRegisteredCallbacks.hpp>
 
 #include <iostream>
 #include <string>
