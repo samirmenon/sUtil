@@ -74,6 +74,8 @@ namespace sutil
    *   sutil::CRegisteredDynamicTypes<std::string>::getObjectForType(std::string("int"), obj);
    *   int *x = reinterpret_cast<int*>(obj);
    *
+   *  NOTE : This follows a different convention from the callbacks, objects and printables
+   *         because this acts as a dynamic type factory, while those act as lookup tables.
    * */
   template <typename Idx>
   class CRegisteredDynamicTypes :
