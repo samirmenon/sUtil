@@ -103,11 +103,12 @@ namespace sutil
    * into the stream
    *
    * Eg. One such call could be:
-   * std::cout<<CPrettyPrintRegistry::getData()->at(std::string("YourObject"));
+   * if(0!=CPrettyPrintRegistry::get(std::string("YourObject")))
+   *   std::cout<<*CPrettyPrintRegistry::get(std::string("YourObject"));
    */
   class  CPrettyPrintRegistry : private
-  sutil::CSingleton<CMappedPointerList<std::string,SPrintableBase,false> >
-  {typedef sutil::CSingleton<CMappedPointerList<std::string,SPrintableBase,false> > singleton;
+  sutil::CSingleton<CMappedPointerList<std::string,SPrintableBase,true> >
+  {typedef sutil::CSingleton<CMappedPointerList<std::string,SPrintableBase,true> > singleton;
   public:
   /** Gets a pointer to the database data structure */
   static const SPrintableBase* get(const std::string& arg_name)
