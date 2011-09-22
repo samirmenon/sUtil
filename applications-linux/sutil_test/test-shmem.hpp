@@ -30,7 +30,7 @@ sUtil. If not, see <http://www.gnu.org/licenses/>.
 #ifndef TEST_SHMEM_HPP_
 #define TEST_SHMEM_HPP_
 
-#include <sutil/CUnixSharedMemory.hpp>
+#include <sutil/CSharedMemory.hpp>
 
 //For getpid() and fork()
 #include <sys/types.h>
@@ -58,7 +58,7 @@ namespace sutil_test
     try
     {
       //Create shared memory object, id 8080
-      sutil::CUnixSharedMemory<SShmObj, char> shmem(8080,'x');
+      sutil::CSharedMemory<SShmObj, char> shmem(8080,'x');
 
       std::cout<<std::flush;
 

@@ -26,8 +26,8 @@ sUtil. If not, see <http://www.gnu.org/licenses/>.
  *  Copyright (C) 2011, Samir Menon <smenon@stanford.edu>
  */
 
-#ifndef CCALLBACKREGISTRY_HPP_
-#define CCALLBACKREGISTRY_HPP_
+#ifndef CREGISTEREDCALLBACKS_HPP_
+#define CREGISTEREDCALLBACKS_HPP_
 
 #include <sutil/CSingleton.hpp>
 #include <sutil/CMappedList.hpp>
@@ -302,4 +302,4 @@ namespace sutil
   };
 }
 
-#endif /* CCALLBACKREGISTRY_HPP_ */
+#endif /* CREGISTEREDCALLBACKS_HPP_ */

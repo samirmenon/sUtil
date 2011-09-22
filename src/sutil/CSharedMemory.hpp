@@ -19,7 +19,7 @@ You should have received a copy of the GNU Lesser General Public
 License and a copy of the GNU General Public License along with
 sUtil. If not, see <http://www.gnu.org/licenses/>.
  */
-/* \file  CUnixSharedMemory.hpp
+/* \file  CSharedMemory.hpp
  *
  *  Created on: Sep 14, 2011
  *
@@ -63,14 +63,14 @@ namespace sutil
    *   Close  : shmDetach()
    *  */
   template<typename MemType, typename SignalType>
-  class CUnixSharedMemory
+  class CSharedMemory
   {
   public:
-    CUnixSharedMemory(const key_t& arg_shmem_key, const SignalType& arg_term_cond):
+    CSharedMemory(const key_t& arg_shmem_key, const SignalType& arg_term_cond):
       data_(0), data_signal_(0), data_terminate_(arg_term_cond),
       key_(arg_shmem_key), has_been_init_(false) {}
 
-    ~CUnixSharedMemory(){}
+    ~CSharedMemory(){}
 
     /** A shared memory server creates the shared memory */
     bool shmCreate()
@@ -84,7 +84,7 @@ namespace sutil
       shmem_id_ = shmget(key_, sizeof(MemType)+sizeof(SignalType), IPC_CREAT | 0666);
       if (shmem_id_ < 0)
       {
-        perror("CUnixSharedMemory::create() : Error: shmget could not create shared memory");
+        perror("CSharedMemory::create() : Error: shmget could not create shared memory");
         return false;
       }
 
@@ -93,7 +93,7 @@ namespace sutil
       //Returns "(void*) -1" on error
       if(shmem == (void *) -1)
       {
-        perror("CUnixSharedMemory::create() : Error: shmat could not attach shared memory");
+        perror("CSharedMemory::create() : Error: shmat could not attach shared memory");
         return false;
       }
 
@@ -118,7 +118,7 @@ namespace sutil
       shmem_id_ = shmget(key_, sizeof(MemType)+sizeof(SignalType), 0666);
       if (shmem_id_ < 0)
       {
-        perror("CUnixSharedMemory::create() : Error: shmget could not create shared memory");
+        perror("CSharedMemory::create() : Error: shmget could not create shared memory");
         return false;
       }
 
@@ -127,7 +127,7 @@ namespace sutil
       //Returns "(void*) -1" on error
       if(shmem == (void *) -1)
       {
-        perror("CUnixSharedMemory::create() : Error: shmat could not attach shared memory");
+        perror("CSharedMemory::create() : Error: shmat could not attach shared memory");
         return false;
       }
 
@@ -158,7 +158,7 @@ namespace sutil
 
         if(0 != shmdt(reinterpret_cast<const void *>(data_signal_)))
         {
-          perror("CUnixSharedMemory::detach() : Error: shmat could not detach shared memory");
+          perror("CSharedMemory::detach() : Error: shmat could not detach shared memory");
           return false;
         }
 
@@ -177,7 +177,7 @@ namespace sutil
 
         if(0 != shmdt(reinterpret_cast<const void *>(data_signal_)))
         {
-          perror("CUnixSharedMemory::detach() : Error: shmat could not detach shared memory");
+          perror("CSharedMemory::detach() : Error: shmat could not detach shared memory");
           return false;
         }
 

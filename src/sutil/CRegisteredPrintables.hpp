@@ -26,8 +26,8 @@ sUtil. If not, see <http://www.gnu.org/licenses/>.
  *  Copyright (C) 2011, Samir Menon <smenon@stanford.edu>
  */
 
-#ifndef CPRETTYPRINTREGISTRY_HPP_
-#define CPRETTYPRINTREGISTRY_HPP_
+#ifndef CREGISTEREDPRINTABLES_HPP_
+#define CREGISTEREDPRINTABLES_HPP_
 
 #include <sutil/CMappedList.hpp>
 #include <sutil/CSingleton.hpp>
@@ -72,6 +72,12 @@ namespace sutil
 
     //The only way you can overload << (it is a global function)
     friend std::ostream& operator<<(std::ostream& outstr, const SPrintableBase& me);
+
+  protected:
+    SPrintableBase(){}
+  private:
+    SPrintableBase(const SPrintableBase&);
+    SPrintableBase& operator =(const SPrintableBase&);
   };
 
   std::ostream& operator<<(std::ostream& out, const SPrintableBase& me)
@@ -143,4 +149,4 @@ namespace sutil
   };
 }
 
-#endif /* CPRETTYPRINTREGISTRY_HPP_ */
+#endif /* CREGISTEREDPRINTABLES_HPP_ */

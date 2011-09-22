@@ -26,8 +26,8 @@ sUtil. If not, see <http://www.gnu.org/licenses/>.
  *  Copyright (C) 2011, Samir Menon <smenon@stanford.edu>
  */
 
-#ifndef CDYNAMICTYPEFACTORY_HPP_
-#define CDYNAMICTYPEFACTORY_HPP_
+#ifndef CREGISTEREDDYNAMICTYPES_HPP_
+#define CREGISTEREDDYNAMICTYPES_HPP_
 
 #include <sutil/CMappedList.hpp>
 #include <sutil/CSingleton.hpp>
@@ -297,4 +297,4 @@ namespace sutil
 
 }
 
-#endif /* CDYNAMICTYPEFACTORY_HPP_ */
+#endif /* CREGISTEREDDYNAMICTYPES_HPP_ */
