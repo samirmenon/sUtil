@@ -19,7 +19,7 @@ You should have received a copy of the GNU Lesser General Public
 License and a copy of the GNU General Public License along with
 sUtil. If not, see <http://www.gnu.org/licenses/>.
  */
-/* \file CPrettyPrintRegistry.hpp
+/* \file CRegisteredPrintables.hpp
  *
  *  Created on: Sep 20, 2011
  *
@@ -54,7 +54,7 @@ namespace sutil
    *
    * 2. Add these lines of code in your callbacks:
    *
-   *     CPrettyPrintRegistry::add(rob.name_, SPrintable<TYPE>(your_object));
+   *     CRegisteredPrintables::add(rob.name_, SPrintable<TYPE>(your_object));
    */
   template<typename T> void printToStream(std::ostream&, const T&);
 
@@ -103,10 +103,10 @@ namespace sutil
    * into the stream
    *
    * Eg. One such call could be:
-   * if(0!=CPrettyPrintRegistry::get(std::string("YourObject")))
-   *   std::cout<<*CPrettyPrintRegistry::get(std::string("YourObject"));
+   * if(0!=CRegisteredPrintables::get(std::string("YourObject")))
+   *   std::cout<<*CRegisteredPrintables::get(std::string("YourObject"));
    */
-  class  CPrettyPrintRegistry : private
+  class  CRegisteredPrintables : private
   sutil::CSingleton<CMappedPointerList<std::string,SPrintableBase,true> >
   {typedef sutil::CSingleton<CMappedPointerList<std::string,SPrintableBase,true> > singleton;
   public:
@@ -135,11 +135,11 @@ namespace sutil
 
   private:
   /** Private constructor : for the singleton */
-  CPrettyPrintRegistry();
+  CRegisteredPrintables();
   /** Private constructor : for the singleton */
-  CPrettyPrintRegistry(const CPrettyPrintRegistry&);
+  CRegisteredPrintables(const CRegisteredPrintables&);
   /** Private operator : for the singleton */
-  CPrettyPrintRegistry& operator= (const CPrettyPrintRegistry&);
+  CRegisteredPrintables& operator= (const CRegisteredPrintables&);
   };
 }
 
