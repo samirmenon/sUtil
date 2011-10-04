@@ -99,6 +99,9 @@ namespace sutil
       CCallbackBase<Idx, ArgumentTuple, Data>* callback =
           dynamic_cast<CCallbackBase<Idx, ArgumentTuple, Data>*>(*mapped_callback);
 
+      if(NULL == callback)
+      { return false; }
+
       callback->call(args); //The actual function call
 
       return true; //Everything worked out

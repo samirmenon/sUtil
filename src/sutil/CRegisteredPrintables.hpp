@@ -151,20 +151,20 @@ namespace sutil
    * implement the:
    *      printToStream<Type>(std::outstream&, Type&)
    * function. Do so for every printable type you want to support. */
-  template<typename T>
+  template<typename ObjectType>
   class SPrintable : public SPrintableBase
   {
   public:
-    SPrintable(const T& arg_data) :
+    SPrintable(const ObjectType& arg_data) :
       SPrintableBase(), data_(arg_data) {}
 
     virtual void printDataToStream(std::ostream& ostr) const
-    { printToStream<T>(ostr, data_); }
+    { printToStream<ObjectType>(ostr, data_); }
 
     virtual SPrintableBase* createObject() const
-    { return new SPrintable<T>(data_); }
+    { return new SPrintable<ObjectType>(data_); }
 
-    const T& data_;
+    const ObjectType& data_;
 
   private: //To enforce implementers to pass an object (which is then registered)
     SPrintable();
