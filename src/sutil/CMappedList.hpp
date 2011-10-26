@@ -30,6 +30,7 @@ sUtil. If not, see <http://www.gnu.org/licenses/>.
 #define CMAPPEDLIST_HPP_
 
 #include <map>
+#include <cstddef>
 
 #ifdef DEBUG
 #include <iostream>
