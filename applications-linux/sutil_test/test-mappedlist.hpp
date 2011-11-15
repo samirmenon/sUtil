@@ -188,21 +188,47 @@ namespace sutil_test
       l1.create("1",1);
       l1.create("2",2);
       l1.create("3",3);
-      if(l1 == l1) { std::cout<<"\nTest Result ("<<test_id++<<") operator == works correctly"; }
-      else { throw(std::runtime_error("operator == failed")); }
+      if(l1 == l1) { std::cout<<"\nTest Result ("<<test_id++<<") operator == works correctly with identical lists"; }
+      else { throw(std::runtime_error("operator == failed with identical lists")); }
 
-      if(l1 != l1) { throw(std::runtime_error("operator != failed")); }
-      else { std::cout<<"\nTest Result ("<<test_id++<<") operator != works correctly"; }
+      if(l1 != l1) { throw(std::runtime_error("operator != failed with identical lists")); }
+      else { std::cout<<"\nTest Result ("<<test_id++<<") operator != works correctly with identical lists"; }
 
       std::cout<<std::flush;//Time for the next round
 
       l2 = l1;
 
-      if(l1 == l1) { std::cout<<"\nTest Result ("<<test_id++<<") operator == works correctly after using operator = "; }
+      if(l1 == l1) { std::cout<<"\nTest Result ("<<test_id++<<") operator == works after using operator = "; }
       else { throw(std::runtime_error("operator = failed after using operator = ")); }
 
       if(l1 == l2) { std::cout<<"\nTest Result ("<<test_id++<<") operator = works correctly"; }
       else { throw(std::runtime_error("operator = failed")); }
+
+      if(l2 == l1) { std::cout<<"\nTest Result ("<<test_id++<<") operator = works correctly, opposite order"; }
+      else { throw(std::runtime_error("operator = failed, opposite order")); }
+
+      l2.create("22",22);
+      if(l1 != l2) { std::cout<<"\nTest Result ("<<test_id++<<") operator != works for unequal lists at start"; }
+      else { throw(std::runtime_error("operator == failed for unequal lists at start")); }
+
+      if(l2 != l1) { std::cout<<"\nTest Result ("<<test_id++<<") operator != works for unequal lists at start, opposite order"; }
+      else { throw(std::runtime_error("operator == failed for unequal lists at start, opposite order")); }
+
+      flag = l2.erase("22");
+      if(false == flag) { throw(std::runtime_error("Could not erase element from temp list"));  }
+
+      if(l1 == l2) { std::cout<<"\nTest Result ("<<test_id++<<") operator = works after insert and erase"; }
+      else { throw(std::runtime_error("operator = failed after insert and erase")); }
+
+      if(l2 == l1) { std::cout<<"\nTest Result ("<<test_id++<<") operator = works after insert and erase, opposite order"; }
+      else { throw(std::runtime_error("operator = failed after insert and erase, opposite order")); }
+
+      l2.create("22",22,false);
+      if(l1 != l2) { std::cout<<"\nTest Result ("<<test_id++<<") operator != works for unequal lists at end"; }
+      else { throw(std::runtime_error("operator == failed for unequal lists at start")); }
+
+      if(l2 != l1) { std::cout<<"\nTest Result ("<<test_id++<<") operator != works for unequal lists at end, opposite order"; }
+      else { throw(std::runtime_error("operator == failed for unequal lists at start, opposite order")); }
 
       std::cout<<std::flush;//Time for the next round
 
