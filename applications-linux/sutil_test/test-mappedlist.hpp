@@ -249,6 +249,42 @@ namespace sutil_test
       else
       { throw(std::runtime_error("Deep copy failed to produce identical results with copy constructor and operator =")); }
 
+      /** **********************
+       * Swap tests
+       * *********************** */
+      sutil::CMappedList<std::string,double> swl1,swl2,swl3,swl4;
+      swl1.create("1", 1.0);
+      swl1.create("5", 5.0);
+      swl1.create("9", 9.0);
+
+      swl4 = swl1;
+      swl2 = swl3;
+
+      swl1.swap(swl2);
+      if( (swl1 == swl3) && (swl2 == swl4))
+      { std::cout<<"\nTest Result ("<<test_id++<<") Swap works with empty argument list"; }
+      else { throw(std::runtime_error("Swap failed with empty argument list")); }
+
+      swl1.swap(swl2);
+      if( (swl1 == swl4) && (swl2 == swl3))
+      { std::cout<<"\nTest Result ("<<test_id++<<") Swap works with empty base list"; }
+      else { throw(std::runtime_error("Swap failed with empty base list")); }
+
+      swl1.swap(swl1);
+      if(swl1 == swl4)
+      { std::cout<<"\nTest Result ("<<test_id++<<") Swap works with self"; }
+      else { throw(std::runtime_error("Swap failed with self")); }
+
+      swl2.create("3",3.0);
+      swl3 = swl2;
+      swl1.swap(swl2);
+      if( (swl1 == swl3) && (swl2 == swl4))
+      { std::cout<<"\nTest Result ("<<test_id++<<") Swap works with full lists"; }
+      else { throw(std::runtime_error("Swap failed with full list")); }
+
+      if( (NULL != swl1.at("3")) && (NULL != swl2.at("1")) )
+      { std::cout<<"\nTest Result ("<<test_id++<<") Swapped elements verified"; }
+      else { throw(std::runtime_error("Swapped elements don't match expected values")); }
 
       /** **********************
        * Iterator tests
