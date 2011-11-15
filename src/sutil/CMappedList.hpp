@@ -146,8 +146,8 @@ namespace sutil
      * Beware; This can be quite slow. */
     bool operator != (const CMappedList<Idx,T>& rhs);
 
-//    /** Swaps the elements with the passed pilemap */
-//    void swap(CMappedList<Idx,T>& arg_swap_obj);
+    /** Swaps the elements with the passed pilemap */
+    void swap(CMappedList<Idx,T>& arg_swap_obj);
 
 //    /** Example usage:
 //     *   first.assign (7,100);                      // 7 ints with value 100
@@ -512,6 +512,33 @@ namespace sutil
   template <typename Idx, typename T>
   bool CMappedList<Idx,T>::operator != (const CMappedList<Idx,T>& rhs)
   { return !(*this == rhs);}
+
+
+  template <typename Idx, typename T>
+  void CMappedList<Idx,T>::swap(CMappedList<Idx,T>& arg_swap_obj)
+  {
+    //Be lazy
+    CMappedList<Idx,T> *lhs, *rhs;
+    if(size_ >= arg_swap_obj.size_)
+    { lhs = this; rhs = &arg_swap_obj;  }
+    else
+    { lhs = &arg_swap_obj; rhs = this;  }
+
+    SMLNode<Idx,T> *tf = lhs->front_;
+    SMLNode<Idx,T> *tb = lhs->back_;
+    std::map<Idx, SMLNode<Idx,T>*> tmap(lhs->map_);
+    size_t ts = lhs->size_;
+
+    lhs->front_ = rhs->front_;
+    lhs->back_ = rhs->back_;
+    lhs->map_ = rhs->map_;
+    lhs->size_ = rhs->size_;
+
+    rhs->front_ = tf;
+    rhs->back_ = tb;
+    rhs->map_ = tmap;
+    rhs->size_ = ts;
+  }
 
   template <typename Idx, typename T>
   T* CMappedList<Idx,T>::create(const Idx & arg_idx, const bool insert_at_start)
