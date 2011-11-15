@@ -124,7 +124,7 @@ namespace sutil
      * 'explicit' makes sure that only a CMappedList can be copied. Ie. Implicit
      * copy-constructor use is disallowed.*/
     explicit CMappedList(const CMappedList<Idx,T>& arg_pm)
-    { deepCopy(&arg_pm);  }
+    { front_ = NULL; back_ = NULL; size_ = 0; deepCopy(&arg_pm);  }
 
     /** Assignment operator : Performs a deep-copy (std container requirement).
      * Beware; This can be quite slow. */
@@ -495,18 +495,18 @@ namespace sutil
     CMappedList<Idx,T>::const_iterator it, ite, it2, it2e;
     for(it = begin(), ite = end(),
         it2 = rhs.begin(), it2e = rhs.end();
-        it!=ite || it2!=it2e; ++it, ++it2)
+        it!=ite && it2!=it2e; ++it, ++it2)
     {
       if(*it != *it2)
       { return false; }
     }
     //Would exit loop if atleast one was at the end.
-    //If both aren't at the end, return false;
-    if( ((it != ite)&&(it2 == it2e)) ||
-        ((it == ite)&&(it2 != it2e)) )
-    { return false; }
     //If both are at the end then the two mapped lists are equal
-    return true;
+    if((it == ite) && (it2 == it2e))
+    { return true;  }
+    //If both aren't at the end, return false;
+    else
+    { return false; }
   }
 
   template <typename Idx, typename T>
@@ -533,7 +533,7 @@ namespace sutil
     tmp->data_ = new T();
     tmp->id_ = new Idx(arg_idx);
 
-    if(insert_at_start)
+    if((1 > size_) || (insert_at_start))
     {
       tmp->next_ = front_;
       front_ = tmp;
@@ -576,7 +576,7 @@ namespace sutil
     tmp->data_ = new T(arg_t);
     tmp->id_ = new Idx(arg_idx);
 
-    if(insert_at_start)
+    if((1 > size_) || (insert_at_start))
     {
       tmp->next_ = front_;
       front_ = tmp;
