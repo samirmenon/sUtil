@@ -515,46 +515,7 @@ namespace sutil
 
   template <typename Idx, typename T>
   T* CMappedList<Idx,T>::create(const Idx & arg_idx, const bool insert_at_start)
-  {
-    SMLNode<Idx,T> * tmp = new SMLNode<Idx,T>();
-
-    if(NULL==tmp) //Memory not allocated
-    { return NULL; }
-
-    //Make sure the idx hasn't already been registered.
-    if(map_.find(arg_idx) != map_.end())
-    {
-#ifdef DEBUG
-      std::cerr<<"\nCMappedList<Idx,T>::create() ERROR : Idx exists. Tried to add duplicate entry";
-#endif
-      return NULL;
-    }
-
-    tmp->data_ = new T();
-    tmp->id_ = new Idx(arg_idx);
-
-    if((1 > size_) || (insert_at_start))
-    {
-      tmp->next_ = front_;
-      front_ = tmp;
-      tmp = NULL;
-    }
-    else
-    {
-      back_->next_ = tmp;
-      tmp->next_ = NULL;
-      back_ = tmp;
-      tmp = NULL;
-    }
-    size_++;
-
-    if(1 == size_)
-    { back_ = front_; }
-
-    map_.insert( std::pair<Idx, SMLNode<Idx,T> *>(arg_idx, front_) );
-
-    return front_->data_;
-  }
+  { return create(arg_idx,T(),insert_at_start); }
 
   template <typename Idx, typename T>
   T* CMappedList<Idx,T>::create(const Idx & arg_idx, const T& arg_t, const bool insert_at_start)
