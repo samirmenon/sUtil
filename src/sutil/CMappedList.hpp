@@ -124,9 +124,7 @@ namespace sutil
      * 'explicit' makes sure that only a CMappedList can be copied. Ie. Implicit
      * copy-constructor use is disallowed.*/
     explicit CMappedList(const CMappedList<Idx,T>& arg_pm)
-    {
-      deepCopy(&arg_pm);
-    }
+    { deepCopy(&arg_pm);  }
 
     /** Assignment operator : Performs a deep-copy (std container requirement).
      * Beware; This can be quite slow. */
@@ -140,13 +138,13 @@ namespace sutil
      * done so. */
     virtual ~CMappedList();
 
-//    /** Comparison operator : Performs an element-by-element check (std container requirement).
-//     * Beware; This can be quite slow. */
-//    bool operator == (const CMappedList<Idx,T>& lhs, const CMappedList<Idx,T>& rhs);
+    /** Comparison operator : Performs an element-by-element check (std container requirement).
+     * Beware; This can be quite slow. */
+    bool operator == (const CMappedList<Idx,T>& rhs);
 
-//    /** Comparison operator : Performs an element-by-element check (std container requirement).
-//     * Beware; This can be quite slow. */
-//    bool operator != (const CMappedList<Idx,T>& lhs, const CMappedList<Idx,T>& rhs);
+    /** Comparison operator : Performs an element-by-element check (std container requirement).
+     * Beware; This can be quite slow. */
+    bool operator != (const CMappedList<Idx,T>& rhs);
 
 //    /** Swaps the elements with the passed pilemap */
 //    void swap(CMappedList<Idx,T>& arg_swap_obj);
@@ -164,11 +162,11 @@ namespace sutil
 
     /** Creates an element, inserts an element into the list
      * and returns the pointer   */
-    virtual T* create(const Idx & arg_idx);
+    virtual T* create(const Idx & arg_idx, const bool insert_at_start=true);
 
     /** Copies the given element, inserts the copied element into the list
      * and returns the pointer to the copied element   */
-    virtual T* create(const Idx & arg_idx, const T& arg_t);
+    virtual T* create(const Idx & arg_idx, const T& arg_t, const bool insert_at_start=true);
 
     /** Returns the element at the given numerical index
      * in the linked list (usually useful only for
@@ -391,8 +389,14 @@ namespace sutil
     iterator begin()
     { return iterator(front_); }
 
+    const_iterator begin() const
+    { return const_iterator(front_); }
+
     iterator end()
     { return iterator(); }
+
+    const_iterator end() const
+    { return const_iterator(); }
   };
 
   /** This is to delete the second pointers in the destructor. Useful
@@ -428,6 +432,10 @@ namespace sutil
   template <typename Idx, typename T>
   bool CMappedList<Idx,T>::deepCopy(const CMappedList<Idx,T>* const arg_pmap)
   {//Deep copy.
+    //No need if both are identical
+    if(this == arg_pmap)
+    { return true;  }
+
     this->~CMappedList(); //Delete everything in the mappedlist
 
     /**Set the current mappedlist to the new mappedlist**/
@@ -439,7 +447,7 @@ namespace sutil
       while(iterator!=NULL)
       {
         T* tmp = create(*(iterator->id_),
-            *(iterator->data_));
+            *(iterator->data_),false);
         if(NULL == tmp)
         {
 #ifdef DEBUG
@@ -482,7 +490,31 @@ namespace sutil
   }
 
   template <typename Idx, typename T>
-  T* CMappedList<Idx,T>::create(const Idx & arg_idx)
+  bool CMappedList<Idx,T>::operator == (const CMappedList<Idx,T>& rhs)
+  {
+    CMappedList<Idx,T>::const_iterator it, ite, it2, it2e;
+    for(it = begin(), ite = end(),
+        it2 = rhs.begin(), it2e = rhs.end();
+        it!=ite || it2!=it2e; ++it, ++it2)
+    {
+      if(*it != *it2)
+      { return false; }
+    }
+    //Would exit loop if atleast one was at the end.
+    //If both aren't at the end, return false;
+    if( ((it != ite)&&(it2 == it2e)) ||
+        ((it == ite)&&(it2 != it2e)) )
+    { return false; }
+    //If both are at the end then the two mapped lists are equal
+    return true;
+  }
+
+  template <typename Idx, typename T>
+  bool CMappedList<Idx,T>::operator != (const CMappedList<Idx,T>& rhs)
+  { return !(*this == rhs);}
+
+  template <typename Idx, typename T>
+  T* CMappedList<Idx,T>::create(const Idx & arg_idx, const bool insert_at_start)
   {
     SMLNode<Idx,T> * tmp = new SMLNode<Idx,T>();
 
@@ -500,9 +532,20 @@ namespace sutil
 
     tmp->data_ = new T();
     tmp->id_ = new Idx(arg_idx);
-    tmp->next_ = front_;
-    front_ = tmp;
-    tmp = NULL;
+
+    if(insert_at_start)
+    {
+      tmp->next_ = front_;
+      front_ = tmp;
+      tmp = NULL;
+    }
+    else
+    {
+      back_->next_ = tmp;
+      tmp->next_ = NULL;
+      back_ = tmp;
+      tmp = NULL;
+    }
     size_++;
 
     if(1 == size_)
@@ -514,7 +557,7 @@ namespace sutil
   }
 
   template <typename Idx, typename T>
-  T* CMappedList<Idx,T>::create(const Idx & arg_idx, const T& arg_t)
+  T* CMappedList<Idx,T>::create(const Idx & arg_idx, const T& arg_t, const bool insert_at_start)
   {
     SMLNode<Idx,T> * tmp = new SMLNode<Idx,T>();
 
@@ -532,9 +575,21 @@ namespace sutil
 
     tmp->data_ = new T(arg_t);
     tmp->id_ = new Idx(arg_idx);
-    tmp->next_ = front_;
-    front_ = tmp;
-    tmp = NULL;
+
+    if(insert_at_start)
+    {
+      tmp->next_ = front_;
+      front_ = tmp;
+      tmp = NULL;
+    }
+    else
+    {
+      back_->next_ = tmp;
+      tmp->next_ = NULL;
+      back_ = tmp;
+      tmp = NULL;
+    }
+
     size_++;
 
     if(1 == size_)

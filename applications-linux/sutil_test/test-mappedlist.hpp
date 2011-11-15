@@ -179,13 +179,58 @@ namespace sutil_test
           <<" <double> entry ("<<*t2<<") 10,000 times"
           <<" in "<<time2-time1<<" seconds";
 
+      std::cout<<std::flush;//Time for the next round
+
+      /**  **********************
+       * Test operators
+       * *********************** */
+      sutil::CMappedList<std::string, int> l1,l2;
+      l1.create("1",1);
+      l1.create("2",2);
+      l1.create("3",3);
+      if(l1 == l1) { std::cout<<"\nTest Result ("<<test_id++<<") operator == works correctly"; }
+      else { throw(std::runtime_error("operator == failed")); }
+
+      if(l1 != l1) { throw(std::runtime_error("operator != failed")); }
+      else { std::cout<<"\nTest Result ("<<test_id++<<") operator != works correctly"; }
+
+      std::cout<<std::flush;//Time for the next round
+
+      l2 = l1;
+
+      if(l1 == l1) { std::cout<<"\nTest Result ("<<test_id++<<") operator == works correctly after using operator = "; }
+      else { throw(std::runtime_error("operator = failed after using operator = ")); }
+
+      if(l1 == l2) { std::cout<<"\nTest Result ("<<test_id++<<") operator = works correctly"; }
+      else { throw(std::runtime_error("operator = failed")); }
+
+      std::cout<<std::flush;//Time for the next round
+
+      /**  **********************
+       * Test deep copy
+       * *********************** */
+      //Copy constructor test
+      sutil::CMappedList<std::string,double> mappedlist_c1(mappedlist);
+      if(mappedlist == mappedlist_c1)
+      { std::cout<<"\nTest Result ("<<test_id++<<") Copy constructor works correctly"; }
+      else
+      { throw(std::runtime_error("Mapped list copy constructor failed")); }
+
+      sutil::CMappedList<std::string,double> mappedlist_c2;
+      mappedlist_c2 = mappedlist;
+      if(mappedlist_c2 == mappedlist_c1)
+      { std::cout<<"\nTest Result ("<<test_id++<<") Deep copy works correctly"; }
+      else
+      { throw(std::runtime_error("Deep copy failed to produce identical results with copy constructor and operator =")); }
+
+
       /** **********************
        * Iterator tests
        * *********************** */
       sutil::CMappedList<std::string,double> mappedlist2;
-      mappedlist2.create("0",0);
-      mappedlist2.create("1",1);
-      mappedlist2.create("2",2);
+      mappedlist2.create("0",0.0);
+      mappedlist2.create("1",1.0);
+      mappedlist2.create("2",2.0);
 
       sutil::CMappedList<std::string,double>::iterator it, ite;
 
