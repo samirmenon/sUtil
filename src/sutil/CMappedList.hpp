@@ -446,7 +446,7 @@ namespace sutil
       SMLNode<Idx,T> *iterator = arg_pmap->front_;
       while(iterator!=NULL)
       {
-        T* tmp = create(*(iterator->id_),
+        T* tmp = CMappedList<Idx,T>::create(*(iterator->id_),
             *(iterator->data_),false);
         if(NULL == tmp)
         {
@@ -542,7 +542,7 @@ namespace sutil
 
   template <typename Idx, typename T>
   T* CMappedList<Idx,T>::create(const Idx & arg_idx, const bool insert_at_start)
-  { return create(arg_idx,T(),insert_at_start); }
+  { return CMappedList<Idx,T>::create(arg_idx,T(),insert_at_start); }
 
   template <typename Idx, typename T>
   T* CMappedList<Idx,T>::create(const Idx & arg_idx, const T& arg_t, const bool insert_at_start)
