@@ -88,6 +88,7 @@ namespace sutil_test
       else
       { std::cout<<"\nTest Result ("<<test_id++<<") "; }
 
+      std::cout<<"\nTest #"<<arg_id<<" (Object History Test) Succeeded.";
     }
     catch(std::exception& ee)
     {
