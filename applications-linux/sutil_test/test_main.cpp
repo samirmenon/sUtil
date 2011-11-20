@@ -34,6 +34,7 @@ sUtil. If not, see <http://www.gnu.org/licenses/>.
 #include "test-callbacks.hpp"
 #include "test-shmem.hpp"
 #include "test-printables.hpp"
+#include "test-objhist.hpp"
 
 #include <sutil/CSingleton.hpp>
 #include <sutil/CSystemClock.hpp>
@@ -174,6 +175,17 @@ int main(int argc, char** argv)
       <<sutil::CSystemClock::getSimTime()
       <<"]";
       sutil_test::test_printables(id);
+    }
+    ++id;
+
+    if((tid==0)||(tid==id))
+    {//Test callbacks
+      std::cout<<"\n\nTest #"<<id<<". System Clock [Sys time, Sim time :"
+          <<sutil::CSystemClock::getSysTime()
+      <<" "
+      <<sutil::CSystemClock::getSimTime()
+      <<"]";
+      sutil_test::test_objhist(id);
     }
     ++id;
 

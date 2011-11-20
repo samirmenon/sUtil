@@ -76,10 +76,11 @@ namespace sutil
       CMappedList<double, StoreObjectsAs>
     > data_;
 
+  public:
     /** Saves the current state of an object (can be retrieved later) */
     bool saveObject(const Idx& arg_idx, const StoreObjectsAs& arg_obj)
     {
-      bool flag
+      bool flag;
       CMappedList<double, StoreObjectsAs>* objl = data_.at(arg_idx);
       if(NULL == objl)
       {
@@ -138,12 +139,13 @@ namespace sutil
       { return objl->at( std::size_t(0) );  }
     }
 
-    /** Pointer deletion requires knowing the type. Must be */
-    const bool removeObjectTimeSeries(const Idx& arg_idx)
+    /** Pointer deletion requires knowing the type. The Idx
+     * and StoreObjectsAsdestructors should work. */
+    bool removeObjectTimeSeries(const Idx& arg_idx)
     { return data_.erase(arg_idx); }
 
     /** Pointer deletion requires knowing the type. */
-    const bool removeObject(const Idx& arg_idx,
+    bool removeObject(const Idx& arg_idx,
         /** Optional timestamp argument. Ignore this to remove the last saved state. */
         double arg_time = -1)
     {
@@ -170,10 +172,10 @@ namespace sutil
 
   private:
     /** Private constructor : To ensure uniqueness */
-    CObjectHistory(const CObjectHistory&){}
+    CObjectHistory(const CObjectHistory&);
 
     /** Private operator : To ensure uniqueness */
-    CObjectHistory& operator =(const CObjectHistory&){}
+    CObjectHistory& operator =(const CObjectHistory&);
   };
 
 } /* namespace sutil */
