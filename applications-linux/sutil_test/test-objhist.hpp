@@ -46,65 +46,38 @@ namespace sutil_test
     std::vector<double> vec_;
   };
 
-  // Serlializer
-  void operator >> (const SObjectToStore& obj, std::string& str)
-  {
-    std::stringstream ss;
-    ss<<obj.x_<<obj.y_<<obj.z_;
-    std::vector<double>::const_iterator it,ite;
-    for(it = obj.vec_.begin(), ite = obj.vec_.end();
-        it!=ite; ++it)
-    { ss<<*it;  }
-    str = ss.str();
-  }
-
-  // Deserlializer
-  void operator << (SObjectToStore& obj, const std::string& str)
-  {
-    std::stringstream ss(str);
-    ss>>obj.x_;ss>>obj.y_; ss>>obj.z_;
-    while(EOF!=ss.peek())
-    {
-      double d;
-      ss>>d;
-      obj.vec_.push_back(d);
-    }
-  }
-
   /** Tests the object history storage utility
    * @param arg_id : The id of the test */
   void test_objhist(const int arg_id)
   {
     bool flag = true;
     unsigned int test_id=0;
-    int instances_to_store = 5;
+    const int instances_to_store = 5;
     try
     {
       std::cout<<std::flush;
-      sutil::CObjectHistory<std::string,std::string> oh;
+      sutil::CObjectHistory<std::string,SObjectToStore> oh;
 
       SObjectToStore o1;
 
       //Store an object's history instances_to_store times
       for(int i=0; i<instances_to_store; ++i)
       {
+        //Initialize the object (to different values)
         o1.x_ = i;
         o1.y_ = i*i;
         o1.z_ = i*i*i;
         o1.vec_.push_back(sutil::CSystemClock::getSysTime());
 
-        std::string s;
-        o1 >> s;
-
-        flag = oh.saveObject("o1",s);
+        //Store the object
+        flag = oh.saveObject("o1",o1);
         if(false == flag)
         { throw(std::runtime_error( "Failed to save object to history" ));  }
         else
         { std::cout<<"\nObject History ("<<i<<") Stored object to history"; }
 
-        std::cout<<"\n ObjStore ["<<s<<"]";
-        std::cout<<"\n Obj ["<<o1.x_<<", "<<o1.y_<<", "<<o1.z_<<". [ ";
-
+        //Print stored object to screen
+        std::cout<<"\n Obj: "<<o1.x_<<", "<<o1.y_<<", "<<o1.z_<<". [ ";
         std::vector<double>::const_iterator it2,it2e;
         for(it2 = o1.vec_.begin(), it2e = o1.vec_.end();
             it2!=it2e; ++it2)
@@ -115,23 +88,23 @@ namespace sutil_test
       std::cout<<"\nTest Result ("<<test_id++<<") Stored object's history time series.";
 
       //Now print all the stored instances
-      const sutil::CMappedList<double,std::string>* olist = oh.getObjectTimeSeries("o1");
+      const sutil::CMappedList<double,SObjectToStore>* olist = oh.getObjectTimeSeries("o1");
       if(NULL == olist)
       { throw(std::runtime_error( "Failed to retrieve object's history time series" ));  }
       else
       { std::cout<<"\nTest Result ("<<test_id++<<") Retrieved object's history time series."; }
 
       int j=0;
-      sutil::CMappedList<double,std::string>::const_iterator it, ite;
+      sutil::CMappedList<double,SObjectToStore>::const_iterator it, ite;
       for(it = olist->begin(), ite = olist->end();
           it!=ite; ++it, ++j/*To count iterations*/)
       {
-        SObjectToStore o2;
-        o2 << *it;
-        std::cout<<"\nObject History ("<<j<<") Time ["<<(!it)<<"] ObjStore ["
-            <<*it<<"]";
-        std::cout<<"\n Obj ["<<o2.x_<<", "<<o2.y_<<", "<<o2.z_<<". [ ";
+        //Get the object
+        const SObjectToStore& o2 = *it;
 
+        //Now print the object's contents
+        std::cout<<"\nObject History ("<<j<<") Time ["<<(!it)<<"]";
+        std::cout<<"\n Obj: "<<o2.x_<<", "<<o2.y_<<", "<<o2.z_<<". [ ";
         std::vector<double>::const_iterator it2,it2e;
         for(it2 = o2.vec_.begin(), it2e = o2.vec_.end();
             it2!=it2e; ++it2)
