@@ -134,7 +134,7 @@ namespace sutil
       }
       //Now check for the time
       if(arg_time > 0.0)
-      { return objl->at(arg_idx); }
+      { return objl->at(arg_time); }
       else
       { return objl->at( std::size_t(0) );  }
     }
@@ -159,9 +159,9 @@ namespace sutil
       }
       //Now check for the time
       if(arg_time > 0.0)
-      { return objl->erase(arg_idx); }
+      { return objl->erase(arg_time); }
       else
-      { return objl->erase( std::size_t(0) );  }
+      { return objl->erase( objl->at(std::size_t(0)) );  }
     }
 
     /** Constructor : Does nothing. */

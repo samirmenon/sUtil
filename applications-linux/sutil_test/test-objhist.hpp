@@ -36,6 +36,7 @@ sUtil. If not, see <http://www.gnu.org/licenses/>.
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <vector>
 
 namespace sutil_test
 {
@@ -44,6 +45,16 @@ namespace sutil_test
   {
     double x_, y_, z_;
     std::vector<double> vec_;
+
+    void print() const
+    {
+      std::cout<<"Obj: "<<x_<<", "<<y_<<", "<<z_<<". [ ";
+      std::vector<double>::const_iterator it2,it2e;
+      for(it2 = vec_.begin(), it2e = vec_.end();
+          it2!=it2e; ++it2)
+      { std::cout<<*it2<<" ";  }
+      std::cout<<"]";
+    }
   };
 
   /** Tests the object history storage utility
@@ -77,12 +88,7 @@ namespace sutil_test
         { std::cout<<"\nObject History ("<<i<<") Stored object to history"; }
 
         //Print stored object to screen
-        std::cout<<"\n Obj: "<<o1.x_<<", "<<o1.y_<<", "<<o1.z_<<". [ ";
-        std::vector<double>::const_iterator it2,it2e;
-        for(it2 = o1.vec_.begin(), it2e = o1.vec_.end();
-            it2!=it2e; ++it2)
-        { std::cout<<*it2<<" ";  }
-        std::cout<<"]";
+        std::cout<<"\n "; o1.print();
       }
 
       std::cout<<"\nTest Result ("<<test_id++<<") Stored object's history time series.";
@@ -95,6 +101,8 @@ namespace sutil_test
       { std::cout<<"\nTest Result ("<<test_id++<<") Retrieved object's history time series."; }
 
       int j=0;
+      double time_stored[instances_to_store]; //For since object retrieval.
+
       sutil::CMappedList<double,SObjectToStore>::const_iterator it, ite;
       for(it = olist->begin(), ite = olist->end();
           it!=ite; ++it, ++j/*To count iterations*/)
@@ -104,12 +112,9 @@ namespace sutil_test
 
         //Now print the object's contents
         std::cout<<"\nObject History ("<<j<<") Time ["<<(!it)<<"]";
-        std::cout<<"\n Obj: "<<o2.x_<<", "<<o2.y_<<", "<<o2.z_<<". [ ";
-        std::vector<double>::const_iterator it2,it2e;
-        for(it2 = o2.vec_.begin(), it2e = o2.vec_.end();
-            it2!=it2e; ++it2)
-        { std::cout<<*it2<<" ";  }
-        std::cout<<"]";
+        std::cout<<"\n "; o2.print();
+
+        time_stored[j] = !it; //Save the storage time
       }
 
       if(instances_to_store != j)
@@ -117,10 +122,56 @@ namespace sutil_test
       else
       { std::cout<<"\nTest Result ("<<test_id++<<") Retrieved the correct number of entries in the object's history time series."; }
 
-      if(false == flag)
-      { throw(std::runtime_error("Client: Failed to read Object History"));  }
+      //Test the dual map
+      const SObjectToStore* tobj;
+
+      for(int i=0; i<instances_to_store; ++i)
+      {
+        tobj = oh.getObject("o1", time_stored[i]);
+        if(NULL == tobj)
+        { throw(std::runtime_error( "Failed to retrieve single object based on stored time" ));  }
+        else
+        { std::cout<<"\nObject retrieve ("<<i<<") Retrieved object stored at time: "<<time_stored[i]; }
+      }
+
+      std::cout<<"\nTest Result ("<<test_id++<<") Retrieved the objects by time index.";
+
+      //Test the default (last object stored) retrieve call
+      tobj = oh.getObject("o1");
+      if(NULL == tobj)
+      { throw(std::runtime_error( "Failed to retrieve last single object" ));  }
       else
-      { std::cout<<"\nTest Result ("<<test_id++<<") "; }
+      { std::cout<<"\nTest Result ("<<test_id++<<") Retrieved the last single object."; }
+
+      //Test object removal : Remove all but last three objects
+      for(int i=0; i<instances_to_store-3; ++i)
+      {
+        flag = oh.removeObject("o1", time_stored[i]);
+        if(false == flag)
+        { throw(std::runtime_error( "Failed to remove single object based on stored time" ));  }
+        else
+        { std::cout<<"\nObject delete ("<<i<<") Removed object stored at time: "<<time_stored[i]; }
+
+        tobj = oh.getObject("o1", time_stored[i]);
+        if(NULL != tobj)
+        { throw(std::runtime_error( "Delete unsuccessful. Retrieved deleted object" ));  }
+      }
+
+      //Remove a single object
+      flag = oh.removeObject("o1");
+      if(false == flag)
+      { throw(std::runtime_error( "Failed to remove the last single object" ));  }
+      else
+      { std::cout<<"\nObject delete : Removed the last single object"; }
+
+      //Last one stored should be the next one in the list
+      tobj = oh.getObject("o1", time_stored[instances_to_store-3]);
+      if(NULL != tobj)
+      {
+        std::cout<<"\nRetrieved deleted last single object: ";
+        tobj->print();
+        throw(std::runtime_error( "Delete unsuccessful" ));
+      }
 
       std::cout<<"\nTest #"<<arg_id<<" (Object History Test) Succeeded.";
     }
