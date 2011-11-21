@@ -77,6 +77,7 @@ namespace sutil_test
   {
     bool flag = true;
     unsigned int test_id=0;
+    int instances_to_store = 5;
     try
     {
       std::cout<<std::flush;
@@ -84,8 +85,8 @@ namespace sutil_test
 
       SObjectToStore o1;
 
-      //Store an object's history 10 times
-      for(int i=0; i<10; ++i)
+      //Store an object's history instances_to_store times
+      for(int i=0; i<instances_to_store; ++i)
       {
         o1.x_ = i;
         o1.y_ = i*i;
@@ -99,8 +100,19 @@ namespace sutil_test
         if(false == flag)
         { throw(std::runtime_error( "Failed to save object to history" ));  }
         else
-        { std::cout<<"\nTest Result ("<<test_id++<<") Stored object to history. #"<<i; }
+        { std::cout<<"\nObject History ("<<i<<") Stored object to history"; }
+
+        std::cout<<"\n ObjStore ["<<s<<"]";
+        std::cout<<"\n Obj ["<<o1.x_<<", "<<o1.y_<<", "<<o1.z_<<". [ ";
+
+        std::vector<double>::const_iterator it2,it2e;
+        for(it2 = o1.vec_.begin(), it2e = o1.vec_.end();
+            it2!=it2e; ++it2)
+        { std::cout<<*it2<<" ";  }
+        std::cout<<"]";
       }
+
+      std::cout<<"\nTest Result ("<<test_id++<<") Stored object's history time series.";
 
       //Now print all the stored instances
       const sutil::CMappedList<double,std::string>* olist = oh.getObjectTimeSeries("o1");
@@ -116,18 +128,18 @@ namespace sutil_test
       {
         SObjectToStore o2;
         o2 << *it;
-        std::cout<<"\nTest Result ("<<test_id++<<") Time ["<<(!it)<<"] ObjStore ["
+        std::cout<<"\nObject History ("<<j<<") Time ["<<(!it)<<"] ObjStore ["
             <<*it<<"]";
-        std::cout<<"\n Obj ["<<o2.x_<<", "<<o2.y_<<", "<<o2.z_<<". [";
+        std::cout<<"\n Obj ["<<o2.x_<<", "<<o2.y_<<", "<<o2.z_<<". [ ";
 
         std::vector<double>::const_iterator it2,it2e;
         for(it2 = o2.vec_.begin(), it2e = o2.vec_.end();
             it2!=it2e; ++it2)
-        { std::cout<<*it2<<", ";  }
+        { std::cout<<*it2<<" ";  }
         std::cout<<"]";
       }
 
-      if(10 != j)
+      if(instances_to_store != j)
       { throw(std::runtime_error( "Failed to retrieve the correct number of entries in the object's history time series" ));  }
       else
       { std::cout<<"\nTest Result ("<<test_id++<<") Retrieved the correct number of entries in the object's history time series."; }
