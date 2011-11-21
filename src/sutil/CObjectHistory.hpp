@@ -169,13 +169,6 @@ namespace sutil
 
     /** Destructor : Does nothing. */
     ~CObjectHistory(){}
-
-  private:
-    /** Private constructor : To ensure uniqueness */
-    CObjectHistory(const CObjectHistory&);
-
-    /** Private operator : To ensure uniqueness */
-    CObjectHistory& operator =(const CObjectHistory&);
   };
 
 } /* namespace sutil */
