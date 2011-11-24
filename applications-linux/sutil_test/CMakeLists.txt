@@ -12,6 +12,9 @@ INCLUDE_DIRECTORIES(${SUTIL_INC_DIR})
 #Set all the sources required for the tests
 SET(ALLSRC ${SUTIL_TEST_DIR}/test_main.cpp
            ${SUTIL_TEST_DIR}/test-callbacks.cpp
+           ${SUTIL_TEST_DIR}/test-dyntypes.cpp
+           ${SUTIL_TEST_DIR}/test-mappedlist.cpp
+           ${SUTIL_TEST_DIR}/test-printables.cpp
    )
 
 #Set the build mode to debug by default

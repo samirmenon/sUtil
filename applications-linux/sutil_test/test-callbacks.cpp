@@ -20,15 +20,12 @@ License and a copy of the GNU General Public License along with
 sUtil. If not, see <http://www.gnu.org/licenses/>.
  */
 /*
- * test-callbacks.hpp
+ * test-callbacks.cpp
  *
  *  Created on: Sep 09, 2011
  *
  *  Copyright (C) 2011, Samir Menon <smenon@stanford.edu>
  */
-
-#ifndef TEST_CALLBACKS_HPP_
-#define TEST_CALLBACKS_HPP_
 
 #include "test-callbacks.hpp"
 
@@ -104,4 +101,3 @@ namespace sutil_test
   }
 
 }
-#endif /* TEST_CALLBACKS_HPP_ */
