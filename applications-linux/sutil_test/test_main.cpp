@@ -158,7 +158,7 @@ int main(int argc, char** argv)
     ++id;
 
     if((tid==0)||(tid==id))
-    {//Test callbacks
+    {//Test shared memory wrapper
       std::cout<<"\n\nTest #"<<id<<". System Clock [Sys time, Sim time :"
           <<sutil::CSystemClock::getSysTime()
       <<" "
@@ -169,7 +169,7 @@ int main(int argc, char** argv)
     ++id;
 
     if((tid==0)||(tid==id))
-    {//Test callbacks
+    {//Test printables
       std::cout<<"\n\nTest #"<<id<<". System Clock [Sys time, Sim time :"
           <<sutil::CSystemClock::getSysTime()
       <<" "
@@ -180,7 +180,7 @@ int main(int argc, char** argv)
     ++id;
 
     if((tid==0)||(tid==id))
-    {//Test callbacks
+    {//Test object history
       std::cout<<"\n\nTest #"<<id<<". System Clock [Sys time, Sim time :"
           <<sutil::CSystemClock::getSysTime()
       <<" "
