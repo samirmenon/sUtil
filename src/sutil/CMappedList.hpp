@@ -623,25 +623,17 @@ namespace sutil
     { return NULL;  }
     else
     {
-      try
+      if(map_.find(arg_idx) == map_.end())
       {
-        if(map_.find(arg_idx) == map_.end())
-        {
-          return NULL;
-        }
-
-        SMLNode<Idx,T> * t = map_[arg_idx];
-
-        if(NULL==t)
-        { return NULL;  }
-        else
-        { return t->data_;  }
-      }
-      catch(std::exception &e)
-      {
-        //TODO : print something
         return NULL;
       }
+
+      SMLNode<Idx,T> * t = map_[arg_idx];
+
+      if(NULL==t)
+      { return NULL;  }
+      else
+      { return t->data_;  }
     }
   }
 
