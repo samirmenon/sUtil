@@ -14,7 +14,12 @@ SET(ALLSRC ${SUTIL_TEST_DIR}/test_main.cpp
            ${SUTIL_TEST_DIR}/test-callbacks.cpp
            ${SUTIL_TEST_DIR}/test-dyntypes.cpp
            ${SUTIL_TEST_DIR}/test-mappedlist.cpp
+           ${SUTIL_TEST_DIR}/test-mapped-tree.cpp
+           ${SUTIL_TEST_DIR}/test-memcopier.cpp
+           ${SUTIL_TEST_DIR}/test-objhist.cpp
            ${SUTIL_TEST_DIR}/test-printables.cpp
+           ${SUTIL_TEST_DIR}/test-shmem.cpp
+           ${SUTIL_TEST_DIR}/test-singleton.cpp
    )
 
 #Set the build mode to debug by default

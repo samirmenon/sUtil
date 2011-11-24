@@ -40,6 +40,7 @@ sUtil. If not, see <http://www.gnu.org/licenses/>.
 #include <sutil/CSystemClock.hpp>
 
 #include <iostream>
+#include <stdexcept>
 #include <stdlib.h>
 
 using namespace std;
