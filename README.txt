@@ -33,14 +33,14 @@ To see example code for the different header files, look at the tests in applica
 
 You may run the tests using:
 $ cd applications-linux/sutil_test
-$ make release
+$ sh make_rel.sh
 $ ./sutil_test 0
 
 
 Supported Platforms:
 
-1. Linux 2.6.38, gcc 4.5, x86
-2. Linux 2.6.38, gcc 4.5, x64
+1. Linux >2.6.38, gcc >4.5, x86
+2. Linux >2.6.38, gcc >4.5, x64
 
 * However, the code should work on most non windows platforms and on windows with minor changes.
 
