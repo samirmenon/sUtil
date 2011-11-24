@@ -32,6 +32,7 @@ sUtil. If not, see <http://www.gnu.org/licenses/>.
 #include <sutil/CSingleton.hpp>
 #include <sutil/CMappedList.hpp>
 
+#include <vector>
 #ifdef DEBUG
 #include <iostream>
 #endif
