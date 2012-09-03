@@ -296,7 +296,7 @@ namespace sutil
 
   protected:
     /** Only a subclass may create an object of this type */
-    CCallbackBase(){}
+    CCallbackBase() : data_(NULL){}
 
     Data* data_;
 
