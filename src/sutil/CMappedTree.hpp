@@ -147,7 +147,7 @@ namespace sutil
         deepCopy(arg_mt);
     if(true == flag)
     {
-      this->root_node_ = at(arg_mt->getRootNode()->name_);
+      this->root_node_ = CMappedList<TIdx,TNode>::at(arg_mt->getRootNode()->name_);
       this->has_been_init_ = arg_mt->has_been_init_;
       return true;
     }
