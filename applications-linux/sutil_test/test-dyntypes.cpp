@@ -47,23 +47,29 @@ namespace sutil_test
      *
      * A virtual function is required to make a class "polymorphic" */
     virtual void doesNothing(){}
+  public:
+    /** To save some warnings about virtual destructors */
+    virtual ~SType(){}
   };
 
   class SType1 : public SType
   {
   public:
+    virtual ~SType1(){}
     int x;
   };
 
   class SType2 : public SType1
   {
   public:
+    virtual ~SType2(){}
     int y;
   };
 
   class SType3 : public SType2
   {
   public:
+    virtual ~SType3(){}
     int z;
   };
 

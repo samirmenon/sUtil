@@ -48,6 +48,8 @@ namespace sutil_test
   {
     typedef sutil::CCallbackBase<std::string, ArgType > base;
   public:
+    virtual ~CCallbackFunc(){}
+
     virtual void call(ArgType& args)
     {
       int x; x = std::get<0>(args);
