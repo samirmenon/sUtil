@@ -28,13 +28,13 @@ SET(ALLSRC ${SUTIL_TEST_DIR}/test_main.cpp
 IF(CMAKE_BUILD_TYPE MATCHES Debug)
   #Add debug definitions
   ADD_DEFINITIONS(-DASSERT=assert -DDEBUG=1 -DW_TESTING=1)
-  SET(CMAKE_CXX_FLAGS_DEBUG "-Wall -ggdb -O0 -pg -std=c++0x  -fopenmp")
+  SET(CMAKE_CXX_FLAGS_DEBUG "-Wall -Woverloaded-virtual -ggdb -O0 -pg -std=c++0x -fopenmp")
 ENDIF(CMAKE_BUILD_TYPE MATCHES Debug)
 
 IF(CMAKE_BUILD_TYPE MATCHES Release)
   #Add release definitions
   ADD_DEFINITIONS( -DEIGEN_NO_DEBUG )
-  SET(CMAKE_CXX_FLAGS_RELEASE "-Wall -O3 -std=c++0x -fopenmp")
+  SET(CMAKE_CXX_FLAGS_RELEASE "-Wall -Woverloaded-virtual -O3 -std=c++0x -fopenmp")
 ENDIF(CMAKE_BUILD_TYPE MATCHES Release)
 
 #Make sure the generated makefile is not shortened
