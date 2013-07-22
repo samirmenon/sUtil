@@ -64,10 +64,14 @@ namespace sutil
      * the appropriate slot in the vector-list. Uses the copy-constructor. */
     virtual T* create(const Idx& arg_idx, const std::size_t arg_priority);
 
-    /** Copy-Constructor : Does a deep copy of the mapped multi level list to
-     *  get a new one.
-     * NOTE : This uses the passed mapped list's iterator construct. */
-    virtual bool deepCopy(CMappedMultiLevelList<Idx,T>* arg_br);
+
+    /** Assignment operator : Performs a deep-copy (std container requirement).
+     * Beware; This can be quite slow. */
+    virtual CMappedMultiLevelList<Idx,T>& operator = (const CMappedMultiLevelList<Idx,T>& arg_rhs)
+    {
+      deepCopy(&arg_rhs);
+      return *this;
+    }
 
     /** Erases an element from the list.
      * Referenced by the element's memory location */
@@ -100,6 +104,8 @@ namespace sutil
     /** Create a node on the mapped list and also insert it into the vector
      * of lists. That way someone can lookup or iterate over the mapped list
      * and can also exploit the structure of the vec<list>
+     *
+     * NOTE TODO : Should not keep this public. Resolve this later.
      */
     std::vector<std::vector<T*> > mlvec_;
 
@@ -112,6 +118,23 @@ namespace sutil
 
     /** The priority levels this multi-level map has */
     std::size_t pri_levels_;
+
+  protected:
+    /** These functions exist in the parent class, but are not to be
+     * called by pointers to this class. The overloaded equivalents
+     * in this class are the replacements. For more information, read
+     * the documentation related to -Woverloaded-virtual
+     *
+     * NOTE TODO : This needs to be protected here.
+     * T* CMappedList<Idx,T>::create(const Idx & arg_idx, const bool insert_at_start);
+     */
+
+
+    /** Copy-Constructor : Does a deep copy of the mapped multi level list to
+     *  get a new one.
+     * NOTE : This uses the passed mapped list's iterator construct. */
+    virtual bool deepCopy(const CMappedMultiLevelList<Idx,T>* arg_br);
+
   }; //End of template class
 
   /***************************************************************
@@ -181,7 +204,7 @@ namespace sutil
 
   template <typename Idx, typename T>
   bool CMappedMultiLevelList<Idx,T>::
-  deepCopy(CMappedMultiLevelList<Idx,T>* arg_br)
+  deepCopy(const CMappedMultiLevelList<Idx,T>* arg_br)
   {//Deep copy.
     this->~CMappedMultiLevelList(); //Delete everything in the mapped list
 
@@ -219,7 +242,7 @@ namespace sutil
           clear(); return false;
         }
 
-        std::size_t pri = arg_br->map_nodeptr2pri_[tmp];
+        std::size_t pri = arg_br->map_nodeptr2pri_.at(tmp);
         map_nodeptr2pri_.insert(std::pair<T*,std::size_t>(tmp,pri));
 
         //Now add the entry to the vector
