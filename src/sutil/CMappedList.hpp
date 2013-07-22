@@ -184,19 +184,19 @@ namespace sutil
      * in the linked list
      *
      * NOTE : The index starts at 0   */
-    virtual const Idx* getIndexAt(const std::size_t arg_idx);
+    virtual const Idx* getIndexAt(const std::size_t arg_idx) const;
 
     /** Returns the element at the given numerical index
      * in the linked list (usually useful only for
      * debugging)
      *
      * NOTE : The index starts at 0   */
-    virtual const T* at_const(const std::size_t arg_idx);
+    virtual const T* at_const(const std::size_t arg_idx) const;
 
     /** Returns a const pointer to the element referenced by the index
      *
      * NOTE : This uses the std::map (and is rather slow) */
-    virtual const T* at_const(const Idx & arg_idx);
+    virtual const T* at_const(const Idx & arg_idx) const;
 
     /** Erases an element from the list.
      * Referenced by the element's memory location   */
@@ -638,7 +638,7 @@ namespace sutil
   }
 
   template <typename Idx, typename T>
-  const Idx* CMappedList<Idx,T>::getIndexAt(const std::size_t arg_idx)
+  const Idx* CMappedList<Idx,T>::getIndexAt(const std::size_t arg_idx) const
   {
     if(NULL==front_)
     { return NULL;  }
@@ -666,12 +666,53 @@ namespace sutil
   }
 
   template <typename Idx, typename T>
-  const T* CMappedList<Idx,T>::at_const(const std::size_t arg_idx)
-  { return (const T*) at(arg_idx);  }
+  const T* CMappedList<Idx,T>::at_const(const std::size_t arg_idx) const
+  {
+    if(NULL==front_)
+    { return NULL;  }
+    else
+    {
+      if(arg_idx > size_)
+      { return NULL; }
+      const SMLNode<Idx,T> * t = front_;
+
+      for(std::size_t i=0; i<arg_idx; ++i)
+      {
+#ifdef DEBUG
+        assert(i<=size_);
+#endif
+
+        if(NULL==t)
+        { return NULL;  }
+        t = t->next_;
+      }
+      if(NULL==t)
+      { return NULL;  }
+
+      return (const T*) t->data_;
+    }
+  }
 
   template <typename Idx, typename T>
-  const T* CMappedList<Idx,T>::at_const(const Idx & arg_idx)
-  { return (const T*) at(arg_idx);  }
+  const T* CMappedList<Idx,T>::at_const(const Idx & arg_idx) const
+  {
+    if(NULL==front_)
+    { return NULL;  }
+    else
+    {
+      if(map_.find(arg_idx) == map_.end())
+      {
+        return NULL;
+      }
+
+      const SMLNode<Idx,T> * t = map_.at(arg_idx);
+
+      if(NULL==t)
+      { return NULL;  }
+      else
+      { return (const T*) t->data_;  }
+    }
+  }
 
 
   template <typename Idx, typename T>
