@@ -333,7 +333,7 @@ namespace sutil
       operator -(int offset)
       {
         SMLNode<Idx,T> *ptr = this->pos_;
-        for(int i=0; i < offset; --i)
+        for(int i=0; i < offset; ++i)
         {
           if(NULL== ptr) { break; }
           ptr = ptr->prev_;
