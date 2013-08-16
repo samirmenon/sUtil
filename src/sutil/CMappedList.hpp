@@ -335,7 +335,7 @@ namespace sutil
         SMLNode<Idx,T> *ptr = this->pos_;
         for(int i=0; i < offset; ++i)
         {
-          if(NULL== ptr) { break; }
+          if(NULL== ptr->prev_) { break; }
           ptr = ptr->prev_;
         }
 
