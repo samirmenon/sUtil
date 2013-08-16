@@ -334,6 +334,39 @@ namespace sutil_test
       if(mappedlist2.end() != ite) { throw(std::runtime_error("Iterator + operator failed at overflow")); }
       else  { std::cout<<"\nTest Result ("<<test_id++<<") Iterator + operator works at overflow"; }
 
+      //Test the iterator's -- operators
+      it = mappedlist2.begin();
+      ++it; --it;
+      if(2 != *it) { throw(std::runtime_error("Iterator prefix -- operator failed")); }
+      else  { std::cout<<"\nTest Result ("<<test_id++<<") Iterator prefix -- operator works"; }
+
+      //Test the iterator's -- operators
+      it = mappedlist2.begin();
+      ++it; it--;
+      if(2 != *it) { throw(std::runtime_error("Iterator postfix -- operator failed")); }
+      else  { std::cout<<"\nTest Result ("<<test_id++<<") Iterator prefix -- operator works"; }
+
+      //Test the iterator's - operator
+      it = mappedlist2.begin();
+      ++it;
+      ite = it-1;
+      it--;
+      if(it != ite) { throw(std::runtime_error("Iterator - operator failed")); }
+
+      it = mappedlist2.begin();
+      ++it; ++it;
+      ite = it-2;
+      it--; --it;
+      if(it != ite) { throw(std::runtime_error("Iterator - operator failed at second iteration")); }
+
+      std::cout<<"\nTest Result ("<<test_id++<<") Iterator - operator works";
+
+      it = mappedlist2.begin();
+      ++it;
+      ite = it - 2;
+      if(mappedlist2.begin() != ite) { throw(std::runtime_error("Iterator - operator failed at underflow")); }
+      else  { std::cout<<"\nTest Result ("<<test_id++<<") Iterator - operator works at underflow"; }
+
       //Test the iterator's access speed
       time1 = sutil::CSystemClock::getSysTime();
       for(long long i=0;i<10000;i++)
