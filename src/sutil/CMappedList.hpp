@@ -49,13 +49,14 @@ namespace sutil
     IdxS* id_;
 
     //For the linked list
-    SMLNode<IdxS,TS> *next_;
+    SMLNode<IdxS,TS> *next_,*prev_;
 
     SMLNode()
     {
       data_=NULL;
       id_=NULL;
       next_=NULL;
+      prev_=NULL;
     }
   };
 
@@ -309,6 +310,37 @@ namespace sutil
 
         return iterator(ptr);
       }
+
+      /** Postfix x--. Note that its argument must be an int */
+      iterator&
+      operator --(int unused)
+      {
+        if(NULL!= pos_)
+        { pos_ = pos_->prev_; }
+        return *this;
+      }
+
+      /** Prefix --x */
+      iterator&
+      operator --()
+      {
+        if(NULL!= pos_)
+        { pos_ = pos_->prev_; }
+        return *this;
+      }
+
+      iterator
+      operator -(int offset)
+      {
+        SMLNode<Idx,T> *ptr = this->pos_;
+        for(int i=0; i < offset; --i)
+        {
+          if(NULL== ptr) { break; }
+          ptr = ptr->prev_;
+        }
+
+        return iterator(ptr);
+      }
     };
 
     /** An stl style const_iterator for CMappedList */
@@ -377,6 +409,37 @@ namespace sutil
         {
           if(NULL== ptr) { break; }
           ptr = ptr->next_;
+        }
+
+        return const_iterator(ptr);
+      }
+
+      /** Postfix x--. Note that its argument must be an int */
+      const_iterator&
+      operator --(int unused)
+      {
+        if(NULL!= pos_)
+        { pos_ = pos_->prev_; }
+        return *this;
+      }
+
+      /** Prefix --x */
+      const_iterator&
+      operator --()
+      {
+        if(NULL!= pos_)
+        { pos_ = pos_->prev_; }
+        return *this;
+      }
+
+      const_iterator
+      operator -(int offset)
+      {
+        const SMLNode<Idx,T> *ptr = this->pos_;
+        for(int i=0; i <offset; --i)
+        {
+          if(NULL== ptr) { break; }
+          ptr = ptr->prev_;
         }
 
         return const_iterator(ptr);
@@ -564,16 +627,27 @@ namespace sutil
     tmp->data_ = new T(arg_t);
     tmp->id_ = new Idx(arg_idx);
 
+    /** Insert at start if:
+     * (a) Insert at start required
+     * (b) Size = 0 and insert at back
+     */
     if((1 > size_) || (insert_at_start))
     {
       tmp->next_ = front_;
+      if(0!=size_){ front_->prev_ = tmp; }
       front_ = tmp;
+      front_->prev_ = NULL;
       tmp = NULL;
     }
+    /** Insert at back if:
+     * (a) Insert at back required
+     * (b) Size > 0 and insert at back
+     */
     else
     {
       back_->next_ = tmp;
       tmp->next_ = NULL;
+      tmp->prev_ = back_;
       back_ = tmp;
       tmp = NULL;
     }
