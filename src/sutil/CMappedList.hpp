@@ -888,7 +888,7 @@ namespace sutil
   template <typename Idx, typename T>
   bool CMappedList<Idx,T>::erase(const Idx& arg_idx)
   {
-    if(NULL==front_)
+    if(0>=size_)
     { return false;  }
 
     //Make sure the node exists
@@ -900,70 +900,53 @@ namespace sutil
       return false;
     }
 
-    SMLNode<Idx,T> * t, *tpre;
     SMLNode<Idx,T> * node = map_[arg_idx];
 
-    //Head is a special case
-    if(front_->data_ == node->data_)
+    if(1==size_)
     {
-      t = front_;
-      front_ = front_->next_;
+      if(front_!=node) { return false; } //This should never happen when Size 1 + idx exists.
 
-      if(NULL!= t->data_)
-      {
-        delete t->data_;
-        if(NULL!= t->id_)
-        { delete t->id_;  }
-        size_--;
-        map_.erase(arg_idx);
+      if(NULL!= front_->data_)
+      { delete front_->data_; }
+      if(NULL!= front_->id_)
+      { delete front_->id_;  }
+      delete front_;
 
-        if(0 == size_)
-        { back_ = NULL; null_.prev_ = NULL; }
-
-        delete t;
-        return true; // Deleted head.
-      }
-
-      return false;//Head was NULL --> Error condition.
+      front_ = NULL; back_ = NULL; null_.prev_ = NULL;
+      node = NULL;
     }
     else
-    {
-      //The head doesn't match.
-      tpre = front_;
-      t = front_->next_;
+    {//At least two nodes. Remove the node
+      if(NULL!= node->data_)
+      { delete node->data_; }
+      if(NULL!= node->id_)
+      { delete node->id_;  }
 
-      //Find the node
-      while(NULL!=t)
+      if(front_ == node)
       {
-        if(t->data_ == node->data_)
-        {
-          tpre->next_ = t->next_;
-          if(NULL!= t->data_)
-          {
-            delete t->data_;
-            if(NULL!= t->id_)
-            { delete t->id_;  }
-            size_--;
-            map_.erase(arg_idx);
-
-            if(0 == size_)
-            { back_ = NULL; null_.prev_ = NULL; }
-
-            //Deleting the back node requires updating the back pointer
-            if(t == back_)
-            { back_ = tpre; back_->next_ = &null_; null_.prev_ = back_; }
-
-            delete t;
-            return true; // Deleted node.
-          }
-          else
-          { return false; }//Node to delete was NULL --> Error condition.
-        }
-        tpre = t;
-        t = t->next_;
+        front_ = front_->next_;
+        front_->prev_ = NULL;
       }
-      return false; // Didn't delete anything.
-    }//End of if/else
+      else if(back_ == node)
+      {
+        back_ = back_->prev_;
+        back_->next_ = &null_;
+        null_.prev_ = back_;
+      }
+      else
+      {
+        node->prev_->next_ = node->next_;
+        node->next_->prev_ = node->prev_;
+      }
+
+      delete node;
+      node = NULL;
+    }
+
+    size_--;
+    map_.erase(arg_idx);
+
+    return true; // Deleted head.
   }
 
   template <typename Idx, typename T>
