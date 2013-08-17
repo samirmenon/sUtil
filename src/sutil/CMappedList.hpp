@@ -112,7 +112,7 @@ namespace sutil
      * The standard methods
      * ************************** */
     /** Constructor : Resets the pilemap. */
-    CMappedList() : front_(NULL), back_(NULL),size_(0) {}
+    CMappedList() : front_(NULL), back_(NULL), size_(0) {}
 
   protected:
     /** Does a deep copy of the mappedlist to
@@ -125,7 +125,10 @@ namespace sutil
      * 'explicit' makes sure that only a CMappedList can be copied. Ie. Implicit
      * copy-constructor use is disallowed.*/
     explicit CMappedList(const CMappedList<Idx,T>& arg_pm)
-    { front_ = NULL; back_ = NULL; size_ = 0; deepCopy(&arg_pm);  }
+    {
+      front_ = NULL; back_ = NULL; null_.prev_ = NULL; size_ = 0;
+      deepCopy(&arg_pm);
+    }
 
     /** Assignment operator : Performs a deep-copy (std container requirement).
      * Beware; This can be quite slow. */
@@ -232,6 +235,10 @@ namespace sutil
     /** Pointer to the tail/back/dangling-end of the list */
     SMLNode<Idx,T> *back_;
 
+    /** Pointer to the element obtained with the end() call.
+     * Does not exist in the map. */
+    SMLNode<Idx,T> null_;
+
     /** The map that will enable Idx based data lookup */
     std::map<Idx, SMLNode<Idx,T>*> map_;
 
@@ -284,7 +291,7 @@ namespace sutil
       iterator&
       operator ++(int unused)
       {
-        if(NULL!= pos_)
+        if(NULL!= pos_->next_)
         { pos_ = pos_->next_; }
         return *this;
       }
@@ -293,7 +300,7 @@ namespace sutil
       iterator&
       operator ++()
       {
-        if(NULL!= pos_)
+        if(NULL!= pos_->next_)
         { pos_ = pos_->next_; }
         return *this;
       }
@@ -304,7 +311,7 @@ namespace sutil
         SMLNode<Idx,T> *ptr = this->pos_;
         for(int i=0; i <offset; ++i)
         {
-          if(NULL== ptr) { break; }
+          if(NULL== ptr->next_) { break; }
           ptr = ptr->next_;
         }
 
@@ -387,7 +394,7 @@ namespace sutil
       const_iterator&
       operator ++(int unused)
       {
-        if(NULL!= pos_)
+        if(NULL!= pos_->next_)
         { pos_ = pos_->next_; }
         return *this;
       }
@@ -396,7 +403,7 @@ namespace sutil
       const_iterator&
       operator ++()
       {
-        if(NULL!= pos_)
+        if(NULL!= pos_->next_)
         { pos_ = pos_->next_; }
         return *this;
       }
@@ -407,7 +414,7 @@ namespace sutil
         const SMLNode<Idx,T> *ptr = this->pos_;
         for(int i=0; i <offset; ++i)
         {
-          if(NULL== ptr) { break; }
+          if(NULL== ptr->next_) { break; }
           ptr = ptr->next_;
         }
 
@@ -450,16 +457,22 @@ namespace sutil
      * The iterator functions
      * ************************** */
     iterator begin()
-    { return iterator(front_); }
+    {
+      if(NULL!=front_){ return iterator(front_);  }
+      else{ return iterator(&null_);  }
+    }
 
     const_iterator begin() const
-    { return const_iterator(front_); }
+    {
+      if(NULL!=front_){ return const_iterator(front_);  }
+      else{ return const_iterator(&null_);  }
+    }
 
     iterator end()
-    { return iterator(); }
+    { return iterator(&null_); }
 
     const_iterator end() const
-    { return const_iterator(); }
+    { return const_iterator(&null_); }
   };
 
   /** This is to delete the second pointers in the destructor. Useful
@@ -503,14 +516,17 @@ namespace sutil
 
     /**Set the current mappedlist to the new mappedlist**/
     if(0 == arg_pmap->size_)
-    { front_ = NULL; back_ = NULL; map_.clear(); size_ = 0; }
+    {
+      front_ = NULL; back_ = NULL; null_.prev_ = NULL;
+      map_.clear();
+      size_ = 0;
+    }
     else
     {
-      SMLNode<Idx,T> *iterator = arg_pmap->front_;
-      while(iterator!=NULL)
+      CMappedList<Idx,T>::const_iterator it,ite;
+      for(it = arg_pmap->begin(), ite = arg_pmap->end(); it!=ite; ++it)
       {
-        T* tmp = CMappedList<Idx,T>::create(*(iterator->id_),
-            *(iterator->data_),false);
+        T* tmp = CMappedList<Idx,T>::create(!it,*it,false);
         if(NULL == tmp)
         {
 #ifdef DEBUG
@@ -520,7 +536,6 @@ namespace sutil
           this->~CMappedList();//Reset the mappedlist.
           return false;
         }
-        iterator = iterator->next_;
       }
     }
     return true;
@@ -530,24 +545,27 @@ namespace sutil
   CMappedList<Idx,T>::~CMappedList()
   {
     SMLNode<Idx,T> *t, *t2;
-    t = front_;
-    if(NULL!=t)
-    { t2 = front_->next_;  }
+
+    //Nothing to do if already empty
+    if(0==size_) {  return; }
+
+    //Terminate the end (just in case)
+    null_.next_ = NULL;
+
+    //Now start deleting everything
+    t = front_->next_;
     while(NULL!=t)
     {
-      if(NULL!=t->data_)
-      { delete t->data_;  }
-      if(NULL!=t->id_)
-      { delete t->id_;  }
-      delete t;
+      if(NULL!=t->prev_->data_)
+      { delete t->prev_->data_;  }
+      if(NULL!=t->prev_->id_)
+      { delete t->prev_->id_;  }
+      delete t->prev_;
 
-      t = t2;
-      if(NULL!=t)
-      { t2 = t->next_;  }
+      t = t->next_;
     }
 
-    front_ = NULL;
-    back_ = NULL;
+    front_ = NULL; back_ = NULL; null_.prev_ = NULL;
     map_.clear();
     size_ = 0;
   }
@@ -596,11 +614,15 @@ namespace sutil
     lhs->back_ = rhs->back_;
     lhs->map_ = rhs->map_;
     lhs->size_ = rhs->size_;
+    lhs->null_.prev_ = lhs->back_;
+    if(0 < lhs->size_) {  lhs->back_->next_ = &(lhs->null_);  }
 
     rhs->front_ = tf;
     rhs->back_ = tb;
     rhs->map_ = tmap;
     rhs->size_ = ts;
+    rhs->null_.prev_ = rhs->back_;
+    if(0 < rhs->size_) {  rhs->back_->next_ = &(rhs->null_);  }
   }
 
   template <typename Idx, typename T>
@@ -627,35 +649,36 @@ namespace sutil
     tmp->data_ = new T(arg_t);
     tmp->id_ = new Idx(arg_idx);
 
-    /** Insert at start if:
-     * (a) Insert at start required
-     * (b) Size = 0 and insert at back
-     */
-    if((1 > size_) || (insert_at_start))
+    /** If size is zero, insert at start/end doesn't matter. */
+    if(0 == size_)
+    {
+      back_ = tmp;
+      front_ = tmp;
+      front_->prev_ = NULL;
+      front_->next_ = &null_;
+      null_.prev_ = back_;
+      tmp = NULL;
+    }
+    else if(insert_at_start)
     {
       tmp->next_ = front_;
-      if(0!=size_){ front_->prev_ = tmp; }
+      front_->prev_ = tmp;
       front_ = tmp;
       front_->prev_ = NULL;
       tmp = NULL;
     }
-    /** Insert at back if:
-     * (a) Insert at back required
-     * (b) Size > 0 and insert at back
-     */
     else
     {
       back_->next_ = tmp;
-      tmp->next_ = NULL;
+      tmp->next_ = &null_;
       tmp->prev_ = back_;
       back_ = tmp;
+      null_.prev_ = back_;
+      back_->next_ = &null_;
       tmp = NULL;
     }
 
     size_++;
-
-    if(1 == size_)
-    { back_ = front_; }
 
     map_.insert( std::pair<Idx, SMLNode<Idx,T> *>(arg_idx, front_) );
 
@@ -815,7 +838,7 @@ namespace sutil
         size_--;
 
         if(0 == size_)
-        { back_ = NULL; }
+        { back_ = NULL; null_.prev_=NULL; }
 
         return true; // Deleted head.
       }
@@ -846,7 +869,7 @@ namespace sutil
             size_--;
 
             if(0 == size_)
-            { back_ = NULL; }
+            { back_ = NULL; null_.prev_=NULL; }
 
             return true; // Deleted node.
           }
@@ -895,7 +918,7 @@ namespace sutil
         map_.erase(arg_idx);
 
         if(0 == size_)
-        { back_ = NULL; }
+        { back_ = NULL; null_.prev_ = NULL; }
 
         delete t;
         return true; // Deleted head.
@@ -924,7 +947,11 @@ namespace sutil
             map_.erase(arg_idx);
 
             if(0 == size_)
-            { back_ = NULL; }
+            { back_ = NULL; null_.prev_ = NULL; }
+
+            //Deleting the back node requires updating the back pointer
+            if(t == back_)
+            { back_ = tpre; back_->next_ = &null_; null_.prev_ = back_; }
 
             delete t;
             return true; // Deleted node.
@@ -953,7 +980,7 @@ namespace sutil
 
     front_ = front_->next_;
 
-    while(NULL!=tpre)
+    while(&null_ != tpre)
     {
       if(NULL!=tpre->data_)
       { delete tpre->data_; }
@@ -962,13 +989,13 @@ namespace sutil
       delete tpre;
 
       tpre = front_;
-      if(NULL==tpre)//Reached the end.
+      if(&null_ == tpre)//Reached the end.
       { break; }
       front_ = front_->next_;
     }
 
     size_=0;
-    back_ = NULL;
+    front_ = NULL; back_ = NULL; null_.prev_ = NULL;
     map_.clear(); // Clear the map.
     return true;
   }
