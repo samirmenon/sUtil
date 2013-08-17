@@ -344,7 +344,14 @@ namespace sutil_test
       it = mappedlist2.begin();
       ++it; it--;
       if(2 != *it) { throw(std::runtime_error("Iterator postfix -- operator failed")); }
-      else  { std::cout<<"\nTest Result ("<<test_id++<<") Iterator prefix -- operator works"; }
+      else  { std::cout<<"\nTest Result ("<<test_id++<<") Iterator postfix -- operator works"; }
+
+      //Test the iterator's -- operators
+      it = mappedlist2.begin();
+      ite = mappedlist2.end();
+      ++it; ++it; --ite;
+      if(it != ite) { throw(std::runtime_error("Iterator prefix -- operator failed at the end()")); }
+      else  { std::cout<<"\nTest Result ("<<test_id++<<") Iterator prefix -- operator works at the end()"; }
 
       //Test the iterator's - operator
       it = mappedlist2.begin();
