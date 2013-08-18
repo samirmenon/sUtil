@@ -169,7 +169,10 @@ namespace sutil
     virtual T* create(const Idx & arg_idx, const bool insert_at_start=true);
 
     /** Copies the given element, inserts the copied element into the list
-     * and returns the pointer to the copied element   */
+     * and returns the pointer to the copied element.
+     *
+     * By default inserts element at the start/begin() position. If specified,
+     * flag is false, inserts at the end of the list. */
     virtual T* create(const Idx & arg_idx, const T& arg_t, const bool insert_at_start=true);
 
     /** Returns the element at the given numerical index
@@ -227,6 +230,9 @@ namespace sutil
     virtual T* operator[](const std::size_t arg_idx)
     { return at(arg_idx); }
 
+    /** *******************************************************
+     *                      Mapped List Data
+     * ******************************************************* */
   protected:
 
     /** Pointer to the head/front/insertion-end of the list */
