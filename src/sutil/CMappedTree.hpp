@@ -255,17 +255,17 @@ namespace sutil
         if(tmp_node.parent_addr_ == NULL)
         {//No parent -- Ignore this node
 #ifdef DEBUG
-          std::cout<<"\nCBranchingStructure::linkNodes(): Warning.";
-          std::cout<<"Orphan node found: "<<tmp_node.name_<<". Ignoring.";
+          std::cerr<<"\nCBranchingStructure::linkNodes(): Warning.";
+          std::cerr<<"Orphan node found: "<<tmp_node.name_<<". Ignoring.";
 #endif
           continue;
         }
         tmp_node.parent_addr_->child_addrs_.push_back(&tmp_node);
 
 #ifdef DEBUG
-        std::cout<<"\n\tAdding child "<<tmp_node.name_
+        std::cerr<<"\n\tAdding child "<<tmp_node.name_
             <<" to (parent) "<<tmp_node.parent_addr_->name_;
-        std::cout<<std::flush;
+        std::cerr<<std::flush;
 #endif
       }
     }//End of while loop

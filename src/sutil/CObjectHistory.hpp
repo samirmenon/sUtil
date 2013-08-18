@@ -88,7 +88,7 @@ namespace sutil
         if(false == flag)
         {
 #ifdef DEBUG
-          std::cout<<"\nCObjectHistory::addObject() : Could not create an entry for this object";
+          std::cerr<<"\nCObjectHistory::addObject() : Could not create an entry for this object";
 #endif
           return false;
         }
@@ -96,7 +96,7 @@ namespace sutil
         if(NULL == objl)
         {
 #ifdef DEBUG
-          std::cout<<"\nCObjectHistory::addObject() : Created an entry for this object but can't access it. Invalid state.";
+          std::cerr<<"\nCObjectHistory::addObject() : Created an entry for this object but can't access it. Invalid state.";
 #endif
           return false;
         }
@@ -106,7 +106,7 @@ namespace sutil
       if(false == flag)
       {
 #ifdef DEBUG
-        std::cout<<"\nCObjectHistory::addObject() : Could not timestamp and store this object";
+        std::cerr<<"\nCObjectHistory::addObject() : Could not timestamp and store this object";
 #endif
         return false;
       }
@@ -128,7 +128,7 @@ namespace sutil
       if(NULL == objl)
       {
 #ifdef DEBUG
-        std::cout<<"\nCObjectHistory::getObject() : Can't find object in history.";
+        std::cerr<<"\nCObjectHistory::getObject() : Can't find object in history.";
 #endif
         return NULL;
       }
@@ -153,7 +153,7 @@ namespace sutil
       if(NULL == objl)
       {
 #ifdef DEBUG
-        std::cout<<"\nCObjectHistory::removeObject() : Can't find object in history.";
+        std::cerr<<"\nCObjectHistory::removeObject() : Can't find object in history.";
 #endif
         return NULL;
       }

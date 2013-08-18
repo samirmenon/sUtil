@@ -895,7 +895,7 @@ namespace sutil
     if(map_.find(arg_idx) == map_.end())
     {
 #ifdef DEBUG
-      std::cout<<"\nCMappedList<Idx,T>::erase() WARNING : Tried to erase a nonexistent entry";
+      std::cerr<<"\nCMappedList<Idx,T>::erase() WARNING : Tried to erase a nonexistent entry";
 #endif
       return false;
     }
