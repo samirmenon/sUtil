@@ -451,7 +451,7 @@ namespace sutil_test
        * Sorting tests
        * *********************** */
       //Create a new mapped list to sort and some iterators to parse it.
-      sutil::CMappedList<std::string,std::string> mls;
+      sutil::CMappedList<std::string,std::string> mls, mls2;
       sutil::CMappedList<std::string,std::string>::const_iterator sit;
 
       std::string s;
@@ -469,15 +469,55 @@ namespace sutil_test
 #endif
 
       //Create a sort index for the mapped list
-      std::vector<std::string> mls_idx;
+      std::vector<std::string> mls_idx, mls_idx2;
       mls_idx.resize(4);
       mls_idx[0] = "1"; mls_idx[1] = "1b"; mls_idx[2] = "2"; mls_idx[3] = "8";
+
+      if(true == mls.isSorted() || true == mls.sort_get_order(mls_idx2))
+      { throw(std::runtime_error("Mapped list returns sorted, when it isn't.")); }
+      else  { std::cout<<"\nTest Result ("<<test_id++<<") Test mapped list isSorted before sort.";  }
 
       //Sort the mapped list
       flag = mls.sort(mls_idx);
       if(false == flag)
       { throw(std::runtime_error("Mapped list Iterator Change Each Element failed")); }
       else  { std::cout<<"\nTest Result ("<<test_id++<<") Executed sort call";  }
+
+      if(false == mls.isSorted() || false == mls.sort_get_order(mls_idx2))
+      { throw(std::runtime_error("Mapped list returns not sorted, when it is.")); }
+      else  { std::cout<<"\nTest Result ("<<test_id++<<") Test mapped list isSorted after sort.";  }
+
+      if(mls_idx2[0] != "1" || mls_idx2[1] != "1b" || mls_idx2[2] != "2" || mls_idx2[3] != "8")
+      { throw(std::runtime_error("Mapped list returned sort order is invalid.")); }
+      else  { std::cout<<"\nTest Result ("<<test_id++<<") Test mapped list returned sort order.";  }
+
+      // Test sort disruption after create
+      s = "ten"; mls.create("10",s);
+      if(true == mls.isSorted() || true == mls.sort_get_order(mls_idx2))
+      { throw(std::runtime_error("Mapped list returns sorted after insert.")); }
+      else  { std::cout<<"\nTest Result ("<<test_id++<<") Test mapped list is not sorted after create.";  }
+
+      mls_idx.push_back("10"); //Update the index
+      flag = mls.sort(mls_idx); //Sort again.
+      if(false == mls.isSorted() || false == mls.sort_get_order(mls_idx2))
+      { throw(std::runtime_error("Mapped list couldn't sort after insert.")); }
+      else  { std::cout<<"\nTest Result ("<<test_id++<<") Test mapped list is sorted after create and sort.";  }
+
+      // Test sort disruption after erase
+      flag = mls.erase("10");
+      if(false == flag) { throw(std::runtime_error("Mapped list couldn't erase element after sort.")); }
+
+      if(true == mls.isSorted() || true == mls.sort_get_order(mls_idx2))
+      { throw(std::runtime_error("Mapped list returns sorted after insert.")); }
+      else  { std::cout<<"\nTest Result ("<<test_id++<<") Test mapped list is not sorted after erase.";  }
+
+      //Sort the data again.
+      mls_idx.erase(mls_idx.end()-1);//Remove the "10"
+      flag = mls.sort(mls_idx);
+
+      if(false == mls.isSorted() || false == mls.sort_get_order(mls_idx2))
+      { throw(std::runtime_error("Mapped list couldn't sort after insert.")); }
+      else  { std::cout<<"\nTest Result ("<<test_id++<<") Test mapped list sort after insert.";  }
 
 #ifdef DEBUG
       //Print the list.
@@ -490,6 +530,24 @@ namespace sutil_test
       sit = mls.begin();
       if(*sit == "one" && *(sit+1) == "E1" && *(sit+2) == "two" && *(sit+3) == "eight")
       { std::cout<<"\nTest Result ("<<test_id++<<") Tested sorted data order";  }
+      else
+      { throw(std::runtime_error("Failed to sort string:string mapped list")); }
+
+      //Test the sorted indices.
+      if(!sit == "1" && !(sit+1) == "1b" && !(sit+2) == "2" && !(sit+3) == "8")
+      { std::cout<<"\nTest Result ("<<test_id++<<") Tested sorted indices";  }
+      else { throw(std::runtime_error("Unsorted indices in sorted string:string mapped list")); }
+
+      // *** Test sorting with swapping
+      mls2.swap(mls);
+      if(4 != mls2.size())
+      { throw(std::runtime_error("Mapped list swap failed after sort.")); }
+      else  { std::cout<<"\nTest Result ("<<test_id++<<") Test mapped list swap after sort.";  }
+
+      //Test the sorting order.
+      sit = mls2.begin();
+      if(*sit == "one" && *(sit+1) == "E1" && *(sit+2) == "two" && *(sit+3) == "eight")
+      { std::cout<<"\nTest Result ("<<test_id++<<") Tested sorted data order after swap";  }
       else
       { throw(std::runtime_error("Failed to sort string:string mapped list")); }
 
