@@ -570,16 +570,19 @@ namespace sutil_test
       //Test 6 : Test copy constructor.
       sutil::CMappedMultiLevelList<std::string,SMapTester> mapmllist2;
       mapmllist2 = mapmllist;
+      if( mapmllist2.size() != mapmllist.size() )
+      { throw(std::runtime_error("Failed to deep-copy an object"));  }
+      else  { std::cout<<"\nTest Result ("<<test_id++<<") Deep-copied an object";  }
 
       t2 = mapmllist2.at(tstr);
       if( (NULL==t2) || (tmp_var.pri!=(mapmllist2.at("t1")->pri)) ||
           ((tmp_var.pri+1)!=mapmllist2.getNumPriorityLevels()))
-      { throw(std::runtime_error("Failed to create mlpmap node with copy-constructor"));  }
-      else  { std::cout<<"\nTest Result ("<<test_id++<<") Created mlpmap node with copy constructor"; }
+      { throw(std::runtime_error("Failed to create mlpmap node with copy-constructor in deep-copied object"));  }
+      else  { std::cout<<"\nTest Result ("<<test_id++<<") Created mlpmap node with copy constructor in deep-copied object"; }
 
       if(tmp_var.val!=mapmllist2.getSinglePriorityLevel(tmp_var.pri)->at(0)->val)
-      { throw(std::runtime_error("Failed to access single priority level"));  }
-      else  { std::cout<<"\nTest Result ("<<test_id++<<") Correctly accessed single priority level"; }
+      { throw(std::runtime_error("Failed to access single priority level in deep-copied object"));  }
+      else  { std::cout<<"\nTest Result ("<<test_id++<<") Correctly accessed single priority level in deep-copied object"; }
 
       //Test 7 : Test clear
       flag = mapmllist.clear();
