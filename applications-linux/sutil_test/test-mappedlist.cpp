@@ -554,7 +554,7 @@ namespace sutil_test
       { throw(std::runtime_error("Failed. Unexpected mlpmap priority levels after deleting node."));  }
       else  { std::cout<<"\nTest Result ("<<test_id++<<") MappedMultiLevelList has 3 levels after deleting level 0 node"; }
 
-      //Test 5 : Test copy constructor.
+      //Test 5 : Test access.
       SMapTester tmp_var; tmp_var.pri = 9; tmp_var.val = 6;
       tstr="t1";
       t2 = mapmllist.create(tstr,tmp_var,tmp_var.pri);
@@ -567,7 +567,21 @@ namespace sutil_test
       { throw(std::runtime_error("Failed to access single priority level"));  }
       else  { std::cout<<"\nTest Result ("<<test_id++<<") Correctly accessed single priority level"; }
 
-      //Test 6 : Test clear
+      //Test 6 : Test copy constructor.
+      sutil::CMappedMultiLevelList<std::string,SMapTester> mapmllist2;
+      mapmllist2 = mapmllist;
+
+      t2 = mapmllist2.at(tstr);
+      if( (NULL==t2) || (tmp_var.pri!=(mapmllist2.at("t1")->pri)) ||
+          ((tmp_var.pri+1)!=mapmllist2.getNumPriorityLevels()))
+      { throw(std::runtime_error("Failed to create mlpmap node with copy-constructor"));  }
+      else  { std::cout<<"\nTest Result ("<<test_id++<<") Created mlpmap node with copy constructor"; }
+
+      if(tmp_var.val!=mapmllist2.getSinglePriorityLevel(tmp_var.pri)->at(0)->val)
+      { throw(std::runtime_error("Failed to access single priority level"));  }
+      else  { std::cout<<"\nTest Result ("<<test_id++<<") Correctly accessed single priority level"; }
+
+      //Test 7 : Test clear
       flag = mapmllist.clear();
 
       if( (!flag) || ( NULL != mapmllist.at(0)))
