@@ -446,6 +446,58 @@ namespace sutil_test
       std::cout<<"\nTest Result ("<<test_id++<<") Mapped list Const Iterator Copy Each Element : "<<maplist_sz
           <<" <double> entries in "<<time2-time1<<" seconds";
 
+
+      /** **********************
+       * Sorting tests
+       * *********************** */
+      //Create a new mapped list to sort and some iterators to parse it.
+      sutil::CMappedList<std::string,std::string> mls;
+      sutil::CMappedList<std::string,std::string>::const_iterator sit;
+
+      std::string s;
+      s = "one"; mls.create("1",s);
+      s = "E1"; mls.create("1b",s);
+      s = "two"; mls.create("2",s);
+      s = "eight"; mls.create("8",s);
+
+#ifdef DEBUG
+      sutil::CMappedList<std::string,std::string>::const_iterator site;
+      //Print the list.
+      std::cout<<"\n Original list: ";
+      for(sit = mls.begin(), site = mls.end(); sit != site; ++sit)
+      { std::cout<<"("<<!sit<<", "<<*sit<<") "; }
+#endif
+
+      //Create a sort index for the mapped list
+      std::vector<std::string> mls_idx;
+      mls_idx.resize(4);
+      mls_idx[0] = "1"; mls_idx[1] = "1b"; mls_idx[2] = "2"; mls_idx[3] = "8";
+
+      //Sort the mapped list
+      flag = mls.sort(mls_idx);
+      if(false == flag)
+      { throw(std::runtime_error("Mapped list Iterator Change Each Element failed")); }
+      else  { std::cout<<"\nTest Result ("<<test_id++<<") Executed sort call";  }
+
+#ifdef DEBUG
+      //Print the list.
+      std::cout<<"\n Sorted list: ";
+      for(sit = mls.begin(), site = mls.end(); sit != site; ++sit)
+      { std::cout<<"("<<!sit<<", "<<*sit<<") "; }
+#endif
+
+      //Test the sorting order.
+      sit = mls.begin();
+      if(*sit == "one" && *(sit+1) == "E1" && *(sit+2) == "two" && *(sit+3) == "eight")
+      { std::cout<<"\nTest Result ("<<test_id++<<") Tested sorted data order";  }
+      else
+      { throw(std::runtime_error("Failed to sort string:string mapped list")); }
+
+      //Test the sorted indices.
+      if(!sit == "1" && !(sit+1) == "1b" && !(sit+2) == "2" && !(sit+3) == "8")
+      { std::cout<<"\nTest Result ("<<test_id++<<") Tested sorted indices";  }
+      else { throw(std::runtime_error("Unsorted indices in sorted string:string mapped list")); }
+
       std::cout<<"\nTest #"<<arg_id<<" (Mapped list Test) Succeeded.";
     }
     catch(std::exception& ee)
