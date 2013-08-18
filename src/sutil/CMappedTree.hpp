@@ -225,57 +225,49 @@ namespace sutil
   bool CMappedTree<TIdx,TNode>::linkNodes()
   {
     //Clear previous links (if any)
-    SMLNode<TIdx,TNode> *iterator;
-    iterator = this->CMappedList<TIdx,TNode>::front_;
-    while(iterator != NULL)
+    typename CMappedList<TIdx,TNode>::iterator it,ite;
+    for(it = CMappedList<TIdx,TNode>::begin(),
+        ite = CMappedList<TIdx,TNode>::end();
+        it != ite; ++it)
     {
-      TNode* tmp_node = iterator->data_;
-      tmp_node->parent_addr_ = NULL;
-      tmp_node->child_addrs_.clear();
-      iterator = iterator->next_;
+      TNode& tmp_node = *it;
+      tmp_node.parent_addr_ = NULL;
+      tmp_node.child_addrs_.clear();
     }
 
     //Form the new links
-    iterator = this->CMappedList<TIdx,TNode>::front_;
-    while(iterator != NULL)
+    for(it = CMappedList<TIdx,TNode>::begin(),
+        ite = CMappedList<TIdx,TNode>::end();
+        it != ite; ++it)
     {
-      TNode* tmp_node = iterator->data_;
+      TNode& tmp_node = *it;
       //Iterate over all nodes and connect them to their
       //parents
-      if(tmp_node == root_node_)
+      if(&tmp_node == root_node_)
       {//No parents
         has_been_init_ = true;
-        //Increment the iterator
-        iterator =
-            iterator->next_;
         continue;
       }
       else
       {
-        tmp_node->parent_addr_ =
-            sutil::CMappedList<TIdx,TNode>::at(tmp_node->parent_name_);
-        if(tmp_node->parent_addr_ == NULL)
+        tmp_node.parent_addr_ =
+            sutil::CMappedList<TIdx,TNode>::at(tmp_node.parent_name_);
+        if(tmp_node.parent_addr_ == NULL)
         {//No parent -- Ignore this node
 #ifdef DEBUG
           std::cout<<"\nCBranchingStructure::linkNodes(): Warning.";
-          std::cout<<"Orphan node found: "<<tmp_node->name_<<". Ignoring.";
+          std::cout<<"Orphan node found: "<<tmp_node.name_<<". Ignoring.";
 #endif
-          iterator =
-              iterator->next_;
           continue;
         }
-        tmp_node->parent_addr_->child_addrs_.push_back(tmp_node);
+        tmp_node.parent_addr_->child_addrs_.push_back(&tmp_node);
 
 #ifdef DEBUG
-        std::cout<<"\n\tAdding child "<<tmp_node->name_
-            <<" to (parent) "<<tmp_node->parent_addr_->name_;
+        std::cout<<"\n\tAdding child "<<tmp_node.name_
+            <<" to (parent) "<<tmp_node.parent_addr_->name_;
         std::cout<<std::flush;
 #endif
       }
-
-      //Increment the iterator
-      iterator =
-          iterator->next_;
     }//End of while loop
     return has_been_init_;
   }
