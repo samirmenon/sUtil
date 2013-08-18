@@ -114,7 +114,7 @@ namespace sutil
      * well. This allows chaining to find out the pri level even from
      * the index (pri == map_nodeptr2pri_[map_[idx]]) &&
      * (pri == map_nodeptr2pri_[nodeptr]) */
-    std::map<T*, std::size_t> map_nodeptr2pri_;
+    std::map<const T*, std::size_t> map_nodeptr2pri_;
 
     /** The priority levels this multi-level map has */
     std::size_t pri_levels_;
@@ -233,7 +233,8 @@ namespace sutil
         }
 
         //Now recreate the priority map
-        if(arg_br->map_nodeptr2pri_.find(tmp) ==
+        const T* tmpptr = &(*it); //Deref iterator to get ref. Get ref's addr to access priority in map.
+        if(arg_br->map_nodeptr2pri_.find(tmpptr) ==
             arg_br->map_nodeptr2pri_.end())
         {
 #ifdef DEBUG
@@ -242,7 +243,7 @@ namespace sutil
           clear(); return false;
         }
 
-        std::size_t pri = arg_br->map_nodeptr2pri_.at(tmp);
+        std::size_t pri = arg_br->map_nodeptr2pri_.at(tmpptr);
         map_nodeptr2pri_.insert(std::pair<T*,std::size_t>(tmp,pri));
 
         //Now add the entry to the vector
