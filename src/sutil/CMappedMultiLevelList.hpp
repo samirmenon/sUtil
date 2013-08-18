@@ -219,11 +219,11 @@ namespace sutil
     else
     {
       //Copy over each element.
-      const SMLNode<Idx,T> * iterator = arg_br->CMappedList<Idx,T>::front_;
-      while(iterator!=NULL)
+      typename CMappedList<Idx,T>::const_iterator it,ite;
+      for(it = arg_br->CMappedList<Idx,T>::begin(), ite = arg_br->CMappedList<Idx,T>::end();
+          it!=ite; ++it)
       {
-        T* tmp = CMappedList<Idx,T>::create(*(iterator->id_),
-            *(iterator->data_));
+        T* tmp = CMappedList<Idx,T>::create(!it,*it);
         if(NULL == tmp)
         {
 #ifdef DEBUG
@@ -253,9 +253,6 @@ namespace sutil
           pri_levels_++;//Every push back increases pri levels.
         }
         mlvec_[pri].push_back(tmp);
-
-        //Move the iterator along
-        iterator = iterator->next_;
       }
     }
     return true;
