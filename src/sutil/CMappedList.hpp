@@ -31,6 +31,7 @@ sUtil. If not, see <http://www.gnu.org/licenses/>.
 
 #include <map>
 #include <cstddef>
+#include <vector>
 
 #ifdef DEBUG
 #include <iostream>
@@ -112,7 +113,7 @@ namespace sutil
      * The standard methods
      * ************************** */
     /** Constructor : Resets the pilemap. */
-    CMappedList() : front_(NULL), back_(NULL), size_(0) {}
+    CMappedList() : front_(NULL), back_(NULL), size_(0), flag_is_sorted_(false) {}
 
   protected:
     /** Does a deep copy of the mappedlist to
@@ -479,7 +480,43 @@ namespace sutil
 
     const_iterator end() const
     { return const_iterator(&null_); }
-  };
+
+    /** *******************************************************
+     *                 Sorting related functions
+     * ******************************************************* */
+  public:
+    /** Sorts the list so that iterator access matches the given
+     * vector's index. Ie. Given indices 0 to n in the vector,
+     * the begin() iterator will match 0, and the end() will
+     * appear after iterating over n.
+     *
+     * Any create/erase/swap etc. function call will invalidate
+     * the sort ordering.
+     *
+     * Sorting type : Insertion Sort.
+     */
+    virtual bool sort(const std::vector<Idx> &arg_order);
+
+    /** Get the sorting order if there is one */
+    virtual bool sort_get_order(std::vector<Idx>& ret_order)
+    {
+      if(flag_is_sorted_)
+      { ret_order = sorting_order_; return true;  }
+      else
+      { return false; }
+    }
+
+    /** Whether the list has been sorted or not */
+    virtual bool isSorted()
+    { return flag_is_sorted_;  }
+
+  protected:
+    /** An index that specifies a sort ordering if required */
+    std::vector<Idx> sorting_order_;
+
+    /** Whether the list is sorted or not */
+    bool flag_is_sorted_;
+  }; //End of class.
 
   /** This is to delete the second pointers in the destructor. Useful
    * if you want to manage pointers to pointers.
@@ -574,6 +611,7 @@ namespace sutil
     front_ = NULL; back_ = NULL; null_.prev_ = NULL;
     map_.clear();
     size_ = 0;
+    flag_is_sorted_ = false;
   }
 
   template <typename Idx, typename T>
@@ -611,11 +649,19 @@ namespace sutil
     else
     { lhs = &arg_swap_obj; rhs = this;  }
 
+    //List status.
     SMLNode<Idx,T> *tf = lhs->front_;
     SMLNode<Idx,T> *tb = lhs->back_;
     std::map<Idx, SMLNode<Idx,T>*> tmap(lhs->map_);
     size_t ts = lhs->size_;
 
+    //Sorting status
+    bool tmp_lhs_sorted = lhs->flag_is_sorted_;
+    std::vector<Idx> tmp_lhs_sorting_order;
+    if(lhs->flag_is_sorted_)
+    { tmp_lhs_sorting_order = lhs->sorting_order_;  }
+
+    //Copy list status
     lhs->front_ = rhs->front_;
     lhs->back_ = rhs->back_;
     lhs->map_ = rhs->map_;
@@ -623,12 +669,25 @@ namespace sutil
     lhs->null_.prev_ = lhs->back_;
     if(0 < lhs->size_) {  lhs->back_->next_ = &(lhs->null_);  }
 
+    //Copy sorting status
+    lhs->flag_is_sorted_ = rhs->flag_is_sorted_;
+    if(lhs->flag_is_sorted_)
+    { lhs->sorting_order_ = rhs->sorting_order_;  }
+    else { lhs->sorting_order_.clear();  }
+
+    //Copy list status from tmp
     rhs->front_ = tf;
     rhs->back_ = tb;
     rhs->map_ = tmap;
     rhs->size_ = ts;
     rhs->null_.prev_ = rhs->back_;
     if(0 < rhs->size_) {  rhs->back_->next_ = &(rhs->null_);  }
+
+    //Copy sorting status from tmp
+    rhs->flag_is_sorted_ = tmp_lhs_sorted;
+    if(rhs->flag_is_sorted_)
+    { rhs->sorting_order_ = tmp_lhs_sorting_order;  }
+    else { rhs->sorting_order_.clear();  }
   }
 
   template <typename Idx, typename T>
@@ -687,6 +746,7 @@ namespace sutil
     size_++;
 
     map_.insert( std::pair<Idx, SMLNode<Idx,T> *>(arg_idx, front_) );
+    flag_is_sorted_ = false;
 
     return front_->data_;
   }
@@ -846,6 +906,8 @@ namespace sutil
         if(0 == size_)
         { back_ = NULL; null_.prev_=NULL; }
 
+        flag_is_sorted_ = false;
+
         return true; // Deleted head.
       }
 
@@ -876,6 +938,8 @@ namespace sutil
 
             if(0 == size_)
             { back_ = NULL; null_.prev_=NULL; }
+
+            flag_is_sorted_ = false;
 
             return true; // Deleted node.
           }
@@ -951,6 +1015,7 @@ namespace sutil
 
     size_--;
     map_.erase(arg_idx);
+    flag_is_sorted_ = false;
 
     return true; // Deleted head.
   }
@@ -964,6 +1029,7 @@ namespace sutil
     if(tpre == NULL)
     {
       size_=0;
+      flag_is_sorted_ = false;
       return true;
     } //Nothing in the list.
 
@@ -986,9 +1052,76 @@ namespace sutil
     size_=0;
     front_ = NULL; back_ = NULL; null_.prev_ = NULL;
     map_.clear(); // Clear the map.
+    flag_is_sorted_ = false; //Not ordered anymore
     return true;
   }
 
+  template <typename Idx, typename T>
+  bool CMappedList<Idx,T>::sort(const std::vector<Idx> &arg_order)
+  {
+    if(1>=size_)
+    {//Already sorted.
+      flag_is_sorted_ = true;
+      sorting_order_ = arg_order;
+      return true;
+    }//Now we know for sure that there are atleast 2 elements, and that front, and back are set.
+
+    // Check that size matches the passed order
+    if(arg_order.size() != size_)
+    {
+#ifdef DEBUG
+      std::cout<<"\nCMappedList<Idx,T>::sort() ERROR : Number of indices in passed order doesn't match mapped list.";
+#endif
+      return false;
+    }
+
+    //First check all the indices actually appear in the list.
+    typename std::vector<Idx>::const_iterator it,ite;
+    for(it = arg_order.begin(), ite = arg_order.end(); it!=ite; ++it)
+    {
+      T* ptr = this->at(*it);
+      if(NULL == ptr)
+      {
+#ifdef DEBUG
+      std::cout<<"\nCMappedList<Idx,T>::sort() ERROR : Passed order contains invalid index element.";
+#endif
+        return false;
+      }
+    }
+
+    // Verified that all the elements are in the mapped list
+    // So proceed to insertion sort.
+    for(it = arg_order.begin(), ite = arg_order.end(); it!=ite; ++it)
+    {
+      // Find the node, starting from idx 0 to end.
+      SMLNode<Idx,T>* node = map_[*it]; //Idx is already tested to exist in the map.
+
+      if(node==back_) { continue;   } //Nothing to do. Node is already in the right place.
+
+      // Detach the node from the list.
+      if(node==front_)
+      {
+        node->next_->prev_ = NULL;
+        front_ = node->next_;
+      }
+      else
+      {
+        node->prev_->next_ = node->next_;
+        node->next_->prev_ = node->prev_;
+      }
+
+      // Re-add the node at the end.
+      back_->next_ = node;
+      node->prev_ = back_;
+      back_ = node;
+      null_.prev_ = node;
+      node->next_ = &null_;
+    }
+
+    flag_is_sorted_ = true;
+    sorting_order_ = arg_order;
+    return true;
+  }
 }
 
 #endif /* CMAPPEDLIST_HPP_ */
