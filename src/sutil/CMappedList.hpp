@@ -587,7 +587,7 @@ namespace sutil
   template <typename Idx, typename T>
   CMappedList<Idx,T>::~CMappedList()
   {
-    SMLNode<Idx,T> *t, *t2;
+    SMLNode<Idx,T> *t;
 
     //Nothing to do if already empty
     if(0==size_) {  return; }
