@@ -176,6 +176,14 @@ namespace sutil
      * flag is false, inserts at the end of the list. */
     virtual T* create(const Idx & arg_idx, const T& arg_t, const bool insert_at_start=true);
 
+    /** Inserts the given object into the list and returns the pointer to the copied element.
+     * NOTE : The recommended method is to use create. Else the object memory deallocation might
+     * be ambiguous. Remember that the mapped list "always" clears its own data.
+     *
+     * By default inserts element at the start/begin() position. If specified,
+     * flag is false, inserts at the end of the list. */
+    virtual T* insert(const Idx & arg_idx, T* arg_t, const bool insert_at_start=true);
+
     /** Returns the element at the given numerical index
      * in the linked list (usually useful only for
      * debugging)
@@ -712,6 +720,63 @@ namespace sutil
     }
 
     tmp->data_ = new T(arg_t);
+    tmp->id_ = new Idx(arg_idx);
+
+    /** If size is zero, insert at start/end doesn't matter. */
+    if(0 == size_)
+    {
+      back_ = tmp;
+      front_ = tmp;
+      front_->prev_ = NULL;
+      front_->next_ = &null_;
+      null_.prev_ = back_;
+      tmp = NULL;
+    }
+    else if(insert_at_start)
+    {
+      tmp->next_ = front_;
+      front_->prev_ = tmp;
+      front_ = tmp;
+      front_->prev_ = NULL;
+      tmp = NULL;
+    }
+    else
+    {
+      back_->next_ = tmp;
+      tmp->next_ = &null_;
+      tmp->prev_ = back_;
+      back_ = tmp;
+      null_.prev_ = back_;
+      back_->next_ = &null_;
+      tmp = NULL;
+    }
+
+    size_++;
+
+    map_.insert( std::pair<Idx, SMLNode<Idx,T> *>(arg_idx, front_) );
+    flag_is_sorted_ = false;
+
+    return front_->data_;
+  }
+
+  template <typename Idx, typename T>
+  T* CMappedList<Idx,T>::insert(const Idx & arg_idx, T* arg_t, const bool insert_at_start)
+  {
+    SMLNode<Idx,T> * tmp = new SMLNode<Idx,T>();
+
+    if(NULL==tmp) //Memory not allocated
+    { return NULL; }
+
+    //Make sure the idx hasn't already been registered.
+    if(map_.find(arg_idx) != map_.end())
+    {
+#ifdef DEBUG
+      std::cerr<<"\nCMappedList<Idx,T>::create() ERROR : Idx exists. Tried to add duplicate entry";
+#endif
+      return NULL;
+    }
+
+    tmp->data_ = arg_t;
     tmp->id_ = new Idx(arg_idx);
 
     /** If size is zero, insert at start/end doesn't matter. */

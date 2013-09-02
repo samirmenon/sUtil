@@ -55,7 +55,7 @@ namespace sutil_test
       double time1,time2;
 
       //Initialize the buffers and the mem copier
-      double *t1, *t2, *t3, *t4;
+      double *t1, *t2, *t3, *t4, *t5, *t5p = new double();
       sutil::CMappedList<std::string,double> mappedlist;
 
       std::string tstr;
@@ -88,6 +88,20 @@ namespace sutil_test
       { throw(std::runtime_error("Failed to create node 4"));  }
       else
       { std::cout<<"\nTest Result ("<<test_id++<<") Created node 4"; }
+
+      tstr = "t5";
+      t5 = mappedlist.insert(tstr,t5p);
+      if((NULL == t5) || (NULL==mappedlist.at(tstr)) || (t5 != t5p))
+      { throw(std::runtime_error("Failed to insert node 5"));  }
+      else
+      { std::cout<<"\nTest Result ("<<test_id++<<") Inserted node 5"; }
+
+      t5p=NULL;
+      flag = mappedlist.erase(t5);
+      if(false == flag)
+      { throw(std::runtime_error("Failed to delete inserted node (5)"));  }
+      else
+      { std::cout<<"\nTest Result ("<<test_id++<<") Deleted inserted node (5)"; }
 
       //Test 2 : Set values to the 4 nodes.
       *t1 = 1; *t2 = 2; *t3 = 3; *t4 = 4;
