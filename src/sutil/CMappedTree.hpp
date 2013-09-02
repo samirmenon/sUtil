@@ -100,6 +100,15 @@ namespace sutil
      * NOTE 2 : There can only be one root node. */
     virtual TNode* create(const TIdx& arg_idx, const bool arg_is_root_);
 
+    /** Adds an existing object to the mapped tree. The passed node is
+     * stored in a vector. A map between the idx and the node is also stored.
+     *
+     * NOTE : Assumes you have set the name_  and parent_name_ fields
+     * in the passed arg_node2add
+     * NOTE 2 : There can only be one root node. */
+    virtual TNode* insert(const TIdx& arg_idx, TNode *arg_node2add,
+        const bool arg_is_root_);
+
     /** Organizes the links into a tree. */
     virtual bool linkNodes();
 
@@ -213,6 +222,36 @@ namespace sutil
 
     return tLnk;
       }
+
+  /**
+   * Adds an existing object to the root or child node vectors depending on the
+   * type of node to be added.
+   *
+   * NOTE : Assumes you have set the name_  and parent_name_ fields
+   * in the passed arg_node2add
+   * Passed: node to add, its index name and whether it is a root.
+   */
+  template <typename TIdx, typename TNode>
+  TNode* CMappedTree<TIdx,TNode>::insert(
+      const TIdx& arg_idx, TNode *arg_node2add,
+      const bool arg_is_root_)
+  {
+    if((arg_is_root_)&&(NULL!=root_node_))
+    {
+#ifdef DEBUG
+      std::cerr<<"\nCBranchingStructure::create() : Error. Tried to insert a root node when one already exists.";
+#endif
+      return NULL;
+    }
+
+    //Add the node.
+    TNode* tLnk = sutil::CMappedList<TIdx,TNode>::create(arg_idx,arg_node2add);
+
+    if((arg_is_root_) && (root_node_==NULL))
+    { root_node_ = tLnk;  }
+
+    return tLnk;
+  }
 
 
   /**

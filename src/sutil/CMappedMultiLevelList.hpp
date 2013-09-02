@@ -64,6 +64,11 @@ namespace sutil
      * the appropriate slot in the vector-list. Uses the copy-constructor. */
     virtual T* create(const Idx& arg_idx, const std::size_t arg_priority);
 
+    /** Adds an existing object to the mapped list and inserts its vector into
+     * the appropriate slot in the vector-list */
+    virtual T* insert(const Idx& arg_idx, T *arg_node2add,
+        const std::size_t arg_priority);
+
 
     /** Assignment operator : Performs a deep-copy (std container requirement).
      * Beware; This can be quite slow. */
@@ -201,6 +206,31 @@ namespace sutil
 
     return tLnk;
   }
+
+
+  /** Adds a node at the given level and returns its address.   */
+  template <typename Idx, typename T>
+  T* CMappedMultiLevelList<Idx,T>::insert(
+      const Idx& arg_idx, T *arg_node2add,
+      const std::size_t arg_priority)
+  {
+    //Add the node.
+    T* tLnk = CMappedList<Idx,T>::create(arg_idx,arg_node2add);
+
+    if(NULL!=tLnk)
+    {
+      for(std::size_t i=mlvec_.size(); i <= arg_priority; i++)
+      {
+        std::vector<T*> tmp;
+        mlvec_.push_back(tmp);
+        pri_levels_++;//Every push back increases pri levels.
+      }
+      mlvec_[arg_priority].push_back(tLnk);
+      map_nodeptr2pri_.insert(std::pair<T*,std::size_t>(tLnk,arg_priority));
+    }
+    return tLnk;
+  }
+
 
   template <typename Idx, typename T>
   bool CMappedMultiLevelList<Idx,T>::
