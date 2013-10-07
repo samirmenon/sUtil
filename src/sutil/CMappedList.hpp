@@ -506,7 +506,7 @@ namespace sutil
     virtual bool sort(const std::vector<Idx> &arg_order);
 
     /** Get the sorting order if there is one */
-    virtual bool sort_get_order(std::vector<Idx>& ret_order)
+    virtual bool sort_get_order(std::vector<Idx>& ret_order) const
     {
       if(flag_is_sorted_)
       { ret_order = sorting_order_; return true;  }
@@ -515,7 +515,7 @@ namespace sutil
     }
 
     /** Whether the list has been sorted or not */
-    virtual bool isSorted()
+    virtual bool isSorted() const
     { return flag_is_sorted_;  }
 
   protected:
