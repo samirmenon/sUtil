@@ -126,7 +126,7 @@ namespace sutil
 
     /** Determines if the child has the other node as an ancestor */
     virtual bool isAncestor(const TNode* arg_node_child,
-        const TIdx* arg_node_ancestor)  const;
+        const TNode* arg_node_ancestor)  const;
   }; //End of template class
 
   /***************************************************************
@@ -341,7 +341,7 @@ namespace sutil
   /** Determines if the child has the other node as an ancestor */
   template <typename TIdx, typename TNode>
     bool CMappedTree<TIdx,TNode>::isAncestor(const TNode* arg_node_child,
-      const TIdx* arg_node_ancestor)  const
+      const TNode* arg_node_ancestor)  const
   {
     const TNode *child = arg_node_child;
     if( NULL == child || NULL == arg_node_ancestor)
