@@ -324,8 +324,8 @@ namespace sutil
   bool CMappedTree<TIdx,TNode>::isAncestor(const TIdx& arg_idx_child,
       const TIdx& arg_idx_ancestor) const
   {
-    const TNode *child = at_const(arg_idx_child);
-    const TNode *ancestor = at_const(arg_idx_child);
+    const TNode *child = this->at_const(arg_idx_child);
+    const TNode *ancestor = this->at_const(arg_idx_child);
     if( NULL == child || NULL == ancestor)
     { return false; }
 
