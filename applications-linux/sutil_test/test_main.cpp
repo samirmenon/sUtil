@@ -29,6 +29,7 @@ sUtil. If not, see <http://www.gnu.org/licenses/>.
 #include "test-singleton.hpp"
 #include "test-mappedlist.hpp"
 #include "test-mapped-tree.hpp"
+#include "test-mapped-graph.hpp"
 #include "test-memcopier.hpp"
 #include "test-dyntypes.hpp"
 #include "test-callbacks.hpp"
@@ -61,6 +62,7 @@ int main(int argc, char** argv)
     cout<<"\n"<<tid++<<" : Run mapped listmap tests";
     cout<<"\n"<<tid++<<" : Run multi-level mapped list tests";
     cout<<"\n"<<tid++<<" : Run mapped tree tests";
+    cout<<"\n"<<tid++<<" : Run mapped graph tests";
     cout<<"\n"<<tid++<<" : Run memcopier tests";
     cout<<"\n"<<tid++<<" : Run dynamic type tests";
     cout<<"\n"<<tid++<<" : Run callback registry tests";
@@ -121,6 +123,17 @@ int main(int argc, char** argv)
       <<sutil::CSystemClock::getSimTime()
       <<"]";
       sutil_test::test_mapped_tree(id);
+    }
+    ++id;
+
+    if((tid==0)||(tid==id))
+    {//Test mapped graph
+      std::cout<<"\n\nTest #"<<id<<". System Clock [Sys time, Sim time :"
+          <<sutil::CSystemClock::getSysTime()
+      <<" "
+      <<sutil::CSystemClock::getSimTime()
+      <<"]";
+      sutil_test::test_mapped_graph(id);
     }
     ++id;
 
