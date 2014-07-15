@@ -19,15 +19,15 @@ You should have received a copy of the GNU Lesser General Public
 License and a copy of the GNU General Public License along with
 sUtil. If not, see <http://www.gnu.org/licenses/>.
  */
-/* \file CMappedGraph.hpp
+/* \file CMappedDirGraph.hpp
  *
  *  Created on: Jul 7, 2014
  *
  *  Copyright (C) 2014, Samir Menon <smenon@stanford.edu>
  */
 
-#ifndef CMAPPEDGRAPH_HPP_
-#define CMAPPEDGRAPH_HPP_
+#ifndef CMAPPEDDIRGRAPH_HPP_
+#define CMAPPEDDIRGRAPH_HPP_
 
 #include <sutil/CMappedTree.hpp>
 
@@ -56,29 +56,32 @@ namespace sutil
    * b) std::vector<TNode*> parent_addrs_;
    * c) std::vector<TNode*> child_addrs_;
    *
-   * NOTE : You MUST call CMappedGraph's create functions.
+   * NOTE : You MUST call CMappedDirGraph's create functions.
    *
    * NOTE 2 : You MUST set the name_ and parent_names_ fields for the objects
    *          in the mapped graph. The linkNodes function requires this
    *          to organize your (unordered) list of nodes into a graph.
    */
   template <typename TIdx, typename TNode>
-  class CMappedGraph : public sutil::CMappedTree<TIdx,TNode>
+  class CMappedDirGraph : public sutil::CMappedTree<TIdx,TNode>
   {
   public:
     /** Base class to simplify graph node specification (parent pointers etc.) */
     struct SMGNodeBase;
 
-    CMappedGraph() : CMappedTree<TIdx,TNode>::CMappedTree() { }
-    virtual ~CMappedGraph() { }
+    CMappedDirGraph() : CMappedTree<TIdx,TNode>::CMappedTree() { }
+    virtual ~CMappedDirGraph() { }
 
     /** Organizes the links into a graph. */
     virtual bool linkNodes();
+
+    /** Generates the spanning tree for the graph and store it in the mapped tree pointer structure*/
+    virtual bool genSpanningTree();
   }; //End of template class
 
   /** Node type base class (sets all the pointers etc. that will be required */
   template <typename TIdx, typename TNode>
-  struct CMappedGraph<TIdx,TNode>::SMGNodeBase : public CMappedTree<TIdx,TNode>::SMTNodeBase
+  struct CMappedDirGraph<TIdx,TNode>::SMGNodeBase : public CMappedTree<TIdx,TNode>::SMTNodeBase
   {
   public:
     /** The parent index in the graph */
@@ -87,6 +90,10 @@ namespace sutil
     TNode* &st_parent_addr_;
     /** The child node address pointers in the graph */
     std::vector<TNode*> &st_child_addrs_;
+    /** These are the edges broken while creating the spanning tree
+     * (useful for solving constraints etc. in closed loop / recurrent systems) */
+    typedef TNode2 TNode[2];
+    std::vector<TNode2> &st_broken_edges_;
 
     /** The parent indices in the graph */
     std::vector<TIdx> gr_parent_names_;
@@ -119,7 +126,7 @@ namespace sutil
    * O(n*log(n))
    */
   template <typename TIdx, typename TNode>
-  bool CMappedGraph<TIdx,TNode>::linkNodes()
+  bool CMappedDirGraph<TIdx,TNode>::linkNodes()
   {
     //Clear previous links (if any)
     typename CMappedList<TIdx,TNode>::iterator it,ite;
@@ -178,16 +185,32 @@ namespace sutil
       }
     }//End of while loop
 
-    //NOTE TODO : Now set up the spanning tree
-
-    //Finally link the spanning tree nodes.
-    bool flag = CMappedTree<TIdx,TNode>::linkNodes();
-    if(false == flag) { return false; }
+    //Now set up the spanning tree and affirm initialization is complete.
+    CMappedTree<TIdx,TNode>::has_been_init_ = genSpanningTree();
 
     //Return the end result
     return CMappedTree<TIdx,TNode>::has_been_init_;
   }
 
+  /** Generates the spanning tree for the graph and store it in the mapped tree pointer structure*/
+  template <typename TIdx, typename TNode>
+  bool CMappedDirGraph<TIdx,TNode>::genSpanningTree()
+  {
+    // Must have a root node to be able to create the spanning tree.
+    // NOTE TODO : Potentially eliminate this requirement and pick a suitable root node.
+    TNode* root = CMappedTree<TIdx,TNode>::getRootNode();
+    if(NULL == root)
+    { return false; }
+
+    std::vector<TNode*> nodes_in_tree;
+    nodes_in_tree.push_back(root);
+
+    //addChildren
+
+    //Start at the root node (which has, presumably, been set)
+    return true;
+  }
+
 }//End of namespace sutil
 
-#endif /*CMAPPEDGRAPH_HPP_*/
+#endif /*CMAPPEDDIRGRAPH_HPP_*/
