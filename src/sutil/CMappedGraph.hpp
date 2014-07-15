@@ -73,6 +73,9 @@ namespace sutil
     bool has_been_init_;
 
   public:
+    /** Base class to simplify graph node specification (parent pointers etc.) */
+    struct SMGNodeBase;
+
     CMappedGraph();
     virtual ~CMappedGraph();
     /** Copy-Constructor : Does a deep copy of the mapped graph to
@@ -120,14 +123,52 @@ namespace sutil
     virtual TNode* getRootNode()
     { return root_node_; }
 
-//    /** Determines if the child has the other node as an ancestor */
-//    virtual bool isAncestor(const TIdx& arg_idx_child,
-//        const TIdx& arg_idx_ancestor)  const;
-//
-//    /** Determines if the child has the other node as an ancestor */
-//    virtual bool isAncestor(const TNode* arg_node_child,
-//        const TNode* arg_node_ancestor)  const;
+    /** Determines if the child has the other node as an ancestor
+     * in the __spanning tree__ of the graph */
+    virtual bool isAncestor(const TIdx& arg_idx_child,
+        const TIdx& arg_idx_ancestor)  const;
+
+    /** Determines if the child has the other node as an ancestor
+     * in the __spanning tree__ of the graph */
+    virtual bool isAncestor(const TNode* arg_node_child,
+        const TNode* arg_node_ancestor)  const;
   }; //End of template class
+
+  /** Node type base class (sets all the pointers etc. that will be required */
+  template <typename TIdx, typename TNode>
+  struct CMappedGraph<TIdx,TNode>::SMGNodeBase
+  {
+  public:
+    /** The index of this node */
+    TIdx name_;
+    /** The parent indices in the graph */
+    std::vector<TIdx> parent_names_;
+    /** The parent node address pointers in the graph */
+    std::vector<TNode*> parent_addrs_;
+    /** The child node address pointers in the graph */
+    std::vector<TNode*> child_addrs_;
+
+    // Data for the spanning tree.
+    /** The parent index in the graph */
+    TIdx st_parent_name_;
+    /** The parent node address pointer in the graph */
+    TNode* st_parent_addr_;
+    /** The child node address pointers in the graph */
+    std::vector<TNode*> st_child_addrs_;
+
+    /** Constructor. Sets stuff to NULL */
+    SMGNodeBase()
+    {
+      name_ = "";
+      parent_names_.clear();
+      parent_addrs_.clear();
+      child_addrs_.clear();
+
+      st_parent_name_ = "";
+      st_parent_addr_ = NULL;
+      st_child_addrs_.clear();
+    }
+  };
 
   /***************************************************************
    *******************************Function Definitions*************
@@ -261,9 +302,8 @@ namespace sutil
   }
 
 
-  /**
-   * Organizes all the links in the graph by connecting them to their
-   * parents.
+  /** Organizes all the links in the graph by connecting them to their
+   * parents. Also creates a spanning tree for the graph.
    *
    * O(n*log(n))
    */
@@ -277,11 +317,17 @@ namespace sutil
         it != ite; ++it)
     {
       TNode& tmp_node = *it;
+
+      //Clear the graph
       tmp_node.parent_addrs_.clear();
       tmp_node.child_addrs_.clear();
+
+      //Clear the spanning tree
+      tmp_node.st_parent_addr_ = NULL;
+      tmp_node.st_child_addrs_.clear();
     }
 
-    //Form the new links
+    //Form the new links for the graph
     for(it = CMappedList<TIdx,TNode>::begin(),
         ite = CMappedList<TIdx,TNode>::end();
         it != ite; ++it)
@@ -325,42 +371,34 @@ namespace sutil
   }
 
 
-//  /** Determines if the child has the other node as an ancestor */
-//  template <typename TIdx, typename TNode>
-//  bool CMappedGraph<TIdx,TNode>::isAncestor(const TIdx& arg_idx_child,
-//      const TIdx& arg_idx_ancestor) const
-//  {
-//    const TNode *child = this->at_const(arg_idx_child);
-//    const TNode *ancestor = this->at_const(arg_idx_child);
-//    if( NULL == child || NULL == ancestor)
-//    { return false; }
-//
-//    while(NULL != child)
-//    {
-//      if(ancestor == child)
-//      { return true; }
-//      child = child->parent_addrs_;
-//    }
-//    return false;
-//  }
-//
-//  /** Determines if the child has the other node as an ancestor */
-//  template <typename TIdx, typename TNode>
-//    bool CMappedGraph<TIdx,TNode>::isAncestor(const TNode* arg_node_child,
-//      const TNode* arg_node_ancestor)  const
-//  {
-//    const TNode *child = arg_node_child;
-//    if( NULL == child || NULL == arg_node_ancestor)
-//    { return false; }
-//
-//    while(NULL != child)
-//    {
-//      if(arg_node_ancestor == child)
-//      { return true; }
-//      child = child->parent_addrs_;
-//    }
-//    return false;
-//  }
+  /** Determines if the child has the other node as an ancestor */
+  template <typename TIdx, typename TNode>
+  bool CMappedGraph<TIdx,TNode>::isAncestor(const TIdx& arg_idx_child,
+      const TIdx& arg_idx_ancestor) const
+  {
+    const TNode *child = this->at_const(arg_idx_child);
+    const TNode *ancestor = this->at_const(arg_idx_child);
+
+    return isAncestor(child, ancestor);
+  }
+
+  /** Determines if the child has the other node as an ancestor */
+  template <typename TIdx, typename TNode>
+  bool CMappedGraph<TIdx,TNode>::isAncestor(const TNode* arg_node_child,
+      const TNode* arg_node_ancestor)  const
+  {
+    const TNode *child = arg_node_child;
+    if( NULL == child || NULL == arg_node_ancestor)
+    { return false; }
+
+    while(NULL != child)
+    {
+      if(arg_node_ancestor == child)
+      { return true; }
+      child = child->st_parent_addr_;
+    }
+    return false;
+  }
 
 }//End of namespace sutil
 
