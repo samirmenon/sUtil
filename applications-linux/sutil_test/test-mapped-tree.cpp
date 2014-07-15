@@ -71,6 +71,11 @@ namespace sutil_test
       { throw(std::runtime_error("Add Node : Failed")); }
       else { std::cout<<"\nTest Result ("<<test_id++<<") : Added Node l1";  }
 
+      //1.b. Link nodes should fail.
+      if(true==mtree.linkNodes())
+      { throw(std::runtime_error("Linked nodes without a root")); }
+      else { std::cout<<"\nTest Result ("<<test_id++<<") : Did not link nodes since root is missing";  }
+
       //2. Test adding the same node again (should fail)
       if(NULL!=mtree.create(node.name_,node,false))
       { throw(std::runtime_error("Added Duplicate Node : Failed")); }
