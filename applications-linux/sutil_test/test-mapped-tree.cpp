@@ -142,7 +142,7 @@ namespace sutil_test
       { throw(std::runtime_error("String-AddressPointer map is incorrect Node l1 : Failed")); }
       else { std::cout<<"\nTest Result ("<<test_id++<<") : String-AddressPointer map verified for Node l1";  }
 
-      //8. Test ancestor and descendant code
+      //8. Test ancestor code
       if( false == mtree.isAncestor(mtree.at("l3"),mtree.at("l1")) )
       { throw(std::runtime_error("Node l1 is not the ancestor of node l3 : Failed")); }
       else { std::cout<<"\nTest Result ("<<test_id++<<") : Node l1 ancestor verified for node l3";  }
@@ -162,6 +162,35 @@ namespace sutil_test
       if( false == mtree.isAncestor(mtree.at("r2"),mtree.at("root")) )
       { throw(std::runtime_error("Root is not the ancestor of node r2 : Failed")); }
       else { std::cout<<"\nTest Result ("<<test_id++<<") : Root ancestor verified for node r2";  }
+
+      if( true == mtree.isAncestor(mtree.at("r2"),mtree.at("l1")) )
+      { throw(std::runtime_error("Node l1 reported to be the ancestor of node r2 : Failed")); }
+      else { std::cout<<"\nTest Result ("<<test_id++<<") : Node l1 is not the ancestor of node r2";  }
+
+      //8. Test descendant code
+      if( false == mtree.isDescendant(mtree.at("l1"),mtree.at("l3")) )
+      { throw(std::runtime_error("Node l3 is not the descendant of node l1 : Failed")); }
+      else { std::cout<<"\nTest Result ("<<test_id++<<") : Node l3 descendant verified for node l1";  }
+
+      if( false == mtree.isDescendant("l1","l3") )
+      { throw(std::runtime_error("Index : Node l3 is not the descendant of node l1 : Failed")); }
+      else { std::cout<<"\nTest Result ("<<test_id++<<") : Index : Node l3 descendant verified for node l1";  }
+
+      if( false == mtree.isDescendant(mtree.at("root"),mtree.at("l2")) )
+      { throw(std::runtime_error("Node l2 is not the descendant of node root : Failed")); }
+      else { std::cout<<"\nTest Result ("<<test_id++<<") : Node l2 descendant verified for node root";  }
+
+      if( false == mtree.isDescendant(mtree.at("root"),mtree.at("l3")) )
+      { throw(std::runtime_error("Node l3 is not the descendant of node root : Failed")); }
+      else { std::cout<<"\nTest Result ("<<test_id++<<") : Node l3 descendant verified for node root";  }
+
+      if( false == mtree.isDescendant(mtree.at("root"),mtree.at("r2")) )
+      { throw(std::runtime_error("Node r2 is not the descendant of node root : Failed")); }
+      else { std::cout<<"\nTest Result ("<<test_id++<<") : Node r2 descendant verified for node root";  }
+
+      if( true == mtree.isDescendant(mtree.at("l1"),mtree.at("r2")) )
+      { throw(std::runtime_error("Node r2 reported to be the descendant of node l1 : Failed")); }
+      else { std::cout<<"\nTest Result ("<<test_id++<<") : Node r2 is not the descendant of node l1";  }
 
       std::cout<<"\nTest #"<<arg_id<<" (Mapped Tree Test) Succeeded.";
     }
