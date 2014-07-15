@@ -72,17 +72,26 @@ namespace sutil
     /** True if the mapped tree has a root. */
     bool has_been_init_;
 
+    /** Copy-Constructor : Does a deep copy of the mapped tree to
+     * get a new one.
+     *
+     * NOTE : This uses the passed mappedlist's iterator construct. */
+    virtual bool deepCopy(const CMappedTree<TIdx,TNode>* arg_mt);
+
   public:
     /** Base class to simplify tree node specification (parent pointers etc.) */
     struct SMTNodeBase;
 
     CMappedTree();
     virtual ~CMappedTree();
-    /** Copy-Constructor : Does a deep copy of the mapped tree to
-     * get a new one.
-     *
-     * NOTE : This uses the passed mappedlist's iterator construct. */
-    virtual bool deepCopy(CMappedTree<TIdx,TNode>* arg_mt);
+
+    /** Assignment operator : Performs a deep-copy (std container requirement).
+     * Beware; This can be quite slow. */
+    virtual CMappedTree<TIdx,TNode>& operator = (const CMappedTree<TIdx,TNode>& arg_rhs)
+    {
+      CMappedTree<TIdx,TNode>::deepCopy(&arg_rhs);
+      return *this;
+    }
 
     /** Adds a node to the mapped tree. The passed node is
      * copied and stored in a vector. A map between the idx and the
@@ -183,14 +192,14 @@ namespace sutil
 
   template <typename TIdx, typename TNode>
   bool CMappedTree<TIdx,TNode>::
-  deepCopy(CMappedTree<TIdx,TNode>* arg_mt)
+  deepCopy(const CMappedTree<TIdx,TNode>* const arg_mt)
   {//Deep copy.
     bool flag;
     flag = sutil::CMappedList<TIdx,TNode>::
         deepCopy(arg_mt);
     if(true == flag)
     {
-      this->root_node_ = CMappedList<TIdx,TNode>::at(arg_mt->getRootNode()->name_);
+      this->root_node_ = CMappedList<TIdx,TNode>::at(arg_mt->getRootNodeConst()->name_);
       this->has_been_init_ = arg_mt->has_been_init_;
       return true;
     }
