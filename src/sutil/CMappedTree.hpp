@@ -315,6 +315,9 @@ namespace sutil
   template <typename TIdx, typename TNode>
   bool CMappedTree<TIdx,TNode>::linkNodes()
   {
+    if(NULL == getRootNodeConst())
+    { return false; }
+
     //Clear previous links (if any)
     typename CMappedList<TIdx,TNode>::iterator it,ite;
     for(it = CMappedList<TIdx,TNode>::begin(),
