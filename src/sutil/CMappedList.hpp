@@ -202,6 +202,18 @@ namespace sutil
      * NOTE : The index starts at 0   */
     virtual const Idx* getIndexAt(const std::size_t arg_idx) const;
 
+    /** Returns the numeric index at the given typed index
+     * in the linked list
+     *
+     * NOTE : The index starts at 0. Returns -1 if node not found. */
+    virtual int getIndexNumericAt(const Idx& arg_idx) const;
+
+    /** Returns the numeric index at the given typed index
+     * in the linked list
+     *
+     * NOTE : The index starts at 0. Returns -1 if node not found.   */
+    virtual int getIndexNumericAt(const T* const arg_node) const;
+
     /** Returns the element at the given numerical index
      * in the linked list (usually useful only for
      * debugging)
@@ -892,6 +904,32 @@ namespace sutil
       return t->id_;
     }
   }
+
+  /** Returns the numeric index at the given typed index in the linked list */
+  template <typename Idx, typename T>
+  int CMappedList<Idx,T>::getIndexNumericAt(const Idx& arg_idx) const
+  {
+    const T *tdes = at_const(arg_idx);
+    return getIndexNumericAt(tdes);
+  }
+
+  /** Returns the numeric index at the given typed index in the linked list*/
+  template <typename Idx, typename T>
+  int CMappedList<Idx,T>::getIndexNumericAt(const T* const arg_node) const
+  {
+    if(NULL == arg_node) { return -1; }
+
+    SMLNode<Idx,T> *t = front_;
+
+    int idx = 0;
+    while(t->data_ != arg_node && NULL!=t)
+    { t = t->next_; idx++;  }
+
+    if(NULL == t){idx = -1;}
+
+    return idx;
+  }
+
 
   template <typename Idx, typename T>
   const T* CMappedList<Idx,T>::at_const(const std::size_t arg_idx) const
