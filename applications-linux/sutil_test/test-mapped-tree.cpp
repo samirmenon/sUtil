@@ -38,27 +38,11 @@ sUtil. If not, see <http://www.gnu.org/licenses/>.
 
 namespace sutil_test
 {
-  /**
-   * Test Structure - Mapped tree Node
-   */
-  struct _testSMTNode
+  /** Test Structure - Mapped tree Node */
+  struct _testSMTNode : public sutil::CMappedTree<std::string,_testSMTNode>::SMTNodeBase
   {
   public:
-    std::string name_;
-    std::string parent_name_;
-    _testSMTNode* parent_addr_;
-    std::vector<_testSMTNode*> child_addrs_;
-
-    /**
-     * Init/Reset the object
-     */
-    void init()
-    {
-      name_ = "";
-      parent_name_ = "";
-      parent_addr_ = NULL;
-      child_addrs_.clear();
-    }
+    int random_data_;
   };
 
   /**
