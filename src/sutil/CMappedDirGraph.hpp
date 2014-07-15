@@ -30,9 +30,11 @@ sUtil. If not, see <http://www.gnu.org/licenses/>.
 #define CMAPPEDDIRGRAPH_HPP_
 
 #include <sutil/CMappedTree.hpp>
+#include <limits>
 
 #ifdef DEBUG
 #include <iostream>
+#include <cassert>
 #endif
 
 namespace sutil
@@ -66,10 +68,14 @@ namespace sutil
   class CMappedDirGraph : public sutil::CMappedTree<TIdx,TNode>
   {
   public:
+    /** These are the edges broken while creating the spanning tree
+     * (useful for solving constraints etc. in closed loop / recurrent systems) */
+    std::vector<std::pair<TNode*, TNode*> > st_broken_edges_;
+
     /** Base class to simplify graph node specification (parent pointers etc.) */
     struct SMGNodeBase;
 
-    CMappedDirGraph() : CMappedTree<TIdx,TNode>::CMappedTree() { }
+    CMappedDirGraph() : CMappedTree<TIdx,TNode>::CMappedTree() { st_broken_edges_.clear(); }
     virtual ~CMappedDirGraph() { }
 
     /** Organizes the links into a graph. */
@@ -84,17 +90,6 @@ namespace sutil
   struct CMappedDirGraph<TIdx,TNode>::SMGNodeBase : public CMappedTree<TIdx,TNode>::SMTNodeBase
   {
   public:
-    /** The parent index in the graph */
-    TIdx &st_parent_name_;
-    /** The parent node address pointer in the graph */
-    TNode* &st_parent_addr_;
-    /** The child node address pointers in the graph */
-    std::vector<TNode*> &st_child_addrs_;
-    /** These are the edges broken while creating the spanning tree
-     * (useful for solving constraints etc. in closed loop / recurrent systems) */
-    struct SEdgeBrokenBySTree{  const TNode *parent, *child;  };
-    std::vector<SEdgeBrokenBySTree> st_broken_edges_;
-
     /** The parent indices in the graph */
     std::vector<TIdx> gr_parent_names_;
     /** The parent node address pointers in the graph */
@@ -103,16 +98,11 @@ namespace sutil
     std::vector<TNode*> gr_child_addrs_;
 
     /** Constructor. Sets stuff to NULL */
-    SMGNodeBase() : CMappedTree<TIdx,TNode>::SMTNodeBase(),
-        st_parent_name_(CMappedTree<TIdx,TNode>::SMTNodeBase::parent_name_),
-        st_parent_addr_(CMappedTree<TIdx,TNode>::SMTNodeBase::parent_addr_),
-        st_child_addrs_(CMappedTree<TIdx,TNode>::SMTNodeBase::child_addrs_)
+    SMGNodeBase() : CMappedTree<TIdx,TNode>::SMTNodeBase()
     {
       gr_parent_names_.clear();
       gr_parent_addrs_.clear();
       gr_child_addrs_.clear();
-
-      // Add a st_ prefix for data related to the spanning tree over this graph.
     }
   };
 
@@ -139,15 +129,10 @@ namespace sutil
       //Clear the graph
       tmp_node.gr_parent_addrs_.clear();
       tmp_node.gr_child_addrs_.clear();
-
-      //Clear the spanning tree
-      tmp_node.st_parent_addr_ = NULL;
-      tmp_node.st_child_addrs_.clear();
     }
 
     //Form the new links for the graph
-    for(it = CMappedList<TIdx,TNode>::begin(),
-        ite = CMappedList<TIdx,TNode>::end();
+    for(it = CMappedList<TIdx,TNode>::begin(), ite = CMappedList<TIdx,TNode>::end();
         it != ite; ++it)
     {
       TNode& tmp_node = *it;
@@ -186,13 +171,41 @@ namespace sutil
     }//End of while loop
 
     //Now set up the spanning tree and affirm initialization is complete.
-    CMappedTree<TIdx,TNode>::has_been_init_ = genSpanningTree();
+    bool flag = genSpanningTree();
+    CMappedTree<TIdx,TNode>::has_been_init_ = false; //Not done yet.
+
+    //Now compute the broken edges.
+    st_broken_edges_.clear();
+    for(it = CMappedList<TIdx,TNode>::begin(), ite = CMappedList<TIdx,TNode>::end();
+        it != ite; ++it)
+    {
+      TNode &tmp_node = *it;
+      typename std::vector<TIdx>::iterator itp,itpe; //Each TIdx corresponds to an entry in : std::vector<TNode*> parent_addrs_;
+      for(itp = tmp_node.gr_parent_names_.begin(), itpe = tmp_node.gr_parent_names_.end();
+          itp!=itpe;++itp)
+      {
+        TIdx &pidx = *itp;
+        TNode* test_parent = CMappedList<TIdx,TNode>::at(pidx);
+        if(test_parent != tmp_node.parent_addr_)
+        {//Found a parent who is disconnected in the spanning tree
+          std::pair<TNode*, TNode*> tmp_broken_edge;
+          tmp_broken_edge.first = test_parent;
+          tmp_broken_edge.second = &tmp_node;
+          st_broken_edges_.push_back(tmp_broken_edge);
+        }
+      }
+    }
+
+    CMappedTree<TIdx,TNode>::has_been_init_ = true; //Finally done.
 
     //Return the end result
     return CMappedTree<TIdx,TNode>::has_been_init_;
   }
 
-  /** Generates the spanning tree for the graph and store it in the mapped tree pointer structure*/
+  /** Generates the spanning tree for the graph and stores it in the mapped tree pointer structure
+   *
+   * NOTE TODO : Make this function more efficient.
+   */
   template <typename TIdx, typename TNode>
   bool CMappedDirGraph<TIdx,TNode>::genSpanningTree()
   {
@@ -202,13 +215,69 @@ namespace sutil
     if(NULL == root)
     { return false; }
 
-    std::vector<TNode*> nodes_in_tree;
-    nodes_in_tree.push_back(root);
+    int graph_sz = CMappedList<TIdx,TNode>::size();
 
-    //addChildren
+    struct SSTreeStruct{  bool in_stree_; TNode* node_; };
+    SSTreeStruct *in_stree = new SSTreeStruct[graph_sz];
+
+    //First populate the node pointers (create a temp data struct to store stuff).
+    typename CMappedTree<TIdx,TNode>::iterator it,ite;
+    int i=0;
+    for(it = CMappedTree<TIdx,TNode>::begin(), ite = CMappedTree<TIdx,TNode>::end(); it!=ite; ++it)
+    {
+      //Get the node's numeric index in the underlying mapped list.
+      i = CMappedList<TIdx,TNode>::getIndexNumericAt(&(*it));
+      //Set values at corresponding position in the data struct array
+      in_stree[i].node_ = &(*it);
+      if(CMappedTree<TIdx,TNode>::getRootNodeConst() == in_stree[i].node_)
+      { in_stree[i].in_stree_ = true; }
+      else
+      { in_stree[i].in_stree_ = false;  }
+    }
+
+    //Now compute the spanning tree.
+    bool complete = false;
+    int nodes_in_stree_pre = 1, nodes_in_stree_curr = 1;//Only root so far.
+    while(false == complete)
+    {
+      //Update distances from the spanning tree for each node
+      for(int i=0; i<graph_sz; ++i)
+      {
+        if(in_stree[i].in_stree_){  continue; } //I'm already in.
+
+        // Else try to find a parent for me.
+        typename std::vector<TIdx>::iterator itp, itpe;
+        for(itp = in_stree[i].node_->gr_parent_names_.begin(),itpe = in_stree[i].node_->gr_parent_names_.end();
+            itp!=itpe;++itp)
+        {
+          TIdx &pidx = *itp;
+          int pnidx = CMappedList<TIdx,TNode>::getIndexNumericAt(pidx); //numeric parent index
+#ifdef DEBUG
+          assert(-1 != pnidx);
+#endif
+          if(in_stree[pnidx].in_stree_)
+          {//Parent is in the spanning tree. Then add me as a child and forget about other parents.
+            in_stree[i].node_->parent_name_ = in_stree[pnidx].node_->name_;
+            in_stree[i].in_stree_ = true;
+            nodes_in_stree_curr++;
+            break;
+          }
+        }
+      }
+
+      // Check if all nodes have been added to the spanning tree.
+      complete = true;
+      for(int i=0; complete && i<graph_sz; ++i)
+      { complete = (complete && in_stree[i].in_stree_); }
+
+      if(false == complete && nodes_in_stree_curr == nodes_in_stree_pre)
+      { return false; }//Could not add any node this time. And not complete. Algo is stuck.
+      else
+      { nodes_in_stree_pre = nodes_in_stree_curr; }
+    }
 
     //Start at the root node (which has, presumably, been set)
-    return true;
+    return CMappedTree<TIdx,TNode>::linkNodes();
   }
 
 }//End of namespace sutil
