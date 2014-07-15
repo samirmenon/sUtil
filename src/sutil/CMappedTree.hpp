@@ -73,6 +73,9 @@ namespace sutil
     bool has_been_init_;
 
   public:
+    /** Base class to simplify tree node specification (parent pointers etc.) */
+    struct SMTNodeBase;
+
     CMappedTree();
     virtual ~CMappedTree();
     /** Copy-Constructor : Does a deep copy of the mapped tree to
@@ -128,6 +131,30 @@ namespace sutil
     virtual bool isAncestor(const TNode* arg_node_child,
         const TNode* arg_node_ancestor)  const;
   }; //End of template class
+
+  /** Node type base class (sets all the pointers etc. that will be required */
+  template <typename TIdx, typename TNode>
+  struct CMappedTree<TIdx,TNode>::SMTNodeBase
+  {
+  public:
+    /** The index of this node */
+    TIdx name_;
+    /** The parent index in the graph */
+    TIdx parent_name_;
+    /** The parent node address pointer in the graph */
+    TNode* parent_addr_;
+    /** The child node address pointers in the graph */
+    std::vector<TNode*> child_addrs_;
+
+    /** Constructor. Sets stuff to NULL */
+    SMTNodeBase()
+    {
+      name_ = "";
+      parent_name_ = "";
+      parent_addr_ = NULL;
+      child_addrs_.clear();
+    }
+  };
 
   /***************************************************************
    *******************************Function Definitions*************
