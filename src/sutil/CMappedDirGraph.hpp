@@ -92,8 +92,8 @@ namespace sutil
     std::vector<TNode*> &st_child_addrs_;
     /** These are the edges broken while creating the spanning tree
      * (useful for solving constraints etc. in closed loop / recurrent systems) */
-    typedef TNode2 TNode[2];
-    std::vector<TNode2> &st_broken_edges_;
+    struct SEdgeBrokenBySTree{  const TNode *parent, *child;  };
+    std::vector<SEdgeBrokenBySTree> st_broken_edges_;
 
     /** The parent indices in the graph */
     std::vector<TIdx> gr_parent_names_;
