@@ -139,7 +139,16 @@ namespace sutil
     /** Determines if the child has the other node as an ancestor */
     virtual bool isAncestor(const TNode* arg_node_child,
         const TNode* arg_node_ancestor)  const;
+
+    /** Determines if the parent has the other node as a descendant in the tree */
+    virtual bool isDescendant(const TIdx& arg_idx_parent,
+        const TIdx& arg_idx_descendant)  const;
+
+    /** Determines if the parent has the other node as a descendant in the tree */
+    virtual bool isDescendant(const TNode* arg_node_parent,
+        const TNode* arg_node_descendant)  const;
   }; //End of template class
+
 
   /** Node type base class (sets all the pointers etc. that will be required */
   template <typename TIdx, typename TNode>
@@ -375,6 +384,36 @@ namespace sutil
       if(arg_node_ancestor == child)
       { return true; }
       child = child->parent_addr_;
+    }
+    return false;
+  }
+
+  /** Determines if the parent has the other node as a descendant */
+  template <typename TIdx, typename TNode>
+  bool CMappedTree<TIdx,TNode>::isDescendant(const TIdx& arg_idx_parent,
+      const TIdx& arg_idx_descendant) const
+  { return isDescendant(this->at_const(arg_idx_parent), this->at_const(arg_idx_descendant)); }
+
+  /** Determines if the parent has the other node as a descendant */
+  template <typename TIdx, typename TNode>
+  bool CMappedTree<TIdx,TNode>::isDescendant(const TNode* arg_node_parent,
+      const TNode* arg_node_descendant)  const
+  {
+    const TNode *parent = arg_node_parent;
+    if( NULL == parent || NULL == arg_node_descendant)
+    { return false; }
+
+    if(NULL != parent)
+    {
+      if(arg_node_descendant == parent)
+      { return true; }
+
+      typename std::vector<TNode*>::const_iterator it,ite;
+      for(it = parent->child_addrs_.begin(), ite = parent->child_addrs_.end(); it!=ite; ++it)
+      {
+        if(isDescendant(*it, arg_node_descendant))
+        { return true;  }
+      }
     }
     return false;
   }
