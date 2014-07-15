@@ -359,20 +359,7 @@ namespace sutil
   template <typename TIdx, typename TNode>
   bool CMappedTree<TIdx,TNode>::isAncestor(const TIdx& arg_idx_child,
       const TIdx& arg_idx_ancestor) const
-  {
-    const TNode *child = this->at_const(arg_idx_child);
-    const TNode *ancestor = this->at_const(arg_idx_child);
-    if( NULL == child || NULL == ancestor)
-    { return false; }
-
-    while(NULL != child)
-    {
-      if(ancestor == child)
-      { return true; }
-      child = child->parent_addr_;
-    }
-    return false;
-  }
+  { return isAncestor(this->at_const(arg_idx_child), this->at_const(arg_idx_child));  }
 
   /** Determines if the child has the other node as an ancestor */
   template <typename TIdx, typename TNode>
