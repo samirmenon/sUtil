@@ -570,6 +570,13 @@ namespace sutil_test
       { std::cout<<"\nTest Result ("<<test_id++<<") Tested sorted indices";  }
       else { throw(std::runtime_error("Unsorted indices in sorted string:string mapped list")); }
 
+      //Test the numeric value function.
+      if(0 != mls2.getIndexNumericAt("1")) { throw(std::runtime_error("Numeric index failed at 0")); }
+      if(1 != mls2.getIndexNumericAt("1b")) { throw(std::runtime_error("Numeric index failed at 1")); }
+      if(2 != mls2.getIndexNumericAt("2")) { throw(std::runtime_error("Numeric index failed at 2")); }
+      if(3 != mls2.getIndexNumericAt(mls2.at("8"))) { throw(std::runtime_error("Numeric index failed at 3")); }
+      std::cout<<"\nTest Result ("<<test_id++<<") Tested numeric index computing function";
+
       std::cout<<"\nTest #"<<arg_id<<" (Mapped list Test) Succeeded.";
     }
     catch(std::exception& ee)
