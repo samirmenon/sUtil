@@ -126,8 +126,8 @@ namespace sutil_test
       else { std::cout<<"\nTest Result ("<<test_id++<<") : Added Node r2 (parent=r1)";  }
 
       if(false==mgraph.linkNodes())
-      { throw(std::runtime_error("Could not link nodes into a \'banching representation\' graph : Failed")); }
-      else { std::cout<<"\nTest Result ("<<test_id++<<") : Linked nodes into a \'banching representation\' graph";  }
+      { throw(std::runtime_error("Could not link nodes into a \'branching representation\' graph : Failed")); }
+      else { std::cout<<"\nTest Result ("<<test_id++<<") : Linked nodes into a \'branching representation\' graph";  }
 
       //Print graph:
       sutil::CMappedDirGraph<std::string,_testSMGNode>::iterator it, ite;
@@ -155,6 +155,29 @@ namespace sutil_test
         }
       }
 
+      //Print spanning tree:
+      std::cout<<"\nTest Result ("<<test_id++<<") : Printing spanning tree for graph :";
+      //Print tree:
+      for(it = mgraph.begin(), ite = mgraph.end();
+          it!=ite; ++it)
+      {
+        printf("\n\tNode: %s. Parent %s. Children:",it->name_.c_str(), it->parent_name_.c_str());
+
+        _testSMGNode& tmp_node = *it;
+        std::vector<_testSMGNode*>::const_iterator it2, ite2;
+        ite2 = tmp_node.child_addrs_.end();
+        for(it2 = tmp_node.child_addrs_.begin();it2!=ite2;++it2)
+        { printf(" %s",(*it2)->name_.c_str()); }
+      }
+
+      //Print broken edges in the spanning tree:
+      std::cout<<"\nTest Result ("<<test_id++<<") : Printing edges broken by the spanning tree for graph :";
+      //Print broken edges:
+      std::vector<std::pair<_testSMGNode*, _testSMGNode*> >::iterator itb, itbe;
+      for(itb = mgraph.st_broken_edges_.begin(), itbe = mgraph.st_broken_edges_.end();
+          itb!=itbe; ++itb)
+      { printf("\n\tEdge: Parent %s -> Child: %s",itb->first->name_.c_str(), itb->second->name_.c_str()); }
+
       //7. Test Map (Idx and name of pointed object should match)
       _testSMGNode* tmp_mapped_node = mgraph.at("l1");
 
@@ -163,9 +186,9 @@ namespace sutil_test
       else { std::cout<<"\nTest Result ("<<test_id++<<") : String-AddressPointer map verified for Node l1";  }
 
       //8. Test ancestor and descendant code
-      if( false == mgraph.isAncestor(mgraph.at("l3"),mgraph.at("l1")) )
-      { throw(std::runtime_error("Node l1 is not the ancestor of node l3 : Failed")); }
-      else { std::cout<<"\nTest Result ("<<test_id++<<") : Node L1 ancestor verified for node l3";  }
+      if( false == mgraph.isAncestor(mgraph.at("l2"),mgraph.at("l1")) )
+      { throw(std::runtime_error("Node l1 is not the ancestor of node l2 : Failed")); }
+      else { std::cout<<"\nTest Result ("<<test_id++<<") : Node l1 ancestor verified for node l2";  }
 
       if( false == mgraph.isAncestor(mgraph.at("l2"),mgraph.at("root")) )
       { throw(std::runtime_error("Root is not the ancestor of node l2 : Failed")); }
@@ -184,13 +207,13 @@ namespace sutil_test
       else { std::cout<<"\nTest Result ("<<test_id++<<") : Node l1 is not the ancestor of node r2";  }
 
       //8. Test descendant code
-      if( false == mgraph.isDescendant(mgraph.at("l1"),mgraph.at("l3")) )
-      { throw(std::runtime_error("Node l3 is not the descendant of node l1 : Failed")); }
-      else { std::cout<<"\nTest Result ("<<test_id++<<") : Node l3 descendant verified for node l1";  }
+      if( false == mgraph.isDescendant(mgraph.at("l1"),mgraph.at("l2")) )
+      { throw(std::runtime_error("Node l2 is not the descendant of node l1 : Failed")); }
+      else { std::cout<<"\nTest Result ("<<test_id++<<") : Node l2 descendant verified for node l1";  }
 
-      if( false == mgraph.isDescendant("l1","l3") )
-      { throw(std::runtime_error("Index : Node l3 is not the descendant of node l1 : Failed")); }
-      else { std::cout<<"\nTest Result ("<<test_id++<<") : Index : Node l3 descendant verified for node l1";  }
+      if( false == mgraph.isDescendant("l1","l2") )
+      { throw(std::runtime_error("Index : Node l2 is not the descendant of node l1 : Failed")); }
+      else { std::cout<<"\nTest Result ("<<test_id++<<") : Index : Node l2 descendant verified for node l1";  }
 
       if( false == mgraph.isDescendant(mgraph.at("root"),mgraph.at("l2")) )
       { throw(std::runtime_error("Node l2 is not the descendant of node root : Failed")); }
