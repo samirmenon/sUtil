@@ -142,6 +142,27 @@ namespace sutil_test
       { throw(std::runtime_error("String-AddressPointer map is incorrect Node l1 : Failed")); }
       else { std::cout<<"\nTest Result ("<<test_id++<<") : String-AddressPointer map verified for Node l1";  }
 
+      //8. Test ancestor and descendant code
+      if( false == mtree.isAncestor(mtree.at("l3"),mtree.at("l1")) )
+      { throw(std::runtime_error("Node l1 is not the ancestor of node l3 : Failed")); }
+      else { std::cout<<"\nTest Result ("<<test_id++<<") : Node l1 ancestor verified for node l3";  }
+
+      if( false == mtree.isAncestor("l3","l1") )
+      { throw(std::runtime_error("Index : Node l1 is not the ancestor of node l3 : Failed")); }
+      else { std::cout<<"\nTest Result ("<<test_id++<<") : Index : Node l1 ancestor verified for node l3";  }
+
+      if( false == mtree.isAncestor(mtree.at("l2"),mtree.at("root")) )
+      { throw(std::runtime_error("Root is not the ancestor of node l2 : Failed")); }
+      else { std::cout<<"\nTest Result ("<<test_id++<<") : Root ancestor verified for node l2";  }
+
+      if( false == mtree.isAncestor(mtree.at("l3"),mtree.at("root")) )
+      { throw(std::runtime_error("Root is not the ancestor of node l3 : Failed")); }
+      else { std::cout<<"\nTest Result ("<<test_id++<<") : Root ancestor verified for node l3";  }
+
+      if( false == mtree.isAncestor(mtree.at("r2"),mtree.at("root")) )
+      { throw(std::runtime_error("Root is not the ancestor of node r2 : Failed")); }
+      else { std::cout<<"\nTest Result ("<<test_id++<<") : Root ancestor verified for node r2";  }
+
       std::cout<<"\nTest #"<<arg_id<<" (Mapped Tree Test) Succeeded.";
     }
     catch (std::exception& ee)
