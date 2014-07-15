@@ -38,27 +38,12 @@ sUtil. If not, see <http://www.gnu.org/licenses/>.
 
 namespace sutil_test
 {
-  /**
-   * Test Structure - Mapped graph Node
-   */
-  struct _testSMGNode
+  /** Test Structure - Mapped graph Node.
+   * Inherit all the pointers etc. */
+  struct _testSMGNode : public sutil::CMappedGraph<std::string,_testSMGNode>::SMGNodeBase
   {
   public:
-    std::string name_;
-    std::vector<std::string> parent_names_;
-    std::vector<_testSMGNode*> parent_addrs_;
-    std::vector<_testSMGNode*> child_addrs_;
-
-    /**
-     * Init/Reset the object
-     */
-    void init()
-    {
-      name_ = "";
-      parent_names_.clear();
-      parent_addrs_.clear();
-      child_addrs_.clear();
-    }
+    int random_data_;
   };
 
   /**
