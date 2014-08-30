@@ -233,7 +233,7 @@ namespace sutil
     if((arg_is_root_)&&(NULL!=root_node_))
     {
 #ifdef DEBUG
-      std::cerr<<"\nCBranchingStructure::create() : Error. Tried to insert a root node when one already exists.";
+      std::cerr<<"\nCMappedTree::create() : Error. Tried to insert a root node when one already exists.";
 #endif
       return NULL;
     }
@@ -261,7 +261,7 @@ namespace sutil
     if((arg_is_root_)&&(NULL!=root_node_))
     {
 #ifdef DEBUG
-      std::cerr<<"\nCBranchingStructure::create() : Error. Tried to insert a root node when one already exists.";
+      std::cerr<<"\nCMappedTree::create() : Error. Tried to insert a root node when one already exists.";
 #endif
       return NULL;
     }
@@ -291,7 +291,7 @@ namespace sutil
     if((arg_is_root_)&&(NULL!=root_node_))
     {
 #ifdef DEBUG
-      std::cerr<<"\nCBranchingStructure::create() : Error. Tried to insert a root node when one already exists.";
+      std::cerr<<"\nCMappedTree::create() : Error. Tried to insert a root node when one already exists.";
 #endif
       return NULL;
     }
@@ -349,7 +349,7 @@ namespace sutil
         if(tmp_node.parent_addr_ == NULL)
         {//No parent -- Ignore this node
 #ifdef DEBUG
-          std::cerr<<"\nCBranchingStructure::linkNodes(): Warning.";
+          std::cerr<<"\nCMappedTree::linkNodes(): Warning.";
           std::cerr<<"Orphan node found: "<<tmp_node.name_<<". Ignoring.";
 #endif
           continue;
