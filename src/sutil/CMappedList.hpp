@@ -314,6 +314,8 @@ namespace sutil
       operator ! ()
       { return *(pos_->id_);  }
 
+      Idx& getIdx(){ return *(pos_->id_);  }
+
       /** Postfix x++. Note that its argument must be an int */
       iterator&
       operator ++(int unused)
@@ -416,6 +418,8 @@ namespace sutil
       const Idx&
       operator ! ()
       { return *(pos_->id_);  }
+
+      const Idx& getIdx(){ return *(pos_->id_);  }
 
       /** Postfix x++. Note that its argument must be an int */
       const_iterator&
