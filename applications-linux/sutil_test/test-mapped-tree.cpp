@@ -204,14 +204,14 @@ namespace sutil_test
       //Some iterator "itcp" (iterator copied mtree) to be used below...
       sutil::CMappedTree<std::string,_testSMTNode>::const_iterator itcp,itcpe;
 
-      std::cout<<"\nTest Result ("<<test_id++<<") : \nOriginal mapped tree's nodes : ";
+      std::cout<<"\nTest Result ("<<test_id++<<") : \n            Original mapped tree's nodes : ";
       // Print all links
       itcp = mtree.begin(); itcpe = mtree.end();
       for(; itcp!=itcpe;++itcp)
       { std::cout<<" "<<(!itcp);  }
       std::cout<<std::flush;
 
-      std::cout<<"\n  Copied static alloc mapped tree's nodes : ";
+      std::cout<<"\n Copied static alloc mapped tree's nodes : ";
       // Print all links
       itcp = mtree2.begin(); itcpe = mtree2.end();
       for(; itcp!=itcpe;++itcp)
