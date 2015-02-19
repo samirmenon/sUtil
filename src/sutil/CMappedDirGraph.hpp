@@ -76,6 +76,18 @@ namespace sutil
     struct SMGNodeBase;
 
     CMappedDirGraph() : CMappedTree<TIdx,TNode>::CMappedTree() { st_broken_edges_.clear(); }
+
+    /** Copy Constructor : Performs a deep-copy (std container requirement).
+     * 'explicit' makes sure that only a CMappedDirGraph can be copied. Ie. Implicit
+     * copy-constructor use is disallowed.*/
+    explicit CMappedDirGraph(const CMappedDirGraph<TIdx,TNode>& arg_dg) :
+        st_broken_edges_(arg_dg.st_broken_edges_)
+    {
+      const CMappedTree<TIdx,TNode> &tmp_ref = arg_dg;
+      CMappedTree<TIdx,TNode>::deepCopy(&tmp_ref);
+    }
+
+
     virtual ~CMappedDirGraph() { }
 
     /** Organizes the links into a graph. */
@@ -83,6 +95,9 @@ namespace sutil
 
     /** Generates the spanning tree for the graph and store it in the mapped tree pointer structure*/
     virtual bool genSpanningTree();
+
+    /** Clears all elements from the tree */
+    virtual bool clear();
   }; //End of template class
 
   /** Node type base class (sets all the pointers etc. that will be required */
@@ -279,6 +294,17 @@ namespace sutil
     //Start at the root node (which has, presumably, been set)
     return CMappedTree<TIdx,TNode>::linkNodes();
   }
+
+  /** Clears all elements from the tree */
+  template <typename TIdx, typename TNode>
+  bool CMappedDirGraph<TIdx,TNode>::clear()
+  {
+    bool flag = CMappedTree<TIdx,TNode>::clear();
+    if(flag)
+    { st_broken_edges_.clear(); }
+    return flag;
+  }
+
 
 }//End of namespace sutil
 

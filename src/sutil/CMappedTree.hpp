@@ -82,7 +82,16 @@ namespace sutil
     /** Base class to simplify tree node specification (parent pointers etc.) */
     struct SMTNodeBase;
 
+    /** Default constructor : Sets defaults */
     CMappedTree();
+
+    /** Copy Constructor : Performs a deep-copy (std container requirement).
+     * 'explicit' makes sure that only a CMappedTree can be copied. Ie. Implicit
+     * copy-constructor use is disallowed.*/
+    explicit CMappedTree(const CMappedTree<TIdx,TNode>& arg_mt)
+    { CMappedTree<TIdx,TNode>::deepCopy(&arg_mt); }
+
+    /** Default destructor : Deallocs stuff */
     virtual ~CMappedTree();
 
     /** Assignment operator : Performs a deep-copy (std container requirement).
@@ -147,6 +156,9 @@ namespace sutil
     /** Determines if the parent has the other node as a descendant in the tree */
     virtual bool isDescendant(const TNode* arg_node_parent,
         const TNode* arg_node_descendant)  const;
+
+    /** Clears all elements from the tree */
+    virtual bool clear();
   }; //End of template class
 
 
@@ -419,6 +431,19 @@ namespace sutil
       }
     }
     return false;
+  }
+
+  /** Clears all elements from the tree */
+  template <typename TIdx, typename TNode>
+  bool CMappedTree<TIdx,TNode>::clear()
+  {
+    bool flag = CMappedList<TIdx,TNode>::clear();
+    if(flag)
+    {
+      root_node_ = NULL;
+      has_been_init_ = false;
+    }
+    return flag;
   }
 
 }//End of namespace sutil
