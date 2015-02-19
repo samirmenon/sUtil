@@ -234,6 +234,41 @@ namespace sutil_test
       for(auto && it : mtree2.getRootNodeConst()->child_addrs_)
       { std::cout<<" "<<it->name_;  }
 
+      // *************************
+      //10. Test deep copy code with assignment
+      if( false == mtree2.clear() || NULL!=mtree2.getRootNodeConst())
+      { throw(std::runtime_error("Could not clear static alloc mapped tree")); }
+      else { std::cout<<"\nTest Result ("<<test_id++<<") : Cleared static alloc copied mapped tree";  }
+
+      std::cout<<"\n Nodes after a clear : ";
+      itcp = mtree2.begin(); itcpe = mtree2.end(); // Print all links
+      for(; itcp!=itcpe;++itcp) { std::cout<<" "<<(!itcp);  }
+      std::cout<<std::flush;
+
+      // Use assignment operator
+      mtree2 = mtree;
+
+      std::cout<<"\n Nodes after re-assignment: ";
+      itcp = mtree2.begin(); itcpe = mtree2.end(); // Print all links
+      for(; itcp!=itcpe;++itcp) { std::cout<<" "<<(!itcp);  }
+      std::cout<<std::flush;
+
+      org_root = mtree.getRootNodeConst();
+      std::cout<<"\nTest Result ("<<test_id++<<") : Original mapped tree's root node pointer : "<<org_root<<std::flush;
+
+      mtree2_root = mtree2.getRootNodeConst();
+      std::cout<<"\nTest Result ("<<test_id++<<") : Static alloc copied mapped tree's root node pointer : "<<mtree2_root<<std::flush;
+
+      std::cout<<"\nTest Result ("<<test_id++<<") : Original mapped tree's root node's children : ";
+      // Print all links
+      for(auto && it : mtree.getRootNodeConst()->child_addrs_)
+      { std::cout<<" "<<it->name_;  }
+
+      std::cout<<"\nTest Result ("<<test_id++<<") : Static alloc copied mapped tree's root node's children : ";
+      // Print all links
+      for(auto && it : mtree2.getRootNodeConst()->child_addrs_)
+      { std::cout<<" "<<it->name_;  }
+
       std::cout<<"\nTest #"<<arg_id<<" (Mapped Tree Test) Succeeded.";
     }
     catch (std::exception& ee)
