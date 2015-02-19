@@ -97,11 +97,102 @@ namespace sutil_test
       { std::cout<<"\nTest Result ("<<test_id++<<") Inserted node 5"; }
 
       t5p=NULL;
+      flag = mappedlist.erase(t5); //This erases the memory..
+      if(false == flag)
+      { throw(std::runtime_error("Failed to delete inserted node (5)"));  }
+      else
+      { std::cout<<"\nTest Result ("<<test_id++<<") Deleted inserted node (5)"; }
+
+      // Test create at end..
+      t5p = new double(); //Create this memory again (the older var is gone)..
+      *t5p = 8080.80;
+      t5 = mappedlist.create(tstr,*t5p,false);
+      if((NULL == t5) || (NULL==mappedlist.at(tstr)) || (*t5 != *t5p) || (*(mappedlist.end()--) != *t5p))
+      { throw(std::runtime_error("Failed to create node 5 at the back of the list"));  }
+      else
+      { std::cout<<"\nTest Result ("<<test_id++<<") Created node 5 at the back of the list"; }
+
+      // Test the list ordering
+      if((*mappedlist.begin() != *t4) || (*(mappedlist.begin()++) != *t3) || (*(mappedlist.begin()++ ++) != *t2) || (*(mappedlist.begin()++ ++ ++) != *t1)
+          || (*(mappedlist.begin()++ ++ ++ ++) != *t5)|| (mappedlist.begin()++ ++ ++ ++ ++ != mappedlist.end()))
+      { throw(std::runtime_error("Could not find node 4, 3, 2, 1, 5, end in order starting from the front of the list"));  }
+      else
+      { std::cout<<"\nTest Result ("<<test_id++<<") Found node 4, 3, 2, 1, 5, end in order starting from the front of the list (as expected)"<<std::flush; }
+
+      // Test the list ordering (reverse)
+      if((*mappedlist.end()-- != *t5) || (*(mappedlist.end()-- --) != *t1) || (*(mappedlist.end()-- -- --) != *t2) || (*(mappedlist.end()-- -- -- --) != *t3)
+          || (*(mappedlist.end()-- -- -- -- --) != *t4) || (mappedlist.end()-- -- -- -- -- != mappedlist.begin()) )
+      { throw(std::runtime_error("Could not find node 5, 1, 2, 3, 4, end in order starting from the back of the list"));  }
+      else
+      { std::cout<<"\nTest Result ("<<test_id++<<") Found node 5, 1, 2, 3, 4, end in order starting from the back of the list (as expected)"<<std::flush; }
+
+      delete t5p;
+      flag = mappedlist.erase(t5);
+      if(false == flag)
+      { throw(std::runtime_error("Failed to delete created node (5)"));  }
+      else
+      { std::cout<<"\nTest Result ("<<test_id++<<") Deleted created node (5)"; }
+
+      // Test the list ordering
+      if((*mappedlist.begin() != *t4) || (*(mappedlist.begin()++) != *t3) || (*(mappedlist.begin()++ ++) != *t2) || (*(mappedlist.begin()++ ++ ++) != *t1)
+          || (mappedlist.begin()++ ++ ++ ++ != mappedlist.end()))
+      { throw(std::runtime_error("Could not find node 4, 3, 2, 1, end in order starting from the front of the list"));  }
+      else
+      { std::cout<<"\nTest Result ("<<test_id++<<") Found node 4, 3, 2, 1, end in order starting from the front of the list (as expected)"<<std::flush; }
+
+      // Test the list ordering (reverse)
+      if((*(mappedlist.end() --) != *t1) || (*(mappedlist.end() -- --) != *t2) || (*(mappedlist.end() -- -- --) != *t3)
+          || (*(mappedlist.end() -- -- -- --) != *t4) || (mappedlist.end() -- -- -- -- != mappedlist.begin()) )
+      { throw(std::runtime_error("Could not find node 1, 2, 3, 4, end in order starting from the back of the list"));  }
+      else
+      { std::cout<<"\nTest Result ("<<test_id++<<") Found node 1, 2, 3, 4, end in order starting from the back of the list (as expected)"<<std::flush; }
+
+      // Test insert at end..
+      t5p = new double(); //Create this memory again (the older var is gone)..
+      *t5p = 8080.80;
+      t5 = mappedlist.insert(tstr,t5p,false);
+      if((NULL == t5) || (NULL==mappedlist.at(tstr)) || (t5 != t5p) || (*t5 != *t5p) || (*(mappedlist.end()--) != *t5p))
+      { throw(std::runtime_error("Failed to insert node 5 at the back of the list"));  }
+      else
+      { std::cout<<"\nTest Result ("<<test_id++<<") Inserted node 5 at the back of the list"; }
+
+      // Test the list ordering
+      flag = (*(mappedlist.begin()++ ++ ++ ++) != *t5);
+      flag = (mappedlist.begin()++ ++ ++ ++ ++ != mappedlist.end());
+
+      if((*mappedlist.begin() != *t4) || (*(mappedlist.begin()++) != *t3) || (*(mappedlist.begin()++ ++) != *t2) || (*(mappedlist.begin()++ ++ ++) != *t1)
+          || (*(mappedlist.begin()++ ++ ++ ++) != *t5)|| (mappedlist.begin()++ ++ ++ ++ ++ != mappedlist.end()))
+      { throw(std::runtime_error("Could not find node 4, 3, 2, 1, 5, end in order starting from the front of the list"));  }
+      else
+      { std::cout<<"\nTest Result ("<<test_id++<<") Found node 4, 3, 2, 1, 5, end in order starting from the front of the list (as expected)"<<std::flush; }
+
+      // Test the list ordering (reverse)
+      if((*mappedlist.end()-- != *t5) || (*(mappedlist.end()-- --) != *t1) || (*(mappedlist.end()-- -- --) != *t2) || (*(mappedlist.end()-- -- -- --) != *t3)
+          || (*(mappedlist.end()-- -- -- -- --) != *t4) || (mappedlist.end()-- -- -- -- -- != mappedlist.begin()) )
+      { throw(std::runtime_error("Could not find node 5, 1, 2, 3, 4, end in order starting from the back of the list"));  }
+      else
+      { std::cout<<"\nTest Result ("<<test_id++<<") Found node 5, 1, 2, 3, 4, end in order starting from the back of the list (as expected)"<<std::flush; }
+
+      t5p = NULL;
       flag = mappedlist.erase(t5);
       if(false == flag)
       { throw(std::runtime_error("Failed to delete inserted node (5)"));  }
       else
       { std::cout<<"\nTest Result ("<<test_id++<<") Deleted inserted node (5)"; }
+
+      // Test the list ordering
+      if((*mappedlist.begin() != *t4) || (*(mappedlist.begin()++) != *t3) || (*(mappedlist.begin()++ ++) != *t2) || (*(mappedlist.begin()++ ++ ++) != *t1)
+          || (mappedlist.begin()++ ++ ++ ++ != mappedlist.end()))
+      { throw(std::runtime_error("Could not find node 4, 3, 2, 1, end in order starting from the front of the list"));  }
+      else
+      { std::cout<<"\nTest Result ("<<test_id++<<") Found node 4, 3, 2, 1, end in order starting from the front of the list (as expected)"<<std::flush; }
+
+      // Test the list ordering (reverse)
+      if((*(mappedlist.end() --) != *t1) || (*(mappedlist.end() -- --) != *t2) || (*(mappedlist.end() -- -- --) != *t3)
+          || (*(mappedlist.end() -- -- -- --) != *t4) || (mappedlist.end() -- -- -- -- != mappedlist.begin()) )
+      { throw(std::runtime_error("Could not find node 1, 2, 3, 4, end in order starting from the back of the list"));  }
+      else
+      { std::cout<<"\nTest Result ("<<test_id++<<") Found node 1, 2, 3, 4, end in order starting from the back of the list (as expected)"<<std::flush; }
 
       //Test 2 : Set values to the 4 nodes.
       *t1 = 1; *t2 = 2; *t3 = 3; *t4 = 4;
