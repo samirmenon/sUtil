@@ -197,6 +197,43 @@ namespace sutil_test
       { throw(std::runtime_error("Node r2 reported to be the descendant of node l1 : Failed")); }
       else { std::cout<<"\nTest Result ("<<test_id++<<") : Node r2 is not the descendant of node l1";  }
 
+      // *************************
+      //9. Test deep copy code
+      sutil::CMappedTree<std::string,_testSMTNode> mtree2(mtree);
+
+      //Some iterator "itcp" (iterator copied mtree) to be used below...
+      sutil::CMappedTree<std::string,_testSMTNode>::const_iterator itcp,itcpe;
+
+      std::cout<<"\nTest Result ("<<test_id++<<") : \nOriginal mapped tree's nodes : ";
+      // Print all links
+      itcp = mtree.begin(); itcpe = mtree.end();
+      for(; itcp!=itcpe;++itcp)
+      { std::cout<<" "<<(!itcp);  }
+      std::cout<<std::flush;
+
+      std::cout<<"\n  Copied static alloc mapped tree's nodes : ";
+      // Print all links
+      itcp = mtree2.begin(); itcpe = mtree2.end();
+      for(; itcp!=itcpe;++itcp)
+      { std::cout<<" "<<(!itcp);  }
+      std::cout<<std::flush;
+
+      const _testSMTNode* org_root = mtree.getRootNodeConst();
+      std::cout<<"\nTest Result ("<<test_id++<<") : Original mapped tree's root node pointer : "<<org_root<<std::flush;
+
+      const _testSMTNode* mtree2_root = mtree2.getRootNodeConst();
+      std::cout<<"\nTest Result ("<<test_id++<<") : Static alloc copied mapped tree's root node pointer : "<<mtree2_root<<std::flush;
+
+      std::cout<<"\nTest Result ("<<test_id++<<") : Original mapped tree's root node's children : ";
+      // Print all links
+      for(auto && it : mtree.getRootNodeConst()->child_addrs_)
+      { std::cout<<" "<<it->name_;  }
+
+      std::cout<<"\nTest Result ("<<test_id++<<") : Static alloc copied mapped tree's root node's children : ";
+      // Print all links
+      for(auto && it : mtree2.getRootNodeConst()->child_addrs_)
+      { std::cout<<" "<<it->name_;  }
+
       std::cout<<"\nTest #"<<arg_id<<" (Mapped Tree Test) Succeeded.";
     }
     catch (std::exception& ee)
