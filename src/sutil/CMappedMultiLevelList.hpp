@@ -80,7 +80,7 @@ namespace sutil
 
     /** Erases an element from the list.
      * Referenced by the element's memory location */
-    virtual bool erase(T* arg_t);
+    virtual bool erase(const T* arg_t);
 
     /** Erases an element from the list.
      * Referenced by its index */
@@ -290,7 +290,7 @@ namespace sutil
   }
 
   template <typename Idx, typename T>
-  bool CMappedMultiLevelList<Idx,T>::erase(T* arg_t)
+  bool CMappedMultiLevelList<Idx,T>::erase(const T* arg_t)
   {
     bool flag;
     if((NULL==CMappedList<Idx,T>::front_) || (NULL==arg_t))

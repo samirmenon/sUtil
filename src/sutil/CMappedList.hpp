@@ -228,7 +228,7 @@ namespace sutil
 
     /** Erases an element from the list.
      * Referenced by the element's memory location   */
-    virtual bool erase(T* arg_t);
+    virtual bool erase(const T* arg_t);
 
     /** Erases an element from the list.
      * Referenced by its std::map index
@@ -768,11 +768,15 @@ namespace sutil
     }
 
     size_++;
-
-    map_.insert( std::pair<Idx, SMLNode<Idx,T> *>(arg_idx, front_) );
     flag_is_sorted_ = false;
 
-    return front_->data_;
+    if((0 == size_) || insert_at_start) {
+      map_.insert( std::pair<Idx, SMLNode<Idx,T> *>(arg_idx, front_) );
+      return front_->data_;
+    } else {
+      map_.insert( std::pair<Idx, SMLNode<Idx,T> *>(arg_idx, back_) );
+      return back_->data_;
+    }
   }
 
   template <typename Idx, typename T>
@@ -801,7 +805,7 @@ namespace sutil
       back_ = tmp;
       front_ = tmp;
       front_->prev_ = NULL;
-      front_->next_ = &null_;
+      front_->next_ = &null_;//Set the end "null" terminator node..
       null_.prev_ = back_;
       tmp = NULL;
     }
@@ -816,7 +820,7 @@ namespace sutil
     else
     {
       back_->next_ = tmp;
-      tmp->next_ = &null_;
+      tmp->next_ = &null_;//Set the end "null" terminator node..
       tmp->prev_ = back_;
       back_ = tmp;
       null_.prev_ = back_;
@@ -825,11 +829,15 @@ namespace sutil
     }
 
     size_++;
-
-    map_.insert( std::pair<Idx, SMLNode<Idx,T> *>(arg_idx, front_) );
     flag_is_sorted_ = false;
 
-    return front_->data_;
+    if((0 == size_) || insert_at_start) {
+      map_.insert( std::pair<Idx, SMLNode<Idx,T> *>(arg_idx, front_) );
+      return front_->data_;
+    } else {
+      map_.insert( std::pair<Idx, SMLNode<Idx,T> *>(arg_idx, back_) );
+      return back_->data_;
+    }
   }
 
   template <typename Idx, typename T>
@@ -986,7 +994,7 @@ namespace sutil
 
 
   template <typename Idx, typename T>
-  bool CMappedList<Idx,T>::erase(T* arg_t)
+  bool CMappedList<Idx,T>::erase(const T* arg_t)
   {
     if((NULL==front_) || (NULL==arg_t))
     { return false;  }
@@ -998,6 +1006,7 @@ namespace sutil
     {
       t = front_;
       front_ = front_->next_;
+      front_->prev_ = NULL;
 
       if(NULL!= t->data_)
       {
@@ -1032,6 +1041,7 @@ namespace sutil
         if(t->data_ == arg_t)
         {
           tpre->next_ = t->next_;
+          tpre->next_->prev_ = tpre;
           if(NULL!= t->data_)
           {
             delete t->data_;
@@ -1040,6 +1050,8 @@ namespace sutil
               map_.erase(*(t->id_));
               delete t->id_;
             }
+            if(back_ == t)//Removing the ending node; have to reassign
+            { back_ = tpre; }
             delete t;
             size_--;
 
