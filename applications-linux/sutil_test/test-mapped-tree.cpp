@@ -269,6 +269,32 @@ namespace sutil_test
       for(auto && it : mtree2.getRootNodeConst()->child_addrs_)
       { std::cout<<" "<<it->name_;  }
 
+      // *************************
+      //11. Test deep copy code with dyn alloc
+      sutil::CMappedTree<std::string,_testSMTNode> *mtree3;
+      mtree3 = new sutil::CMappedTree<std::string,_testSMTNode>(mtree);
+
+      std::cout<<"\nTest Result ("<<test_id++<<") : Copied mapped tree nodes (copy constructor used): ";
+      itcp = mtree3->begin(); itcpe = mtree3->end(); // Print all links
+      for(; itcp!=itcpe;++itcp) { std::cout<<" "<<(!itcp);  }
+      std::cout<<std::flush;
+
+      org_root = mtree.getRootNodeConst();
+      std::cout<<"\nTest Result ("<<test_id++<<") : Original mapped tree's root node pointer : "<<org_root<<std::flush;
+
+      const _testSMTNode* mtree3_root = mtree3->getRootNodeConst();
+      std::cout<<"\nTest Result ("<<test_id++<<") : Dyn alloc copied mapped tree's root node pointer : "<<mtree3_root<<std::flush;
+
+      std::cout<<"\nTest Result ("<<test_id++<<") : Original mapped tree's root node's children : ";
+      // Print all links
+      for(auto && it : mtree.getRootNodeConst()->child_addrs_)
+      { std::cout<<" "<<it->name_;  }
+
+      std::cout<<"\nTest Result ("<<test_id++<<") : Dyn alloc copied mapped tree's root node's children : ";
+      // Print all links
+      for(auto && it : mtree3->getRootNodeConst()->child_addrs_)
+      { std::cout<<" "<<it->name_;  }
+
       std::cout<<"\nTest #"<<arg_id<<" (Mapped Tree Test) Succeeded.";
     }
     catch (std::exception& ee)
