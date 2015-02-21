@@ -88,7 +88,8 @@ namespace sutil
     /** Copy Constructor : Performs a deep-copy (std container requirement).
      * 'explicit' makes sure that only a CMappedTree can be copied. Ie. Implicit
      * copy-constructor use is disallowed.*/
-    explicit CMappedTree(const CMappedTree<TIdx,TNode>& arg_mt)
+    explicit CMappedTree(const CMappedTree<TIdx,TNode>& arg_mt):
+        CMappedList<TIdx,TNode>()
     { CMappedTree<TIdx,TNode>::deepCopy(&arg_mt); }
 
     /** Default destructor : Deallocs stuff */
@@ -195,37 +196,45 @@ namespace sutil
    * Constructor. Sets default values.
    */
   template <typename TIdx, typename TNode>
-  CMappedTree<TIdx,TNode>::CMappedTree()
+  CMappedTree<TIdx,TNode>::CMappedTree() : CMappedList<TIdx,TNode>()
   {
     root_node_ = NULL;
     has_been_init_ = false;
   }
 
-  /**
-   * Does nothing itself.
+  /** Sets stuff to null
    * Calls CMappedList::~CMappedList() which
    * destroys the (dynamically allocated)
    * nodes in the node-vector.
    */
   template <typename TIdx, typename TNode>
   CMappedTree<TIdx,TNode>::~CMappedTree()
-  {}
+  {
+    root_node_ = NULL;
+    has_been_init_ = false;
+  }
 
   template <typename TIdx, typename TNode>
   bool CMappedTree<TIdx,TNode>::
   deepCopy(const CMappedTree<TIdx,TNode>* const arg_mt)
   {//Deep copy.
     bool flag;
-    flag = sutil::CMappedList<TIdx,TNode>::
-        deepCopy(arg_mt);
+    clear(); //Clear stuff (avoids memory leaks).
+    flag = CMappedList<TIdx,TNode>::deepCopy(
+        dynamic_cast<const CMappedTree<TIdx,TNode>*>(arg_mt));
     if(true == flag)
     {
       this->root_node_ = CMappedList<TIdx,TNode>::at(arg_mt->getRootNodeConst()->name_);
-      this->has_been_init_ = arg_mt->has_been_init_;
-      return true;
+      flag = linkNodes();
+      if(flag)
+      {
+        this->has_been_init_ = arg_mt->has_been_init_;
+        return true;
+      }
     }
-    else
-    { return false; }
+    // Else.. Failed for some reason..
+    clear(); //Leave a clean state for the future.
+    return false;
   }
 
   /**
