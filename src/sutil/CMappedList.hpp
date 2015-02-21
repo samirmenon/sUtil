@@ -579,7 +579,7 @@ namespace sutil
     if(this == arg_pmap)
     { return true;  }
 
-    this->~CMappedList(); //Delete everything in the mappedlist
+    clear(); //Delete everything in the mappedlist
 
     /**Set the current mappedlist to the new mappedlist**/
     if(0 == arg_pmap->size_)
@@ -600,7 +600,7 @@ namespace sutil
           std::cerr<<"\nCMappedList<Idx,T>::CMappedList(const CMappedList<Idx,T>& arg_pmap) : ";
           std::cerr<<"ERROR : Deep copy failed to duplicate a node. Resetting mappedlist.";
 #endif
-          this->~CMappedList();//Reset the mappedlist.
+          clear();//Reset the mappedlist.
           return false;
         }
       }
