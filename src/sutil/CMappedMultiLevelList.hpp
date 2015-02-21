@@ -236,7 +236,7 @@ namespace sutil
   bool CMappedMultiLevelList<Idx,T>::
   deepCopy(const CMappedMultiLevelList<Idx,T>* arg_br)
   {//Deep copy.
-    this->~CMappedMultiLevelList(); //Delete everything in the mapped list
+    clear();
 
     /**Set the current mapped list to the new mapped list**/
     if(0 == arg_br->size())
