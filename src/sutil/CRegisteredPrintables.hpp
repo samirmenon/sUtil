@@ -88,7 +88,7 @@ namespace sutil
      * if(0!=printables::get(std::string("YourObject")))
      *   std::cout<<*printables::get(std::string("YourObject"));
      */
-    const SPrintableBase* get(const std::string& arg_name)
+    inline const SPrintableBase* get(const std::string& arg_name)
     {
       SPrintableBase** ret = CRegisteredPrintables::getData()->at(arg_name);
       if(NULL == ret) { return NULL;  }
@@ -111,7 +111,7 @@ namespace sutil
 
     /** Deletes the all registered printable object definitions.
      * Resets the singleton map that stores them. */
-    bool reset() { return CRegisteredPrintables::resetData(); }
+    inline bool reset() { return CRegisteredPrintables::resetData(); }
   }
 
   /** A generic printable object. All database objects should
@@ -140,7 +140,7 @@ namespace sutil
   };
 
   /** Enables printing SPrintableBase objects */
-  std::ostream& operator<<(std::ostream& out, const SPrintableBase& me)
+  inline std::ostream& operator<<(std::ostream& out, const SPrintableBase& me)
   { me.printDataToStream(out); return out; }
 
   /** This helps the map to work properly (through typical object
