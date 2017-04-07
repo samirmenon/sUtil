@@ -92,6 +92,9 @@ namespace sutil
     /** Returns the tasks at a level */
     std::vector<T*>* getSinglePriorityLevel(std::size_t arg_pri);
 
+    /** Returns the tasks at a level */
+    const std::vector<T*>* getSinglePriorityLevelConst(std::size_t arg_pri) const;
+
     std::size_t getNumPriorityLevels() const
     { return pri_levels_; }
 
@@ -426,6 +429,19 @@ namespace sutil
   }
 
   template <typename Idx, typename T>
+  const std::vector<T*>* CMappedMultiLevelList<Idx,T>::
+  getSinglePriorityLevelConst(std::size_t arg_pri) const
+  {
+    if(arg_pri > mlvec_.size())
+    { return NULL;  }
+    else
+    {
+      const std::vector<T*>* ret = &(mlvec_.at(arg_pri));
+      return ret;
+    }
+  }
+
+  template <typename Idx, typename T>
   int CMappedMultiLevelList<Idx,T>::
   getPriorityLevel(T* arg_t)
   {
@@ -460,3 +476,4 @@ namespace sutil
 }//End of namespace sutil
 
 #endif /*CMAPPEDMULTILEVELLIST_HPP_*/
+
