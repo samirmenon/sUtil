@@ -43,6 +43,8 @@ namespace sutil
    *
    * NOTE : You MUST call CMappedDirGraph's create functions.
    *
+   * NOTE : The MappedTree parent addresses etc. will be used for creating a spanning tree
+   *
    * NOTE 2 : You MUST set the name_ and parent_names_ fields for the objects
    *          in the mapped graph. The linkNodes function requires this
    *          to organize your (unordered) list of nodes into a graph.
