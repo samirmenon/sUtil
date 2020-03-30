@@ -37,9 +37,9 @@ namespace sutil
    *
    * The TNode structure MUST contain (in addition to MappedTree's
    * node requirements):
-   * a) std::vector<TIdx> parent_names_;
-   * b) std::vector<TNode*> parent_addrs_;
-   * c) std::vector<TNode*> child_addrs_;
+   * a) std::vector<TIdx> gr_parent_names_;
+   * b) std::vector<TNode*> gr_parent_addrs_;
+   * c) std::vector<TNode*> gr_child_addrs_;
    *
    * NOTE : You MUST call CMappedDirGraph's create functions.
    *
@@ -157,7 +157,7 @@ namespace sutil
           }
           //Link the node
           tmp_node.gr_parent_addrs_.push_back(tmp_node2add);
-          tmp_node2add->child_addrs_.push_back(&tmp_node);
+          tmp_node2add->gr_child_addrs_.push_back(&tmp_node);
 
 #ifdef DEBUG
           std::cerr<<"\n\tAdding child "<<tmp_node.name_
