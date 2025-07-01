@@ -83,6 +83,10 @@ namespace sutil
 
     friend class CDynamicTypeBase<Idx>;
 
+    // Type aliases for modern C++
+    using TypePtr = std::unique_ptr<CDynamicTypeBase<Idx>>;
+    using TypeFactory = CMappedPointerList<Idx,CDynamicTypeBase<Idx>,true>;
+    
   public:
     /** Checks whether this type has been registered with the factory */
     static bool typeRegistered(const Idx& arg_type_name)
