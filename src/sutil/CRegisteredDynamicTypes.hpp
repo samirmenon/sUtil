@@ -177,13 +177,13 @@ namespace sutil
     }
 
     /** Private for the singleton */
-    CRegisteredDynamicTypes();
+    CRegisteredDynamicTypes() = default;
 
     /** Private for the singleton */
-    CRegisteredDynamicTypes(const CRegisteredDynamicTypes&);
+    CRegisteredDynamicTypes(const CRegisteredDynamicTypes&) = delete;
 
     /** Private for the singleton */
-    CRegisteredDynamicTypes& operator= (const CRegisteredDynamicTypes&);
+    CRegisteredDynamicTypes& operator= (const CRegisteredDynamicTypes&) = delete;
   };
 
   /** To support indexed querying for dynamic object allocation:
@@ -194,10 +194,10 @@ namespace sutil
   {
   public:
     /** Must name a type while creating an object */
-    CDynamicTypeBase(const Idx &arg_type_name) : type_name_(arg_type_name){}
+    explicit CDynamicTypeBase(const Idx &arg_type_name) : type_name_(arg_type_name){}
 
     /** Default Destructor : Does nothing */
-    virtual ~CDynamicTypeBase(){}
+    virtual ~CDynamicTypeBase() = default;
 
     /** Dynamically allocates an object of the type that any
      * subclass implements, and returns it. */
