@@ -214,11 +214,11 @@ namespace sutil
 
   private:
     /** Must name a type while creating an object */
-    CDynamicTypeBase();
+    CDynamicTypeBase() = delete;
     /** Must name a type while creating an object */
-    CDynamicTypeBase(const CDynamicTypeBase&);
+    CDynamicTypeBase(const CDynamicTypeBase&) = delete;
     /** Must name a type while creating an object */
-    CDynamicTypeBase& operator= (const CDynamicTypeBase&);
+    CDynamicTypeBase& operator= (const CDynamicTypeBase&) = delete;
   };
 
   /** This enables supporting dynamic typing for arbitrary
@@ -275,11 +275,11 @@ namespace sutil
 
   private:
       /** Must name a type while creating an object */
-      CDynamicType();
+      CDynamicType() = delete;
       /** Must name a type while creating an object */
-      CDynamicType(const CDynamicType&);
+      CDynamicType(const CDynamicType&) = delete;
       /** Must name a type while creating an object */
-      CDynamicType& operator= (const CDynamicType&);
+      CDynamicType& operator= (const CDynamicType&) = delete;
   };
 
 }
