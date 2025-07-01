@@ -205,7 +205,7 @@ namespace sutil
 
     /** Dynamically allocates an object of the type that any
      * subclass implements, and returns it. */
-    virtual void* createObject()=0;
+    virtual void* createObject() = 0;
 
   protected:
     virtual bool registerMyType(CDynamicTypeBase* arg_obj)
@@ -243,8 +243,8 @@ namespace sutil
      * subclass implements, and returns it. */
     virtual void* createObject()
     {
-      Type* obj = new Type();
-      return reinterpret_cast<void*>(obj);
+      auto obj = std::make_unique<Type>();
+      return obj.release();
     }
 
     bool registerType()
