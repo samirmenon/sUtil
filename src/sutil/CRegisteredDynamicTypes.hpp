@@ -14,6 +14,8 @@ See the Readme.txt file in the root folder for licensing information.
 
 #include <sutil/CMappedList.hpp>
 #include <sutil/CSingleton.hpp>
+#include <memory>
+#include <type_traits>
 
 #ifdef DEBUG
 #include <iostream>
