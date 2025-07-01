@@ -89,14 +89,10 @@ namespace sutil
     
   public:
     /** Checks whether this type has been registered with the factory */
-    static bool typeRegistered(const Idx& arg_type_name)
+    static bool typeRegistered(const Idx& arg_type_name) noexcept
     {
-      CDynamicTypeBase<Idx>** mapped_type = singleton::getData()->at(arg_type_name);
-
-      if(NULL == mapped_type)
-      { return false; }
-
-      return true;
+      auto* mapped_type = singleton::getData()->at(arg_type_name);
+      return (mapped_type != nullptr);
     }
 
     /** This function creates new objects of an indexed type (if the
@@ -149,7 +145,7 @@ namespace sutil
 
     /** Deletes the singleton object and creates a new one
      * in its stead */
-    static bool resetDynamicTypes()
+    static bool resetDynamicTypes() noexcept
     { return singleton::resetData(); }
 
   private:
