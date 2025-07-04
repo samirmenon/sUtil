@@ -239,8 +239,8 @@ namespace sutil
      * subclass implements, and returns it. */
     virtual void* createObject()
     {
-      auto obj = std::make_unique<Type>();
-      return obj.release();
+      auto obj = new Type();
+      return static_cast<void*>(obj);
     }
 
     bool registerType()
