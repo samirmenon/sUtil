@@ -171,7 +171,7 @@ namespace sutil
     }//End of while loop
 
     //Now set up the spanning tree and affirm initialization is complete.
-    bool flag = genSpanningTree();
+    genSpanningTree();
     CMappedTree<TIdx,TNode>::has_been_init_ = false; //Not done yet.
 
     //Now compute the broken edges.
