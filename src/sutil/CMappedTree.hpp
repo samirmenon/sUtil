@@ -65,6 +65,10 @@ namespace sutil
     /** Base class to simplify tree node specification (parent pointers etc.) */
     struct SMTNodeBase;
 
+    // Bring base class virtual functions into scope to avoid hiding warnings
+    using CMappedList<TIdx,TNode>::operator=;
+    using CMappedList<TIdx,TNode>::deepCopy;
+
     /** Default constructor : Sets defaults */
     CMappedTree();
 
