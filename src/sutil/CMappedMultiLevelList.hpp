@@ -31,6 +31,11 @@ namespace sutil
   class CMappedMultiLevelList  : public CMappedList<Idx,T>
   {
   public:
+    // Bring base class virtual functions into scope to avoid hiding warnings
+    using CMappedList<Idx,T>::operator=;
+    using CMappedList<Idx,T>::insert;
+    using CMappedList<Idx,T>::create;
+    
     /** Constructor : Empties the data structure */
     CMappedMultiLevelList();
 
