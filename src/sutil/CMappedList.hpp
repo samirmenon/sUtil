@@ -538,6 +538,9 @@ namespace sutil
   public:
     typedef typename CMappedList<Idx,T*>::iterator iterator;
     typedef typename CMappedList<Idx,T*>::const_iterator const_iterator;
+    
+    // Bring base class virtual functions into scope to avoid hiding warnings
+    using CMappedList<Idx,T*>::operator=;
 
     virtual ~CMappedPointerList()
     {
