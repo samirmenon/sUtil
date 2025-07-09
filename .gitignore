@@ -1,0 +1,11 @@
+# Build directories
+build/
+**/build_*/
+applications-linux/*/build_*/
+
+# Generated files
+*.o
+*.so
+*.a
+delme.txt
+sutil_test
