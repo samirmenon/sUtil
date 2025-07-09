@@ -622,7 +622,7 @@ namespace sutil_test
       { throw(std::runtime_error("Failed to sort string:string mapped list")); }
 
       //Test the sorted indices.
-      if(!sit == "1" && !(sit+1) == "1b" && !(sit+2) == "2" && !(sit+3) == "8")
+      if((!sit) == "1" && (!(sit+1)) == "1b" && (!(sit+2)) == "2" && (!(sit+3)) == "8")
       { std::cout<<"\nTest Result ("<<test_id++<<") Tested sorted indices";  }
       else { throw(std::runtime_error("Unsorted indices in sorted string:string mapped list")); }
 
@@ -640,7 +640,7 @@ namespace sutil_test
       { throw(std::runtime_error("Failed to sort string:string mapped list")); }
 
       //Test the sorted indices.
-      if(!sit == "1" && !(sit+1) == "1b" && !(sit+2) == "2" && !(sit+3) == "8")
+      if((!sit) == "1" && (!(sit+1)) == "1b" && (!(sit+2)) == "2" && (!(sit+3)) == "8")
       { std::cout<<"\nTest Result ("<<test_id++<<") Tested sorted indices";  }
       else { throw(std::runtime_error("Unsorted indices in sorted string:string mapped list")); }
 
