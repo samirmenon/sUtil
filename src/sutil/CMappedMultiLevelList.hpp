@@ -35,6 +35,7 @@ namespace sutil
     using CMappedList<Idx,T>::operator=;
     using CMappedList<Idx,T>::insert;
     using CMappedList<Idx,T>::create;
+    using CMappedList<Idx,T>::deepCopy;
     
     /** Constructor : Empties the data structure */
     CMappedMultiLevelList();

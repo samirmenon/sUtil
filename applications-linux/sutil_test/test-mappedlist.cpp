@@ -762,7 +762,7 @@ namespace sutil_test
       //Test 5 : Test access.
       SMapTester tmp_var; tmp_var.pri = 9; tmp_var.val = 6;
       tstr="t1";
-      t2 = mapmllist.create(tstr,tmp_var,tmp_var.pri);
+      t2 = mapmllist.create(tstr,tmp_var,static_cast<std::size_t>(tmp_var.pri));
       if( (NULL==t2) || (tmp_var.pri!=(mapmllist.at("t1")->pri)) ||
           ((tmp_var.pri+1)!=mapmllist.getNumPriorityLevels()))
       { throw(std::runtime_error("Failed to create mlpmap node with copy-constructor"));  }
