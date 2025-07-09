@@ -53,6 +53,10 @@ namespace sutil
   class CMappedDirGraph : public sutil::CMappedTree<TIdx,TNode>
   {
   public:
+    // Bring base class virtual functions into scope to avoid hiding warnings
+    using CMappedTree<TIdx,TNode>::operator=;
+    using CMappedTree<TIdx,TNode>::deepCopy;
+    
     /** These are the edges broken while creating the spanning tree
      * (useful for solving constraints etc. in closed loop / recurrent systems) */
     std::vector<std::pair<TNode*, TNode*> > st_broken_edges_;
