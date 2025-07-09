@@ -680,22 +680,22 @@ namespace sutil_test
 
       // Test 1 : Create nodes
       tstr = "t1";
-      t1 = mapmllist.create(tstr,0); t1->val = 1; t1->pri = 0;
+      t1 = mapmllist.create(tstr,std::size_t(0)); t1->val = 1; t1->pri = 0;
       if((NULL == t1) || (NULL==mapmllist.at(tstr)))
       { throw(std::runtime_error("Failed to create node 1")); }
 
       tstr = "t2";
-      t2 = mapmllist.create(tstr,2); t2->val = 2; t2->pri = 2;
+      t2 = mapmllist.create(tstr,std::size_t(2)); t2->val = 2; t2->pri = 2;
       if((NULL == t2) || (NULL==mapmllist.at(tstr)))
       { throw(std::runtime_error("Failed to create node 2")); }
 
       tstr = "t3";
-      t3 = mapmllist.create(tstr,2); t3->val = 3; t3->pri = 2;
+      t3 = mapmllist.create(tstr,std::size_t(2)); t3->val = 3; t3->pri = 2;
       if((NULL == t3) || (NULL==mapmllist.at(tstr)))
       { throw(std::runtime_error("Failed to create node 3")); }
 
       tstr = "t4";
-      t4 = mapmllist.create(tstr,8); t4->val = 4; t4->pri = 8;
+      t4 = mapmllist.create(tstr,std::size_t(8)); t4->val = 4; t4->pri = 8;
       if((NULL == t4) || (NULL==mapmllist.at(tstr)))
       { throw(std::runtime_error("Failed to create node 4")); }
 
