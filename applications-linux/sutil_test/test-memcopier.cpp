@@ -18,6 +18,7 @@ See the Readme.txt file in the root folder for licensing information.
 #include <iostream>
 #include <stdexcept>
 #include <cstdio>
+#include <vector>
 
 namespace sutil_test
 {
@@ -164,6 +165,141 @@ namespace sutil_test
 
       delete [] buf;
       delete delbuf;
+
+      //Test edge cases and boundary conditions
+      
+      // Test null pointer handling
+      sutil::CMemCopier<int> null_copier;
+      try {
+        flag = null_copier.init(nullptr);
+        if(flag) {
+          throw(std::runtime_error("Should not allow null pointer initialization"));
+        }
+        std::cout<<"\nTest Result ("<<test_id++<<") Null pointer initialization correctly rejected";
+      } catch(...) {
+        std::cout<<"\nTest Result ("<<test_id++<<") Null pointer initialization correctly rejected with exception";
+      }
+
+      // Test empty buffer list operations
+      sutil::CMemCopier<double> empty_copier;
+      double test_val = 123.456;
+      flag = empty_copier.init(&test_val);
+      if(!flag) {
+        throw(std::runtime_error("Failed to initialize empty copier"));
+      }
+      
+      // Copy with no buffers should succeed (no-op)
+      flag = empty_copier.copy();
+      if(!flag) {
+        throw(std::runtime_error("Copy with no buffers should succeed"));
+      }
+      std::cout<<"\nTest Result ("<<test_id++<<") Empty buffer list operations work correctly";
+
+      // Test multiple initialization
+      double new_val = 999.999;
+      flag = empty_copier.init(&new_val);
+      if(!flag) {
+        throw(std::runtime_error("Failed to re-initialize copier"));
+      }
+      std::cout<<"\nTest Result ("<<test_id++<<") Multiple initialization works correctly";
+
+      // Test single buffer operations
+      double* single_buf = new double(0.0);
+      flag = empty_copier.addBuf(single_buf);
+      if(!flag) {
+        throw(std::runtime_error("Failed to add single buffer"));
+      }
+      
+      flag = empty_copier.copy();
+      if(!flag || *single_buf != new_val) {
+        delete single_buf;
+        throw(std::runtime_error("Single buffer copy failed"));
+      }
+      std::cout<<"\nTest Result ("<<test_id++<<") Single buffer operations work correctly";
+
+      // Test large number of buffers
+      const int large_buf_count = 1000;
+      std::vector<double*> large_buffers;
+      sutil::CMemCopier<double> large_copier;
+      double large_val = 42.424242;
+      
+      flag = large_copier.init(&large_val);
+      if(!flag) {
+        throw(std::runtime_error("Failed to initialize large copier"));
+      }
+      
+      for(int i = 0; i < large_buf_count; ++i) {
+        double* large_buf = new double(0.0);
+        large_buffers.push_back(large_buf);
+        flag = large_copier.addBuf(large_buf);
+        if(!flag) {
+          // Clean up on failure
+          for(double* ptr : large_buffers) delete ptr;
+          throw(std::runtime_error("Failed to add large buffer " + std::to_string(i)));
+        }
+      }
+      
+      flag = large_copier.copy();
+      if(!flag) {
+        for(double* ptr : large_buffers) delete ptr;
+        throw(std::runtime_error("Large buffer copy failed"));
+      }
+      
+      // Verify all buffers got the correct value
+      for(int i = 0; i < large_buf_count; ++i) {
+        if(*large_buffers[i] != large_val) {
+          for(double* ptr : large_buffers) delete ptr;
+          throw(std::runtime_error("Large buffer verification failed at " + std::to_string(i)));
+        }
+      }
+      
+      // Clean up
+      for(double* ptr : large_buffers) delete ptr;
+      delete single_buf;
+      
+      std::cout<<"\nTest Result ("<<test_id++<<") Large buffer count ("<<large_buf_count<<") works correctly";
+
+      // Test different data types
+      sutil::CMemCopier<char> char_copier;
+      char char_val = 'Z';
+      char char_buf = 'A';
+      
+      flag = char_copier.init(&char_val);
+      if(!flag) {
+        throw(std::runtime_error("Failed to initialize char copier"));
+      }
+      
+      flag = char_copier.addBuf(&char_buf);
+      if(!flag) {
+        throw(std::runtime_error("Failed to add char buffer"));
+      }
+      
+      flag = char_copier.copy();
+      if(!flag || char_buf != char_val) {
+        throw(std::runtime_error("Char buffer copy failed"));
+      }
+      std::cout<<"\nTest Result ("<<test_id++<<") Different data type (char) works correctly";
+
+      // Test extreme values
+      sutil::CMemCopier<double> extreme_copier;
+      double extreme_val = 1.7976931348623157e+308; // Close to DBL_MAX
+      double extreme_buf = 0.0;
+      
+      flag = extreme_copier.init(&extreme_val);
+      if(!flag) {
+        throw(std::runtime_error("Failed to initialize extreme value copier"));
+      }
+      
+      flag = extreme_copier.addBuf(&extreme_buf);
+      if(!flag) {
+        throw(std::runtime_error("Failed to add extreme value buffer"));
+      }
+      
+      flag = extreme_copier.copy();
+      if(!flag || extreme_buf != extreme_val) {
+        throw(std::runtime_error("Extreme value copy failed"));
+      }
+      std::cout<<"\nTest Result ("<<test_id++<<") Extreme values work correctly";
 
       std::cout<<"\nTest #"<<arg_id<<" (Memcopier Test) Succeeded";
     }

@@ -21,6 +21,7 @@ See the Readme.txt file in the root folder for licensing information.
 #include <stdlib.h>
 #include <sstream>
 #include <stdexcept>
+#include <vector>
 
 namespace sutil_test
 {
@@ -204,6 +205,116 @@ namespace sutil_test
 
       // Smart pointers automatically clean up when they go out of scope
       std::cout<<"\nTest Result ("<<test_id++<<") Smart pointers automatically manage memory";
+
+      //Test 4: Edge cases and error conditions
+      
+      // Test null pointer handling in legacy API
+      void* null_test = nullptr;
+      flag = RegDynTypes::getObjectForType(std::string("SType1"), null_test);
+      if(!flag || null_test == nullptr) {
+        throw(std::runtime_error("Failed to create object with null pointer"));
+      }
+      delete static_cast<SType1*>(null_test);
+      std::cout<<"\nTest Result ("<<test_id++<<") Null pointer handling works correctly";
+
+      // Test invalid object creation (non-null pointer passed)
+      void* non_null_test = reinterpret_cast<void*>(0x1); // Non-null invalid pointer
+      flag = RegDynTypes::getObjectForType(std::string("SType1"), non_null_test);
+      if(flag) {
+        throw(std::runtime_error("Should have failed with non-null pointer"));
+      }
+      std::cout<<"\nTest Result ("<<test_id++<<") Correctly rejected non-null pointer";
+
+      // Test type registration boundary conditions
+      flag = RegDynTypes::typeRegistered(std::string("SType1"));
+      if(!flag) {
+        throw(std::runtime_error("Type SType1 should be registered"));
+      }
+      std::cout<<"\nTest Result ("<<test_id++<<") Type registration check works";
+
+      flag = RegDynTypes::typeRegistered(std::string("NonExistentType"));
+      if(flag) {
+        throw(std::runtime_error("NonExistentType should not be registered"));
+      }
+      std::cout<<"\nTest Result ("<<test_id++<<") Non-existent type correctly not found";
+
+      // Test large object creation stress
+      const int stress_objects = 100;
+      std::vector<void*> stress_ptrs;
+      for(int i = 0; i < stress_objects; ++i) {
+        void* stress_obj = nullptr;
+        flag = RegDynTypes::getObjectForType(std::string("SType3"), stress_obj);
+        if(!flag || stress_obj == nullptr) {
+          throw(std::runtime_error("Stress test object creation failed at iteration " + std::to_string(i)));
+        }
+        stress_ptrs.push_back(stress_obj);
+      }
+      
+      // Clean up stress test objects
+      for(void* ptr : stress_ptrs) {
+        delete static_cast<SType3*>(ptr);
+      }
+      std::cout<<"\nTest Result ("<<test_id++<<") Stress test created and cleaned up "<<stress_objects<<" objects";
+
+      // Test mixed API usage (legacy and modern)
+      void* legacy_obj = nullptr;
+      flag = RegDynTypes::getObjectForType(std::string("SType2"), legacy_obj);
+      if(!flag || legacy_obj == nullptr) {
+        throw(std::runtime_error("Legacy API object creation failed"));
+      }
+      
+      auto modern_obj = RegDynTypes::createObject<SType2>(std::string("SType2"));
+      if(!modern_obj) {
+        delete static_cast<SType2*>(legacy_obj);
+        throw(std::runtime_error("Modern API object creation failed"));
+      }
+      
+      // Both should work independently
+      static_cast<SType2*>(legacy_obj)->x = 999;
+      modern_obj->x = 888;
+      
+      if(static_cast<SType2*>(legacy_obj)->x != 999 || modern_obj->x != 888) {
+        delete static_cast<SType2*>(legacy_obj);
+        throw(std::runtime_error("Mixed API usage failed"));
+      }
+      
+      delete static_cast<SType2*>(legacy_obj);
+      std::cout<<"\nTest Result ("<<test_id++<<") Mixed legacy and modern API usage works";
+
+      // Test empty string type name
+      auto empty_obj = RegDynTypes::createObject<SType1>(std::string(""));
+      if(empty_obj) {
+        throw(std::runtime_error("Empty string type name should fail"));
+      }
+      std::cout<<"\nTest Result ("<<test_id++<<") Empty string type name correctly rejected";
+
+      // Test very long type name
+      std::string long_name(10000, 'A');
+      auto long_name_obj = RegDynTypes::createObject<SType1>(long_name);
+      if(long_name_obj) {
+        throw(std::runtime_error("Very long type name should fail"));
+      }
+      std::cout<<"\nTest Result ("<<test_id++<<") Very long type name correctly rejected";
+
+      // Test reset functionality
+      flag = RegDynTypes::resetDynamicTypes();
+      if(!flag) {
+        throw(std::runtime_error("Reset dynamic types failed"));
+      }
+      
+      // After reset, types should not be registered
+      flag = RegDynTypes::typeRegistered(std::string("SType1"));
+      if(flag) {
+        throw(std::runtime_error("Type should not be registered after reset"));
+      }
+      std::cout<<"\nTest Result ("<<test_id++<<") Reset functionality works correctly";
+
+      // Re-register types after reset
+      flag = type1.registerType();
+      if(!flag) {
+        throw(std::runtime_error("Failed to re-register type after reset"));
+      }
+      std::cout<<"\nTest Result ("<<test_id++<<") Type re-registration after reset works";
 
       std::cout<<"\nTest #"<<arg_id<<" (Dynamic Typing Test) Succeeded.";
     }

@@ -23,6 +23,7 @@ See the Readme.txt file in the root folder for licensing information.
 #include <stdlib.h>
 #include <sstream>
 #include <stdexcept>
+#include <vector>
 
 namespace sutil_test
 {
@@ -650,6 +651,124 @@ namespace sutil_test
       if(2 != mls2.getIndexNumericAt("2")) { throw(std::runtime_error("Numeric index failed at 2")); }
       if(3 != mls2.getIndexNumericAt(mls2.at("8"))) { throw(std::runtime_error("Numeric index failed at 3")); }
       std::cout<<"\nTest Result ("<<test_id++<<") Tested numeric index computing function";
+
+      //Test edge cases and boundary conditions
+      
+      //Test empty list behavior
+      sutil::CMappedList<std::string,int> empty_list;
+      if(empty_list.size() != 0) {
+        throw(std::runtime_error("Empty list should have size 0"));
+      }
+      if(empty_list.begin() != empty_list.end()) {
+        throw(std::runtime_error("Empty list begin should equal end"));
+      }
+      if(empty_list.at("nonexistent") != nullptr) {
+        throw(std::runtime_error("Empty list should return null for any key"));
+      }
+      std::cout<<"\nTest Result ("<<test_id++<<") Empty list behavior correct";
+
+      //Test duplicate key handling
+      sutil::CMappedList<std::string,double> dup_list;
+      double* dup1 = dup_list.create("duplicate");
+      if(dup1 == nullptr) {
+        throw(std::runtime_error("Failed to create first duplicate key"));
+      }
+      *dup1 = 123.45;
+      
+      double* dup2 = dup_list.create("duplicate");
+      if(dup2 != nullptr) {
+        throw(std::runtime_error("Should not allow duplicate key creation"));
+      }
+      std::cout<<"\nTest Result ("<<test_id++<<") Duplicate key correctly rejected";
+
+      //Test large key stress
+      const int large_key_count = 1000;
+      sutil::CMappedList<std::string,int> large_list;
+      std::vector<std::string> large_keys;
+      for(int i = 0; i < large_key_count; ++i) {
+        std::string key = "key_" + std::to_string(i);
+        large_keys.push_back(key);
+        int* val = large_list.create(key);
+        if(val == nullptr) {
+          throw(std::runtime_error("Failed to create large list key at " + std::to_string(i)));
+        }
+        *val = i * 10;
+      }
+      
+      //Verify all keys exist
+      for(int i = 0; i < large_key_count; ++i) {
+        int* val = large_list.at(large_keys[i]);
+        if(val == nullptr || *val != i * 10) {
+          throw(std::runtime_error("Large list key verification failed at " + std::to_string(i)));
+        }
+      }
+      std::cout<<"\nTest Result ("<<test_id++<<") Large list with "<<large_key_count<<" keys works correctly";
+
+      //Test iterator boundary conditions
+      auto large_it = large_list.begin();
+      auto large_end = large_list.end();
+      int count = 0;
+      while(large_it != large_end) {
+        ++large_it;
+        ++count;
+      }
+      if(count != large_key_count) {
+        throw(std::runtime_error("Iterator count mismatch: expected " + std::to_string(large_key_count) + ", got " + std::to_string(count)));
+      }
+      std::cout<<"\nTest Result ("<<test_id++<<") Iterator boundary conditions work correctly";
+
+      //Test erase edge cases
+      flag = large_list.erase("nonexistent_key");
+      if(flag) {
+        throw(std::runtime_error("Should not be able to erase nonexistent key"));
+      }
+      
+      //Erase all elements
+      for(const std::string& key : large_keys) {
+        flag = large_list.erase(key);
+        if(!flag) {
+          throw(std::runtime_error("Failed to erase key: " + key));
+        }
+      }
+      
+      if(large_list.size() != 0) {
+        throw(std::runtime_error("List should be empty after erasing all elements"));
+      }
+      std::cout<<"\nTest Result ("<<test_id++<<") Erase edge cases work correctly";
+
+      //Test very long key names
+      std::string very_long_key(1000, 'X');
+      sutil::CMappedList<std::string,bool> long_key_list;
+      bool* long_val = long_key_list.create(very_long_key);
+      if(long_val == nullptr) {
+        throw(std::runtime_error("Failed to create very long key"));
+      }
+      *long_val = true;
+      
+      bool* retrieved_val = long_key_list.at(very_long_key);
+      if(retrieved_val == nullptr || *retrieved_val != true) {
+        throw(std::runtime_error("Failed to retrieve very long key"));
+      }
+      std::cout<<"\nTest Result ("<<test_id++<<") Very long key names work correctly";
+
+      //Test special character keys
+      std::vector<std::string> special_keys = {"", " ", "\n", "\t", "!@#$%^&*()", "中文", "🙂"};
+      sutil::CMappedList<std::string,int> special_list;
+      for(size_t i = 0; i < special_keys.size(); ++i) {
+        int* special_val = special_list.create(special_keys[i]);
+        if(special_val == nullptr) {
+          throw(std::runtime_error("Failed to create special character key: " + special_keys[i]));
+        }
+        *special_val = static_cast<int>(i);
+      }
+      
+      for(size_t i = 0; i < special_keys.size(); ++i) {
+        int* retrieved = special_list.at(special_keys[i]);
+        if(retrieved == nullptr || *retrieved != static_cast<int>(i)) {
+          throw(std::runtime_error("Failed to retrieve special character key: " + special_keys[i]));
+        }
+      }
+      std::cout<<"\nTest Result ("<<test_id++<<") Special character keys work correctly";
 
       std::cout<<"\nTest #"<<arg_id<<" (Mapped list Test) Succeeded.";
     }

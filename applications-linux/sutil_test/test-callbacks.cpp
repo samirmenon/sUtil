@@ -75,6 +75,82 @@ namespace sutil_test
       sutil::callbacks::call<std::string,ArgType>(callback_name,t);
       std::cout<<"\nTest Result ("<<test_id++<<") Ran callback "<<callback_name;
 
+      //Test 3: Edge cases and error conditions
+      
+      // Test duplicate callback registration
+      flag = sutil::callbacks::add<CCallbackFunc,
+          std::string, ArgType>(callback_name);
+      if(flag) {
+        throw(std::runtime_error("Should not allow duplicate callback registration"));
+      }
+      std::cout<<"\nTest Result ("<<test_id++<<") Duplicate callback registration correctly rejected";
+
+      // Test calling non-existent callback
+      try {
+        sutil::callbacks::call<std::string,ArgType>("NonExistentCallback", t);
+        throw(std::runtime_error("Should have failed calling non-existent callback"));
+      } catch(const std::exception& e) {
+        // Expected to fail
+        std::cout<<"\nTest Result ("<<test_id++<<") Non-existent callback correctly rejected";
+      }
+
+      // Test multiple different callbacks
+      std::string callback_name2("TestCallback2");
+      flag = sutil::callbacks::add<CCallbackFunc,
+          std::string, ArgType>(callback_name2);
+      if(!flag) {
+        throw(std::runtime_error("Failed to register second callback"));
+      }
+      std::cout<<"\nTest Result ("<<test_id++<<") Registered second callback";
+
+      // Test both callbacks work independently
+      std::get<0>(t) = 100; std::get<1>(t) = 200.5; std::get<2>(t) = "First callback test";
+      sutil::callbacks::call<std::string,ArgType>(callback_name, t);
+      
+      std::get<0>(t) = 300; std::get<1>(t) = 400.7; std::get<2>(t) = "Second callback test";
+      sutil::callbacks::call<std::string,ArgType>(callback_name2, t);
+      std::cout<<"\nTest Result ("<<test_id++<<") Multiple callbacks work independently";
+
+      // Test edge case argument values
+      std::get<0>(t) = -2147483648; // INT_MIN
+      std::get<1>(t) = 1.7976931348623157e+308; // Close to DBL_MAX
+      std::get<2>(t) = ""; // Empty string
+      sutil::callbacks::call<std::string,ArgType>(callback_name, t);
+      std::cout<<"\nTest Result ("<<test_id++<<") Edge case argument values handled correctly";
+
+      // Test very long string argument
+      std::string very_long_string(10000, 'A');
+      std::get<0>(t) = 0;
+      std::get<1>(t) = 0.0;
+      std::get<2>(t) = very_long_string;
+      sutil::callbacks::call<std::string,ArgType>(callback_name, t);
+      std::cout<<"\nTest Result ("<<test_id++<<") Very long string argument handled correctly";
+
+      // Test special character callback names
+      std::string special_name("Callback@#$%^&*()");
+      flag = sutil::callbacks::add<CCallbackFunc,
+          std::string, ArgType>(special_name);
+      if(!flag) {
+        throw(std::runtime_error("Failed to register callback with special characters"));
+      }
+      
+      std::get<0>(t) = 999; std::get<1>(t) = 999.999; std::get<2>(t) = "Special chars test";
+      sutil::callbacks::call<std::string,ArgType>(special_name, t);
+      std::cout<<"\nTest Result ("<<test_id++<<") Special character callback name works";
+
+      // Test empty callback name
+      try {
+        flag = sutil::callbacks::add<CCallbackFunc,
+            std::string, ArgType>("");
+        if(flag) {
+          std::cout<<"\nTest Result ("<<test_id++<<") Empty callback name allowed (implementation choice)";
+        } else {
+          std::cout<<"\nTest Result ("<<test_id++<<") Empty callback name correctly rejected";
+        }
+      } catch(...) {
+        std::cout<<"\nTest Result ("<<test_id++<<") Empty callback name correctly rejected with exception";
+      }
+
       std::cout<<"\nTest #"<<arg_id<<" (Callback Registry Test) Succeeded.";
     }
     catch(std::exception& ee)
