@@ -98,11 +98,11 @@ namespace sutil
     /** This function creates new objects of an indexed type (if the
      * type has already been registered with the singleton) */
     static bool getObjectForType(const Idx& arg_type_name,
-        void*& ret_object)
+        void*& ret_object) noexcept
     {
-      CDynamicTypeBase<Idx>** mapped_type = singleton::getData()->at(arg_type_name);
+      auto* mapped_type = singleton::getData()->at(arg_type_name);
 
-      if(NULL == mapped_type)
+      if(nullptr == mapped_type)
       {
 #ifdef DEBUG
         std::cerr<<"\nCRegisteredDynamicTypes::getObjectForType() Error :"
@@ -111,7 +111,7 @@ namespace sutil
         return false;
       }
 
-      if(NULL != ret_object)
+      if(nullptr != ret_object)
       {
 #ifdef DEBUG
         std::cerr<<"\nCRegisteredDynamicTypes::getObjectForType() Error :"
@@ -121,7 +121,7 @@ namespace sutil
       }
 
 
-      if(NULL == *mapped_type)
+      if(nullptr == *mapped_type)
       {
 #ifdef DEBUG
         std::cerr<<"\nCRegisteredDynamicTypes::getObjectForType() Error :"
@@ -131,13 +131,23 @@ namespace sutil
       }
 
       //Be really careful.
-      ret_object = (*mapped_type)->createObject();
-      if(NULL == ret_object)
-      {
+      try {
+        ret_object = (*mapped_type)->createObject();
+        if(nullptr == ret_object)
+        {
+#ifdef DEBUG
+          std::cerr<<"\nCRegisteredDynamicTypes::getObjectForType() Error :"
+              <<" The type object's createObject() function did not work.";
+#endif
+          return false;
+        }
+      }
+      catch(...) {
 #ifdef DEBUG
         std::cerr<<"\nCRegisteredDynamicTypes::getObjectForType() Error :"
-            <<" The type object's createObject() function did not work.";
+            <<" Exception thrown during object creation.";
 #endif
+        return false;
       }
 
       return true;
@@ -152,7 +162,7 @@ namespace sutil
     /** This function registers new dynamic types with the factory.
      * You can get objects of this type by calling the getObjectForType function */
     static bool registerType(const Idx& arg_type_name,
-        CDynamicTypeBase<Idx>* arg_type_object)
+        CDynamicTypeBase<Idx>* arg_type_object) noexcept
     {
       if(typeRegistered(arg_type_name))
       {
@@ -163,8 +173,17 @@ namespace sutil
         return false;
       }
 
-      CDynamicTypeBase<Idx>** t = singleton::getData()->create(arg_type_name,arg_type_object);
-      if(NULL == t)
+      if(nullptr == arg_type_object)
+      {
+#ifdef DEBUG
+        std::cerr<<"\nCRegisteredDynamicTypes::registerType() Error :"
+            <<" Null type object passed for registration.";
+#endif
+        return false;
+      }
+
+      auto* t = singleton::getData()->create(arg_type_name, arg_type_object);
+      if(nullptr == t)
       {
 #ifdef DEBUG
         std::cerr<<"\nCRegisteredDynamicTypes::registerType() Error :"
@@ -237,18 +256,22 @@ namespace sutil
 
     /** Dynamically allocates an object of the type that any
      * subclass implements, and returns it. */
-    virtual void* createObject()
+    virtual void* createObject() override
     {
-      auto obj = new Type();
-      return static_cast<void*>(obj);
+      try {
+        auto obj = new Type();
+        return static_cast<void*>(obj);
+      }
+      catch(...) {
+        return nullptr;
+      }
     }
 
-    bool registerType()
+    bool registerType() noexcept
     {
-      bool flag;
-      flag = CRegisteredDynamicTypes<Idx>::typeRegistered(CDynamicTypeBase<Idx>::type_name_);
+      bool flag = CRegisteredDynamicTypes<Idx>::typeRegistered(CDynamicTypeBase<Idx>::type_name_);
 
-      if(flag)//Type already registered. Do nothing and return false.
+      if(flag) // Type already registered. Do nothing and return false.
       {
 #ifdef DEBUG
         std::cerr<<"\nCDynamicType::registerType() Warning :"
@@ -256,10 +279,9 @@ namespace sutil
 #endif
         return false;
       }
-      else
-      {
-        CDynamicType<Idx,Type>* obj = new CDynamicType<Idx,Type>(
-            CDynamicTypeBase<Idx>::type_name_);
+
+      try {
+        auto obj = new CDynamicType<Idx,Type>(CDynamicTypeBase<Idx>::type_name_);
         flag = CDynamicTypeBase<Idx>::registerMyType(obj);
         if(!flag)
         {
@@ -267,8 +289,16 @@ namespace sutil
           std::cerr<<"\nCDynamicType::registerType() Error :"
               <<" This object's type could not be registered.";
 #endif
+          delete obj; // Clean up on failure
           return false;
         }
+      }
+      catch(...) {
+#ifdef DEBUG
+        std::cerr<<"\nCDynamicType::registerType() Error :"
+            <<" Exception thrown during type registration.";
+#endif
+        return false;
       }
       return true;
     }
