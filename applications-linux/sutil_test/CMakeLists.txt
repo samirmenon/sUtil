@@ -17,6 +17,7 @@ INCLUDE_DIRECTORIES(${SUTIL_INC_DIR})
 SET(ALLSRC ${SUTIL_TEST_DIR}/test_main.cpp
            ${SUTIL_TEST_DIR}/test-callbacks.cpp
            ${SUTIL_TEST_DIR}/test-dyntypes.cpp
+           ${SUTIL_TEST_DIR}/test-dynamic-linking.cpp
            ${SUTIL_TEST_DIR}/test-mappedlist.cpp
            ${SUTIL_TEST_DIR}/test-mapped-tree.cpp
            ${SUTIL_TEST_DIR}/test-mapped-graph.cpp
@@ -47,3 +48,6 @@ SET(CMAKE_VERBOSE_MAKEFILE ON)
 
 #Define the library to be built
 add_executable(sutil_test ${ALLSRC})
+
+#Link required libraries for dynamic linking tests
+target_link_libraries(sutil_test dl)

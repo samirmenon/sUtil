@@ -19,6 +19,7 @@ See the Readme.txt file in the root folder for licensing information.
 #include "test-shmem.hpp"
 #include "test-printables.hpp"
 #include "test-objhist.hpp"
+#include "test-dynamic-linking.hpp"
 
 #include <sutil/CSingleton.hpp>
 #include <sutil/CSystemClock.hpp>
@@ -51,6 +52,7 @@ int main(int argc, char** argv)
     cout<<"\n"<<tid++<<" : Run callback registry tests";
     cout<<"\n"<<tid++<<" : Run shared memory tests";
     cout<<"\n"<<tid++<<" : Run printable tests";
+    cout<<"\n"<<tid++<<" : Run dynamic linking tests";
     cout<<"\n";
   }
   else
@@ -183,6 +185,17 @@ int main(int argc, char** argv)
       <<sutil::CSystemClock::getSimTime()
       <<"]";
       sutil_test::test_objhist(id);
+    }
+    ++id;
+
+    if((tid==0)||(tid==id))
+    {//Test dynamic linking
+      std::cout<<"\n\nTest #"<<id<<". System Clock [Sys time, Sim time :"
+          <<sutil::CSystemClock::getSysTime()
+      <<" "
+      <<sutil::CSystemClock::getSimTime()
+      <<"]";
+      sutil_test::test_dynamic_linking(id);
     }
     ++id;
 
