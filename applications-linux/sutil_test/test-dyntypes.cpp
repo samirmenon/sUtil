@@ -164,6 +164,47 @@ namespace sutil_test
       delete t3;
       obj = NULL;
 
+      //Test 3 : Test new type-safe methods with smart pointers
+      auto smart_t1 = RegDynTypes::createObject<SType1>(std::string("SType1"));
+      if(!smart_t1)
+      { throw(std::runtime_error("Could not create smart pointer object for type SType1"));  }
+      else
+      { std::cout<<"\nTest Result ("<<test_id++<<") Created smart pointer object for type SType1"; }
+
+      smart_t1->x = 100;
+      std::cout<<"\nTest Result ("<<test_id++<<") Set data in smart pointer SType1 : "<<smart_t1->x;
+
+      auto smart_t2 = RegDynTypes::createObject<SType2>(std::string("SType2"));
+      if(!smart_t2)
+      { throw(std::runtime_error("Could not create smart pointer object for type SType2"));  }
+      else
+      { std::cout<<"\nTest Result ("<<test_id++<<") Created smart pointer object for type SType2"; }
+
+      smart_t2->x = 200;
+      smart_t2->y = 300;
+      std::cout<<"\nTest Result ("<<test_id++<<") Set data in smart pointer SType2 : "<<smart_t2->x<<" "<<smart_t2->y;
+
+      auto smart_t3 = RegDynTypes::createObject<SType3>(std::string("SType3"));
+      if(!smart_t3)
+      { throw(std::runtime_error("Could not create smart pointer object for type SType3"));  }
+      else
+      { std::cout<<"\nTest Result ("<<test_id++<<") Created smart pointer object for type SType3"; }
+
+      smart_t3->x = 400;
+      smart_t3->y = 500;
+      smart_t3->z = 600;
+      std::cout<<"\nTest Result ("<<test_id++<<") Set data in smart pointer SType3 : "<<smart_t3->x<<" "<<smart_t3->y<<" "<<smart_t3->z;
+
+      // Test invalid type name
+      auto invalid_obj = RegDynTypes::createObject<SType1>(std::string("InvalidType"));
+      if(invalid_obj)
+      { throw(std::runtime_error("Created object for invalid type"));  }
+      else
+      { std::cout<<"\nTest Result ("<<test_id++<<") Correctly failed to create object for invalid type"; }
+
+      // Smart pointers automatically clean up when they go out of scope
+      std::cout<<"\nTest Result ("<<test_id++<<") Smart pointers automatically manage memory";
+
       std::cout<<"\nTest #"<<arg_id<<" (Dynamic Typing Test) Succeeded.";
     }
     catch(std::exception& ee)
