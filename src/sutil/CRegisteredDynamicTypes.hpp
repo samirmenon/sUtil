@@ -95,6 +95,31 @@ namespace sutil
       return (mapped_type != nullptr);
     }
 
+    /** Type-safe object creation that returns a smart pointer
+     * This is the preferred modern C++ way to create objects.
+     * Returns nullptr if the type is not registered or creation fails.
+     */
+    template<typename T>
+    static std::unique_ptr<T> createObject(const Idx& arg_type_name) noexcept
+    {
+      void* raw_obj = nullptr;
+      if(getObjectForType(arg_type_name, raw_obj))
+      {
+        return std::unique_ptr<T>(static_cast<T*>(raw_obj));
+      }
+      return nullptr;
+    }
+
+    /** Safely delete an object created by getObjectForType
+     * This should be called for every object created by getObjectForType
+     * to prevent memory leaks.
+     */
+    template<typename T>
+    static void deleteObject(T* obj) noexcept
+    {
+      delete obj;
+    }
+
     /** This function creates new objects of an indexed type (if the
      * type has already been registered with the singleton) */
     static bool getObjectForType(const Idx& arg_type_name,
