@@ -22,6 +22,7 @@ SET(ALLSRC ${SUTIL_TEST_DIR}/test_main.cpp
            ${SUTIL_TEST_DIR}/test-mapped-tree.cpp
            ${SUTIL_TEST_DIR}/test-mapped-graph.cpp
            ${SUTIL_TEST_DIR}/test-memcopier.cpp
+           ${SUTIL_TEST_DIR}/test-memcopier-pedantic-simple.cpp
            ${SUTIL_TEST_DIR}/test-objhist.cpp
            ${SUTIL_TEST_DIR}/test-printables.cpp
            ${SUTIL_TEST_DIR}/test-shmem.cpp
