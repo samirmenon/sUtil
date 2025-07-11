@@ -13,7 +13,8 @@ See the Readme.txt file in the root folder for licensing information.
 #define CMEMCOPIER_HPP_
 
 #include <vector>
-#include <string.h>
+#include <algorithm>
+#include <cstring>
 
 namespace sutil
 {
@@ -61,21 +62,21 @@ namespace sutil
   template <typename T>
   CMemCopier<T>::CMemCopier()
   {
-    mem_ = NULL;
+    mem_ = nullptr;
     initialized_ = false;
   }
 
   template <typename T>
   bool CMemCopier<T>::init(const T* arg_mem)
   {
-    if(NULL == arg_mem)
+    if(nullptr == arg_mem)
     { return false; }
     else
     {
       mem_ = arg_mem;
 
       //Set init variable
-      if(buf_.size() > 0)
+      if(!buf_.empty())
       { initialized_ = true; }
 
       return true;
@@ -85,25 +86,19 @@ namespace sutil
   template <typename T>
   bool CMemCopier<T>::addBuf(T* arg_buf)
   {
-    if(NULL!= arg_buf)
+    if(nullptr != arg_buf)
     {
       //Check if the buffer is already there.
-      typename std::vector<T*>::iterator it, ite;
-      ite = buf_.end();
-      for(it= buf_.begin(); it!=ite; ++it)
+      auto it = std::find(buf_.begin(), buf_.end(), arg_buf);
+      if(it != buf_.end())
       {
-        //In case the pointed to memory has been
-        //deallocated.
-        if(arg_buf == (*it))
-        {
-          return false;
-        }
+        return false;
       }
 
       //Add the buffer (new) to the vector
       buf_.push_back(arg_buf);
 
-      if(NULL != mem_)
+      if(nullptr != mem_)
       { initialized_ = true; }
 
       return true;
@@ -115,47 +110,41 @@ namespace sutil
   template <typename T>
   T* CMemCopier<T>::removeBuf(T* arg_buf)
   {
-    typename std::vector<T*>::iterator it, ite;
-    ite = buf_.end();
-    for(it= buf_.begin(); it!=ite; ++it)
+    auto it = std::find(buf_.begin(), buf_.end(), arg_buf);
+    if(it != buf_.end())
     {
-      //In case the pointed to memory has been
-      //deallocated.
-      if(arg_buf == (*it))
-      {
-        buf_.erase(it);
+      buf_.erase(it);
 
-        //Set init variable
-        if(buf_.size() <= 0)
-        { initialized_ = false; }
+      //Set init variable
+      if(buf_.empty())
+      { initialized_ = false; }
 
-        return arg_buf;
-      }
+      return arg_buf;
     }
-    return NULL;
+    return nullptr;
   }
 
   template <typename T>
   bool CMemCopier<T>::copy()
   {
-    if(!initialized_)
+    if(nullptr == mem_)
     { return false; }
-    else
+    
+    // If no buffers, succeed as no-op
+    if(buf_.empty())
+    { return true; }
+    
+    bool flag = true;
+    for(auto* buffer : buf_)
     {
-      bool flag = true;
-      typename std::vector<T*>::iterator it, ite;
-      ite = buf_.end();
-      for(it= buf_.begin(); it!=ite; ++it)
-      {
-        //In case the pointed to memory has been
-        //deallocated.
-        if(NULL == (*it))
-        { flag = false; continue; }
-        else
-        { memcpy((void*)(*it),mem_,sizeof(T));  }
-      }
-      return flag;
+      //In case the pointed to memory has been
+      //deallocated.
+      if(nullptr == buffer)
+      { flag = false; continue; }
+      else
+      { std::memcpy(static_cast<void*>(buffer), mem_, sizeof(T)); }
     }
+    return flag;
   }
 
 }
