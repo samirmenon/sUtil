@@ -14,8 +14,8 @@ See the Readme.txt file in the root folder for licensing information.
 
 #include <sutil/CSingleton.hpp>
 
-#include <unistd.h>
-#include <sys/time.h>
+#include <chrono>
+#include <thread>
 
 namespace sutil
 {
@@ -31,7 +31,7 @@ namespace sutil
     /** Sets the start times for the system and simulation clocks */
     SSystemClock()
     {
-      gettimeofday(&t_start_,NULL);
+      t_start_ = std::chrono::steady_clock::now();
       sim_time_ = 0.0;
     }
 
@@ -43,13 +43,13 @@ namespace sutil
     suClock sim_time_;
 
     /** Initialized to when the clock started */
-    timeval t_start_;
+    std::chrono::steady_clock::time_point t_start_;
 
     /** Private for the clock singleton */
-    SSystemClock(const SSystemClock&);
+    SSystemClock(const SSystemClock&) = delete;
 
     /** Private for the clock singleton */
-    SSystemClock& operator= (const SSystemClock&);
+    SSystemClock& operator= (const SSystemClock&) = delete;
   };
 
   /** A system (global) clock to measure time in seconds.
@@ -66,81 +66,64 @@ namespace sutil
   public:
     /** Forces the singleton to create the object (and hence set the start
      * time through the constructor). */
-    static bool start()
+    static bool start() noexcept
     {
-      if(NULL != CSingleton<SSystemClock>::getData())
+      if(nullptr != CSingleton<SSystemClock>::getData())
       { return true;  }
       else
       {  return false; }
     }
     /** Returns the system time (in seconds) since the clock
      * was initialized. */
-    static suClock getSysTime()
+    static suClock getSysTime() noexcept
     { return computeTDiff(CSingleton<SSystemClock>::getData()->t_start_);  }
 
     /** Returns the current simulation time. Increment this by
      * calling the tick() function */
-    static suClock getSimTime()
+    static suClock getSimTime() noexcept
     { return CSingleton<SSystemClock>::getData()->sim_time_; }
 
-    static void tick(suClock arg_dt)
-    { CSingleton<SSystemClock>::getData()->sim_time_+=arg_dt;  }
+    static void tick(suClock arg_dt) noexcept
+    { CSingleton<SSystemClock>::getData()->sim_time_ += arg_dt;  }
 
     /** Progresses the simulation time (sleeps if there is nothing to do).
      *
      * Works approximately.*/
-    static void progressToTime(const timeval &arg_t_start,
-        const suClock arg_time_increment=1.0,
-        const bool arg_increment_sim_clock=true)
-    {//Sleeps up to when n seconds have elapsed from the passed timeval
+    static void progressToTime(const std::chrono::steady_clock::time_point &arg_t_start,
+        const suClock arg_time_increment = 1.0,
+        const bool arg_increment_sim_clock = true) noexcept
+    {//Sleeps up to when n seconds have elapsed from the passed time point
       suClock time_diff;
       //How much time has passed since the timestamp
       time_diff = computeTDiff(arg_t_start);
 
-      if(time_diff<arg_time_increment)//Sleep for remaining time
-      {	sleep(arg_time_increment-time_diff);	}
+      if(time_diff < arg_time_increment)//Sleep for remaining time
+      {
+        auto sleep_duration = std::chrono::duration<double>(arg_time_increment - time_diff);
+        std::this_thread::sleep_for(sleep_duration);
+      }
 
       if(arg_increment_sim_clock)//Increment the simulation time
-      { CSingleton<SSystemClock>::getData()->sim_time_+=arg_time_increment; }
+      { CSingleton<SSystemClock>::getData()->sim_time_ += arg_time_increment; }
     }
 
   private:
-    /** Computes the elapsed time (in seconds) since the passed timeval */
-    static suClock computeTDiff(const timeval &arg_t_start)
+    /** Computes the elapsed time (in seconds) since the passed time point */
+    static suClock computeTDiff(const std::chrono::steady_clock::time_point &arg_t_start) noexcept
     {
-      //To compute the elapsed time since the clock was initialized.
-      timeval t_tick,t_diff,t_start(arg_t_start);
-
-      //Get the current system time
-      gettimeofday(&t_tick,NULL);
-      if (t_tick.tv_usec < t_start.tv_usec)
-      {
-        long int nsec = (t_start.tv_usec - t_tick.tv_usec) / 1000000 + 1;
-        t_start.tv_usec -= 1000000 * nsec;
-        t_start.tv_sec += nsec;
-      }
-      if (t_tick.tv_usec - t_start.tv_usec > 1000000)
-      {
-        long int nsec = (t_tick.tv_usec - t_start.tv_usec) / 1000000;
-        t_start.tv_usec += 1000000 * nsec;
-        t_start.tv_sec -= nsec;
-      }
-
-      // Compute the remaining time. tv_usec is positive.
-      t_diff.tv_sec = t_tick.tv_sec - t_start.tv_sec;
-      t_diff.tv_usec = t_tick.tv_usec - t_start.tv_usec;
-
-      return static_cast<suClock>(t_diff.tv_sec)+(static_cast<suClock>(t_diff.tv_usec)/1000000.00);
+      auto now = std::chrono::steady_clock::now();
+      auto elapsed = now - arg_t_start;
+      return std::chrono::duration<suClock>(elapsed).count();
     }
 
     /** Private for the singleton */
-    CSystemClock();
+    CSystemClock() = default;
 
     /** Private for the singleton */
-    CSystemClock(const CSystemClock&);
+    CSystemClock(const CSystemClock&) = delete;
 
     /** Private for the singleton */
-    CSystemClock& operator= (const CSystemClock&);
+    CSystemClock& operator= (const CSystemClock&) = delete;
   };
 }
 
