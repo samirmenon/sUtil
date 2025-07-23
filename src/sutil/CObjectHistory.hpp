@@ -61,11 +61,11 @@ namespace sutil
 
   public:
     /** Saves the current state of an object (can be retrieved later) */
-    bool saveObject(const Idx& arg_idx, const StoreObjectsAs& arg_obj)
+    bool saveObject(const Idx& arg_idx, const StoreObjectsAs& arg_obj) noexcept
     {
       bool flag;
       CMappedList<double, StoreObjectsAs>* objl = data_.at(arg_idx);
-      if(NULL == objl)
+      if(nullptr == objl)
       {
         flag = data_.create(arg_idx);
         if(false == flag)
@@ -76,7 +76,7 @@ namespace sutil
           return false;
         }
         objl = data_.at(arg_idx);
-        if(NULL == objl)
+        if(nullptr == objl)
         {
 #ifdef DEBUG
           std::cerr<<"\nCObjectHistory::addObject() : Created an entry for this object but can't access it. Invalid state.";
@@ -99,21 +99,21 @@ namespace sutil
 
     /** Retrieves an object's entire stored history */
     const CMappedList<double, StoreObjectsAs>*
-    getObjectTimeSeries(const Idx& arg_idx)
+    getObjectTimeSeries(const Idx& arg_idx) noexcept
     { return data_.at(arg_idx); }
 
     /** Retrieves an object from a point in its stored history */
     const StoreObjectsAs* getObject(const Idx& arg_idx,
         /** Optional timestamp argument. Ignore this to get the last saved state. */
-        double arg_time = -1.0)
+        double arg_time = -1.0) noexcept
     {
       CMappedList<double, StoreObjectsAs>* objl = data_.at(arg_idx);
-      if(NULL == objl)
+      if(nullptr == objl)
       {
 #ifdef DEBUG
         std::cerr<<"\nCObjectHistory::getObject() : Can't find object in history.";
 #endif
-        return NULL;
+        return nullptr;
       }
       //Now check for the time
       if(arg_time > 0.0)
@@ -123,22 +123,22 @@ namespace sutil
     }
 
     /** Pointer deletion requires knowing the type. The Idx
-     * and StoreObjectsAsdestructors should work. */
-    bool removeObjectTimeSeries(const Idx& arg_idx)
+     * and StoreObjectsAs destructors should work. */
+    bool removeObjectTimeSeries(const Idx& arg_idx) noexcept
     { return data_.erase(arg_idx); }
 
     /** Pointer deletion requires knowing the type. */
     bool removeObject(const Idx& arg_idx,
         /** Optional timestamp argument. Ignore this to remove the last saved state. */
-        double arg_time = -1)
+        double arg_time = -1) noexcept
     {
       CMappedList<double, StoreObjectsAs>* objl = data_.at(arg_idx);
-      if(NULL == objl)
+      if(nullptr == objl)
       {
 #ifdef DEBUG
         std::cerr<<"\nCObjectHistory::removeObject() : Can't find object in history.";
 #endif
-        return NULL;
+        return false;
       }
       //Now check for the time
       if(arg_time > 0.0)
@@ -147,11 +147,17 @@ namespace sutil
       { return objl->erase( objl->at(std::size_t(0)) );  }
     }
 
-    /** Constructor : Does nothing. */
-    CObjectHistory(){}
+    /** Default constructor */
+    CObjectHistory() = default;
 
-    /** Destructor : Does nothing. */
-    ~CObjectHistory(){}
+    /** Default destructor */
+    ~CObjectHistory() = default;
+
+    /** Copy constructor - delete to prevent accidental copying */
+    CObjectHistory(const CObjectHistory&) = delete;
+
+    /** Assignment operator - delete to prevent accidental assignment */
+    CObjectHistory& operator=(const CObjectHistory&) = delete;
   };
 
 } /* namespace sutil */
